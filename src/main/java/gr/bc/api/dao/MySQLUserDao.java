@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.dao;
+package gr.bc.api.dao;
 
-import com.bc.dao.interfaces.IUserDao;
-import com.bc.entity.User;
-import com.bc.util.Constants;
-import com.bc.util.MySQLHelper;
+import gr.bc.api.dao.interfaces.IUserDao;
+import gr.bc.api.entity.User;
+import gr.bc.api.util.Constants;
+import gr.bc.api.util.MySQLHelper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

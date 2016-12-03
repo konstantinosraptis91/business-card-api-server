@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.service;
+package gr.bc.api.service;
 
-import com.bc.dao.interfaces.IUserDao;
-import com.bc.entity.User;
+import gr.bc.api.dao.interfaces.IUserDao;
+import gr.bc.api.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

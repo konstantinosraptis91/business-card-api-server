@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.entity;
+package gr.bc.api.entity;
 
 /**
  *
  * @author konstantinos
  */
 public class User {
-    
-    private int id;
+   
     private String email;
     private String password;
     private String firstName;
@@ -21,20 +20,11 @@ public class User {
         
     }
 
-    public User(int id, String email, String password, String firstName, String lastName) {
-        this.id = id;
+    public User(String email, String password, String firstName, String lastName) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getEmail() {
@@ -71,7 +61,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + '}';
+        return "User{" + "email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + '}';
     }
-        
+       
 }

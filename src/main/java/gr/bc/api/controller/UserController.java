@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.controller;
+package gr.bc.api.controller;
 
-import com.bc.entity.User;
-import com.bc.service.UserService;
+import gr.bc.api.entity.User;
+import gr.bc.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,8 +31,8 @@ public class UserController {
     }
     
     @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void addUser(@RequestBody User user) {
-        userService.addUser(user);
+    public void updateUser(@RequestBody User user) {
+        // userService.updateUser(user);
     }
     
 }

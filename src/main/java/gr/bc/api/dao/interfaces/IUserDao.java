@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.dao.interfaces;
+package gr.bc.api.dao.interfaces;
 
-import com.bc.entity.User;
+import gr.bc.api.entity.User;
 
 /**
  *

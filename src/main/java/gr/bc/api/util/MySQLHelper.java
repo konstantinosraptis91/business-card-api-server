@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.util;
+package gr.bc.api.util;
 
 /**
  *
@@ -12,9 +12,8 @@ package com.bc.util;
 public class MySQLHelper {
     
     // tables
-    public static final String USER_TABLE = "_user";
-    public static final String APPLICATION_TABLE = "_application";
-    
+    public static final String USER_TABLE = "user";
+        
     // user table attributes
     public static final String USER_ID = "user_id";
     public static final String USER_EMAIL = "user_email";

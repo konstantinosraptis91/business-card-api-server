@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bc.util;
+package gr.bc.api.util;
 
 import java.text.SimpleDateFormat;
 
