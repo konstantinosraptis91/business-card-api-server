@@ -16,7 +16,7 @@ apply plugin: 'application'
 mainClassName = 'gr.bc.api.Application'
 
 jar {
-    baseName = 'Invoice-Parser'
+    baseName = 'bc-wallet-server'
     version =  '0.1.0'
 }
 

@@ -7,6 +7,7 @@ package gr.bc.api.controller;
 
 import gr.bc.api.entity.User;
 import gr.bc.api.service.UserService;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,36 +24,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public void addUser(@RequestBody User user) {
         userService.addUser(user);
     }
-    
+
     @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public int updateUser(@RequestBody User user) {
-        return  userService.updateUser(user);
+        return userService.updateUser(user);
     }
-    
-     @RequestMapping(value="/{email}", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = "/{email}", method = RequestMethod.DELETE)
     public int deleteUser(@PathVariable("email") String email) {
-        return userService.deleteUser(email);
+        return userService.deleteUser(new String(Base64.decodeBase64(email)));
     }
-    
-    @RequestMapping(value="/{email}", method = RequestMethod.GET, 
+
+    @RequestMapping(value = "/{email}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public User getUserByEmail(@PathVariable("email") String email) {
-        return userService.getUserByEmail(email);
+        return userService.getUserByEmail(new String(Base64.decodeBase64(email)));
     }
-        
-    @RequestMapping(method = RequestMethod.GET, 
+
+    @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getUserByName(@RequestParam(value = "firstName", required = false) String firstName,
-                              @RequestParam(value = "lastName", required = false) String lastName) {
+    public User getUserByName(
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName) {
         return userService.getUserByName(firstName, lastName);
     }
-    
+
 }
