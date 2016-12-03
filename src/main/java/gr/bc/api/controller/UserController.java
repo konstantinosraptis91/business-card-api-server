@@ -9,9 +9,11 @@ import gr.bc.api.entity.User;
 import gr.bc.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author konstantinos
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
     
     @Autowired
@@ -31,8 +33,26 @@ public class UserController {
     }
     
     @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUser(@RequestBody User user) {
-        // userService.updateUser(user);
+    public int updateUser(@RequestBody User user) {
+        return  userService.updateUser(user);
+    }
+    
+     @RequestMapping(value="/{email}", method = RequestMethod.DELETE)
+    public int deleteUser(@PathVariable("email") String email) {
+        return userService.deleteUser(email);
+    }
+    
+    @RequestMapping(value="/{email}", method = RequestMethod.GET, 
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public User getUserByEmail(@PathVariable("email") String email) {
+        return userService.getUserByEmail(email);
+    }
+        
+    @RequestMapping(method = RequestMethod.GET, 
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public User getUserByName(@RequestParam(value = "firstName", required = false) String firstName,
+                              @RequestParam(value = "lastName", required = false) String lastName) {
+        return userService.getUserByName(firstName, lastName);
     }
     
 }

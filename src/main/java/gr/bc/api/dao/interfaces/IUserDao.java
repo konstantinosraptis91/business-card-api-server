@@ -16,5 +16,11 @@ public interface IUserDao {
     int addUser(User user);
     
     User getUserByEmail(String email);
+
+    int updateUser(User user);
+
+    int deleteUser(String email);
+
+    User getUserByName(String firstName, String lastName);
       
 }

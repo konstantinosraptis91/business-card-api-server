@@ -26,8 +26,20 @@ public class UserService {
         return userDao.addUser(user);
     }
     
+    public int updateUser(User user) {
+        return userDao.updateUser(user);
+    }
+    
+    public int deleteUser(String email) {
+        return userDao.deleteUser(email);
+    }
+    
     public User getUserByEmail(String email) {
         return userDao.getUserByEmail(email);
+    }
+        
+    public User getUserByName(String firstName, String lastName) {
+        return userDao.getUserByName(firstName, lastName);
     }
     
 }

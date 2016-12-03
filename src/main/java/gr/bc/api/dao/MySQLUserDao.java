@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -49,8 +50,56 @@ public class MySQLUserDao implements IUserDao {
     }
 
     @Override
+    public int updateUser(User user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int deleteUser(String email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
     public User getUserByEmail(String email) {
-        return null;
+        User user = new User();
+        try {
+           user = (User) jdbcTemplate.queryForObject("SELECT * FROM " 
+                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_EMAIL + " = " + "'" + email + "'", 
+                    (rs, rowNum) -> {
+                        User u = new User();
+                        u.setId(rs.getInt(MySQLHelper.USER_ID));
+                        u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                        u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                        u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                        u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        return u;
+                    }); 
+        } catch (DataAccessException e) {
+            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return user;
+    }
+    
+    @Override
+    public User getUserByName(String firstName, String lastName) {
+        User user = new User();
+        try {
+           user = (User) jdbcTemplate.queryForObject("SELECT * FROM " 
+                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'"
+                    + " AND " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'", 
+                    (rs, rowNum) -> {
+                        User u = new User();
+                        u.setId(rs.getInt(MySQLHelper.USER_ID));
+                        u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                        // u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                        u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                        u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        return u;
+                    }); 
+        } catch (DataAccessException e) {
+            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return user;
     }
     
 }
