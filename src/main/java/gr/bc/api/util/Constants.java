@@ -12,22 +12,7 @@ import java.text.SimpleDateFormat;
  * @author konstantinos
  */
 public class Constants {
-    
-    public enum SCOPE {
-        READ("READ"), WRITE("WRITE");
-        
-        private final String value;
-        
-        SCOPE(String value) {
-            this.value = value;
-        }
-        
-        public String getValue() {
-            return value;
-        }
-        
-    }
-    
+       
     public static final String APPLICATION_NAME = "bc_wallet";
     public static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
     

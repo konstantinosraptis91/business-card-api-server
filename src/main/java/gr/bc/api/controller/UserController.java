@@ -7,7 +7,8 @@ package gr.bc.api.controller;
 
 import gr.bc.api.entity.User;
 import gr.bc.api.service.UserService;
-import org.apache.tomcat.util.codec.binary.Base64;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,33 +29,56 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void addUser(@RequestBody User user) {
-        userService.addUser(user);
-    }
-
-    @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public int updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
-    }
-
-    @RequestMapping(value = "/{email}", method = RequestMethod.DELETE)
-    public int deleteUser(@PathVariable("email") String email) {
-        return userService.deleteUser(new String(Base64.decodeBase64(email)));
-    }
-
-    @RequestMapping(value = "/{email}", method = RequestMethod.GET,
+    // ADD USER    
+    @RequestMapping(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getUserByEmail(@PathVariable("email") String email) {
-        return userService.getUserByEmail(new String(Base64.decodeBase64(email)));
+    public User addUser(@RequestBody User user) {
+        return userService.addUser(user);
     }
 
-    @RequestMapping(method = RequestMethod.GET,
+    // UPDATE USER
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getUserByName(
+    public User updateUser(@PathVariable("id") int id, @RequestBody User user) {
+        return userService.updateUser(id, user);
+    }
+
+    // DELETE USER
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE)
+    public void deleteUser(@PathVariable("id") int id) {
+        userService.deleteUser(id);
+    }
+
+    // GET USER (email, first name, last name)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<User> getUsers(
+            @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "firstName", required = false) String firstName,
             @RequestParam(value = "lastName", required = false) String lastName) {
-        return userService.getUserByName(firstName, lastName);
+        List<User> users = new ArrayList<>();
+        if (email != null) {
+            users.add(userService.getUserByEmail(email));
+            return users;
+        }
+        return userService.getUsersByName(firstName, lastName);
+    }
+
+    // GET USER (id)
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public User getUserById(@PathVariable("id") int id) {
+        return userService.getUserById(id);
     }
 
 }

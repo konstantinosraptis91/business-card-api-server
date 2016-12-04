@@ -9,15 +9,21 @@ import gr.bc.api.dao.interfaces.IUserDao;
 import gr.bc.api.entity.User;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -36,7 +42,7 @@ public class MySQLUserDao implements IUserDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public int addUser(User user) {
+    public User addUser(User user) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
         Map<String, Object> params = new HashMap<>();
@@ -45,35 +51,37 @@ public class MySQLUserDao implements IUserDao {
         params.put(MySQLHelper.USER_FIRSTNAME, user.getFirstName());
         params.put(MySQLHelper.USER_LASTNAME, user.getLastName());
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-        LOGGER.info(user + " added successfully.", Constants.LOG_DATE_FORMAT.format(new Date()));
-        return key.intValue();
+        user.setId(key.intValue());
+        return user;
     }
 
     @Override
-    public int updateUser(User user) {
+    public User updateUser(int id, User user) {
         String updateQuery = " UPDATE "
                 + MySQLHelper.USER_TABLE
                 + " SET "
-                + MySQLHelper.USER_EMAIL + "=?," 
+                + MySQLHelper.USER_EMAIL + "=?,"
                 + MySQLHelper.USER_PASSWORD + "=?,"
                 + MySQLHelper.USER_FIRSTNAME + "=?,"
                 + MySQLHelper.USER_LASTNAME + "=?"
-                + " WHERE " + MySQLHelper.USER_EMAIL + "=?";
-        return jdbcTemplate.update(updateQuery, 
+                + " WHERE " + MySQLHelper.USER_ID + "=?";
+        jdbcTemplate.update(updateQuery,
                 new Object[]{
                     user.getEmail(),
                     user.getPassword(),
                     user.getFirstName(),
                     user.getLastName(),
-                    user.getEmail()
+                    id
                 });
+        user.setId(id);
+        return user;
     }
 
     @Override
-    public int deleteUser(String email) {
+    public void deleteUser(int id) {
         String deleteQuery = "DELETE FROM " + MySQLHelper.USER_TABLE
-                + " WHERE " + MySQLHelper.USER_EMAIL + " = " + "?";
-        return jdbcTemplate.update(deleteQuery, new Object[]{email});
+                + " WHERE " + MySQLHelper.USER_ID + " = " + "?";
+        jdbcTemplate.update(deleteQuery, new Object[]{id});
     }
 
     @Override
@@ -86,7 +94,7 @@ public class MySQLUserDao implements IUserDao {
                         User u = new User();
                         u.setId(rs.getInt(MySQLHelper.USER_ID));
                         u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
-                        // u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                        u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                         u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                         u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
                         return u;
@@ -98,7 +106,28 @@ public class MySQLUserDao implements IUserDao {
     }
 
     @Override
-    public User getUserByName(String firstName, String lastName) {
+    public User getUserById(int id) {
+        User user = new User();
+        try {
+            user = (User) jdbcTemplate.queryForObject("SELECT * FROM "
+                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_ID + " = " + "'" + id + "'",
+                    (rs, rowNum) -> {
+                        User u = new User();
+                        u.setId(rs.getInt(MySQLHelper.USER_ID));
+                        u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                        u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                        u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                        u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        return u;
+                    });
+        } catch (DataAccessException e) {
+            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return user;
+    }
+
+    @Override
+    public List<User> getUsersByName(String firstName, String lastName) {
         String selectQuery;
         if (firstName == null) {
             selectQuery = "SELECT * FROM "
@@ -111,22 +140,21 @@ public class MySQLUserDao implements IUserDao {
                     + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'"
                     + " AND " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'";
         }
-        User user = new User();
+        List<User> users = new ArrayList<>();
         try {
-            user = (User) jdbcTemplate.queryForObject(selectQuery,
-                    (rs, rowNum) -> {
-                        User u = new User();
-                        u.setId(rs.getInt(MySQLHelper.USER_ID));
-                        u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
-                        // u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
-                        u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
-                        u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
-                        return u;
-                    });
+            users =  jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
+                    User user = new User();
+                    user.setId(rs.getInt(MySQLHelper.USER_ID));
+                    user.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                    user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                    user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                    user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                    return user;
+            });
         } catch (DataAccessException e) {
             LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
-        return user;
+        return users;
     }
 
 }

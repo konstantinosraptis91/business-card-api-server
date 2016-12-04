@@ -7,6 +7,7 @@ package gr.bc.api.service;
 
 import gr.bc.api.dao.interfaces.IUserDao;
 import gr.bc.api.entity.User;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -22,24 +23,28 @@ public class UserService {
     @Qualifier("MySQLUser")
     private IUserDao userDao;
     
-    public int addUser(User user) {
+    public User addUser(User user) {
         return userDao.addUser(user);
     }
     
-    public int updateUser(User user) {
-        return userDao.updateUser(user);
+    public User updateUser(int id, User user) {
+        return userDao.updateUser(id, user);
     }
     
-    public int deleteUser(String email) {
-        return userDao.deleteUser(email);
+    public void deleteUser(int id) {
+        userDao.deleteUser(id);
     }
     
     public User getUserByEmail(String email) {
         return userDao.getUserByEmail(email);
     }
         
-    public User getUserByName(String firstName, String lastName) {
-        return userDao.getUserByName(firstName, lastName);
+    public List<User> getUsersByName(String firstName, String lastName) {
+        return userDao.getUsersByName(firstName, lastName);
+    }
+
+    public User getUserById(int id) {
+        return userDao.getUserById(id);
     }
     
 }

@@ -6,6 +6,7 @@
 package gr.bc.api.dao.interfaces;
 
 import gr.bc.api.entity.User;
+import java.util.List;
 
 /**
  *
@@ -13,14 +14,16 @@ import gr.bc.api.entity.User;
  */
 public interface IUserDao {
     
-    int addUser(User user);
+    User addUser(User user);
     
+    User updateUser(int id, User user);
+
+    void deleteUser(int id);
+
     User getUserByEmail(String email);
+    
+    List<User> getUsersByName(String firstName, String lastName);
 
-    int updateUser(User user);
-
-    int deleteUser(String email);
-
-    User getUserByName(String firstName, String lastName);
+    User getUserById(int id);
       
 }
