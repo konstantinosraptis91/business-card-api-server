@@ -11,7 +11,7 @@ package gr.bc.api.entity;
  */
 public class User {
     
-    private int id;
+    private long id;
     private String email;
     private String password;
     private String firstName;
@@ -21,7 +21,7 @@ public class User {
         
     }
 
-    public User(int id, String email, String password, String firstName, String lastName) {
+    public User(long id, String email, String password, String firstName, String lastName) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -29,11 +29,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
         

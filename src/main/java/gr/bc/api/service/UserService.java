@@ -27,11 +27,11 @@ public class UserService {
         return userDao.addUser(user);
     }
     
-    public User updateUser(int id, User user) {
+    public User updateUser(long id, User user) {
         return userDao.updateUser(id, user);
     }
     
-    public void deleteUser(int id) {
+    public void deleteUser(long id) {
         userDao.deleteUser(id);
     }
     
@@ -43,7 +43,7 @@ public class UserService {
         return userDao.getUsersByName(firstName, lastName);
     }
 
-    public User getUserById(int id) {
+    public User getUserById(long id) {
         return userDao.getUserById(id);
     }
     

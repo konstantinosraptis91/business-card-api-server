@@ -33,5 +33,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-configuration-processor")
     compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile("mysql:mysql-connector-java:5.1.38")
+    compile("org.springframework.security:spring-security-web")
+    compile("org.springframework.security:spring-security-config")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }

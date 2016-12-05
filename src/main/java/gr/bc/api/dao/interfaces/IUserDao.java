@@ -16,14 +16,14 @@ public interface IUserDao {
     
     User addUser(User user);
     
-    User updateUser(int id, User user);
+    User updateUser(long id, User user);
 
-    void deleteUser(int id);
+    void deleteUser(long id);
 
     User getUserByEmail(String email);
     
     List<User> getUsersByName(String firstName, String lastName);
 
-    User getUserById(int id);
+    User getUserById(long id);
       
 }
