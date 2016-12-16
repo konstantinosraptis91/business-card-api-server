@@ -7,7 +7,7 @@ package gr.bc.api.entity;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 public class User {
     

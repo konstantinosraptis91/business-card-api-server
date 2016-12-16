@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
  

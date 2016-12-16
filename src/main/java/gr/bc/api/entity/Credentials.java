@@ -11,7 +11,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 public class Credentials {
     

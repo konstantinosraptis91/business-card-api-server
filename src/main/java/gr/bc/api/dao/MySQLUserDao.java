@@ -9,7 +9,6 @@ import gr.bc.api.dao.interfaces.IUserDao;
 import gr.bc.api.entity.User;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 @Repository
 @Qualifier("MySQLUser")
@@ -40,21 +39,16 @@ public class MySQLUserDao implements IUserDao {
 
     @Override
     public User addUser(User user) {
-        try {
-            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
-            Map<String, Object> params = new HashMap<>();
-            params.put(MySQLHelper.USER_EMAIL, user.getEmail());
-            params.put(MySQLHelper.USER_PASSWORD, user.getPassword());
-            params.put(MySQLHelper.USER_FIRSTNAME, user.getFirstName());
-            params.put(MySQLHelper.USER_LASTNAME, user.getLastName());
-            Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-            user.setId(key.intValue());
-            return user;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-        return new User();
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
+        Map<String, Object> params = new HashMap<>();
+        params.put(MySQLHelper.USER_EMAIL, user.getEmail());
+        params.put(MySQLHelper.USER_PASSWORD, user.getPassword());
+        params.put(MySQLHelper.USER_FIRSTNAME, user.getFirstName());
+        params.put(MySQLHelper.USER_LASTNAME, user.getLastName());
+        Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
+        user.setId(key.intValue());
+        return user;
     }
 
     @Override

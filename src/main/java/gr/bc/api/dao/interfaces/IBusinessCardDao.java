@@ -5,6 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
+import gr.bc.api.entity.BusinessCard;
 import gr.bc.api.entity.User;
 import java.util.List;
 
@@ -12,34 +13,44 @@ import java.util.List;
  *
  * @author Konstantinos Raptis
  */
-public interface IUserDao {
+public interface IBusinessCardDao {
     
     // -------------------------------------------------------------------------
     // GET
     // -------------------------------------------------------------------------
     
-    User getUserByEmail(String email);
+    BusinessCard getBusinessCardByUserId(long userId);
     
-    List<User> getUsersByName(String firstName, String lastName);
+    BusinessCard getBusinessCardById(long businessCardId);
     
-    User getUserById(long userId);
+    BusinessCard getBusinessCardByUserEmail(String email);
+    
+    List<BusinessCard> getBusinessCardByUserName(String firstName, String lastName);
+    
+    List<BusinessCard> getWalletByUserId(long userId);
+    
+    // -------------------------------------------------------------------------
+    // CREATE
+    // -------------------------------------------------------------------------
+    
+    BusinessCard createBusinessCard(BusinessCard businessCard);
     
     // -------------------------------------------------------------------------
     // ADD
     // -------------------------------------------------------------------------
     
-    User addUser(User user);
+    BusinessCard addBusinessCardToWallet(BusinessCard businessCard, User user);
     
     // -------------------------------------------------------------------------
     // UPDATE
     // -------------------------------------------------------------------------
     
-    User updateUser(long userId, User user);
-
+    BusinessCard updateBusinessCard(long businessCardId, BusinessCard businessCard);
+    
     // -------------------------------------------------------------------------
     // DELETE
     // -------------------------------------------------------------------------
     
-    void deleteUser(long userId);
-      
+    void deleteBusinessCard(long businessCardId);
+    
 }

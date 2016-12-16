@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 public class Constants {
     

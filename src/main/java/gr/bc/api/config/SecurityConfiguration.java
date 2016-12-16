@@ -19,7 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 @Configuration
 @EnableWebSecurity

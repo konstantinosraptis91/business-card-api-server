@@ -32,7 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 @RestController
 @RequestMapping(value = "/api/user")
