@@ -12,6 +12,7 @@ package gr.bc.api.entity;
 public class User {
     
     private long id;
+    private long businessCardId;
     private String email;
     private String password;
     private String firstName;
@@ -69,9 +70,17 @@ public class User {
         this.lastName = lastName;
     }
 
+    public long getBusinessCardId() {
+        return businessCardId;
+    }
+
+    public void setBusinessCardId(long businessCardId) {
+        this.businessCardId = businessCardId;
+    }
+
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + '}';
+        return "User{" + "id=" + id + ", businessCardId=" + businessCardId + ", email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + '}';
     }
-      
+          
 }

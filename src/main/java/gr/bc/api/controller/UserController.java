@@ -47,7 +47,7 @@ public class UserController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> addUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating User with email " + user.getEmail(), Constants.LOG_DATE_FORMAT.format(new Date()));
         User u = userService.getUserByEmail(user.getEmail());
         if (u.getEmail() != null) {
@@ -55,7 +55,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // reuse object u
-        u = userService.addUser(user);
+        u = userService.createUser(user);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(u.getId()).toUri());
         return new ResponseEntity<>(u, headers, HttpStatus.CREATED);

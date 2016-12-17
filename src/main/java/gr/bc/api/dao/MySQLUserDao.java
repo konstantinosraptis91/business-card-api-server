@@ -38,7 +38,7 @@ public class MySQLUserDao implements IUserDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public User addUser(User user) {
+    public User createUser(User user) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
         Map<String, Object> params = new HashMap<>();

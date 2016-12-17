@@ -23,8 +23,8 @@ public class UserService {
     @Qualifier("MySQLUser")
     private IUserDao userDao;
     
-    public User addUser(User user) {
-        return userDao.addUser(user);
+    public User createUser(User user) {
+        return userDao.createUser(user);
     }
     
     public User updateUser(long id, User user) {
