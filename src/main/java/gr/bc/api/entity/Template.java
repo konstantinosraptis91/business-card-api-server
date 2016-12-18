@@ -12,14 +12,16 @@ package gr.bc.api.entity;
 public class Template {
     
     private long id;
-    private int primaryColor;
-    private int secondaryColor;
+    private String name;
+    private String primaryColor;
+    private String secondaryColor;
 
     public Template() {
     }
 
-    public Template(long id, int primaryColor, int secondaryColor) {
+    public Template(long id, String name, String primaryColor, String secondaryColor) {
         this.id = id;
+        this.name = name;
         this.primaryColor = primaryColor;
         this.secondaryColor = secondaryColor;
     }
@@ -32,25 +34,33 @@ public class Template {
         this.id = id;
     }
 
-    public int getPrimaryColor() {
+    public String getPrimaryColor() {
         return primaryColor;
     }
 
-    public void setPrimaryColor(int primaryColor) {
+    public void setPrimaryColor(String primaryColor) {
         this.primaryColor = primaryColor;
     }
 
-    public int getSecondaryColor() {
+    public String getSecondaryColor() {
         return secondaryColor;
     }
 
-    public void setSecondaryColor(int secondaryColor) {
+    public void setSecondaryColor(String secondaryColor) {
         this.secondaryColor = secondaryColor;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     @Override
     public String toString() {
-        return "Template{" + "id=" + id + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
+        return "Template{" + "id=" + id + ", name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
     }
-        
+       
 }

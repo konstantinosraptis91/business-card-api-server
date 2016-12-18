@@ -37,13 +37,14 @@ public class MySQLHelper {
        
     // template table attributes
     public static final String TEMPLATE_ID = "template_id";
+    public static final String TEMPLATE_NAME = "template_name";
     public static final String TEMPLATE_PRIMARY_COLOR = "template_primary_color";
     public static final String TEMPLATE_SECONDARY_COLOR = "template_secondary_color";
     
     // profession table attributes
     public static final String PROFESSION_ID = "profession_id";
     public static final String PROFESSION_NAME = "profession_name";
-    public static final String PROFESSION_DISCRIPTION = "profession_discription";
+    public static final String PROFESSION_DESCRIPTION = "profession_description";
     
     // user rating table attributes
     public static final String USER_RATING_ID = "user_rating_id";
