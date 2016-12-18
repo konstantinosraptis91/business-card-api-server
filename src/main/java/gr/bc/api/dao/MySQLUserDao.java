@@ -51,7 +51,7 @@ public class MySQLUserDao implements IUserDao {
             user.setId(key.intValue());
             return user;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("createTemplate: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return new User();
     }
@@ -161,7 +161,7 @@ public class MySQLUserDao implements IUserDao {
                 return user;
             });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return users;
     }

@@ -6,6 +6,7 @@
 package gr.bc.api.service;
 
 import gr.bc.api.dao.interfaces.IBusinessCardDao;
+import gr.bc.api.entity.BusinessCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class BusinessCardService {
     @Autowired
     @Qualifier("MySQLBusinessCard")
     private IBusinessCardDao businessCardDao;
+
+    public BusinessCard createBusinessCard(BusinessCard businessCard) {
+        return businessCardDao.createBusinessCard(businessCard);
+    }
     
     
     

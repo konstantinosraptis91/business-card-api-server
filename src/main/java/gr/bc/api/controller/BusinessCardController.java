@@ -6,9 +6,7 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.entity.BusinessCard;
-import gr.bc.api.entity.User;
 import gr.bc.api.service.BusinessCardService;
-import gr.bc.api.service.UserService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -35,9 +33,7 @@ public class BusinessCardController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCardController.class);
     @Autowired
     private BusinessCardService businessCardService;
-    @Autowired
-    private UserService userService;
-    
+        
     // Create user business card
     @RequestMapping(
             method = RequestMethod.POST,
@@ -51,12 +47,11 @@ public class BusinessCardController {
 //            LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
 //            return new ResponseEntity<>(HttpStatus.CONFLICT);
 //        }
-//        // reuse object u
-//        u = userService.createUser(user);
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(u.getId()).toUri());
-//        return new ResponseEntity<>(u, headers, HttpStatus.CREATED);
-        return null;
+        // reuse object u
+        BusinessCard bc = businessCardService.createBusinessCard(businessCard);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(bc.getId()).toUri());
+        return new ResponseEntity<>(bc, headers, HttpStatus.CREATED);
     }
     
 }

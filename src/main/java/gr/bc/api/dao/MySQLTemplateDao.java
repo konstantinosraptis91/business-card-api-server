@@ -50,7 +50,7 @@ public class MySQLTemplateDao implements ITemplateDao {
             template.setId(key.intValue());
             return template;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("createTemplate: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return new Template();
     }

@@ -50,7 +50,7 @@ public class MySQLProfessionDao implements IProfessionDao {
             profession.setId(key.intValue());
             return profession;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("createProfession: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return new Profession();
     }
@@ -69,7 +69,7 @@ public class MySQLProfessionDao implements IProfessionDao {
                         return p;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("getProfessionByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return profession;
     }

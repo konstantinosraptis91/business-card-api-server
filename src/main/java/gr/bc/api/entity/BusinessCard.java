@@ -120,7 +120,7 @@ public class BusinessCard {
         this.website = website;
     }
 
-    public boolean isIsPublic() {
+    public boolean isPublic() {
         return isPublic;
     }
 
