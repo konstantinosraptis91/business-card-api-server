@@ -129,7 +129,7 @@ public class MySQLUserDao implements IUserDao {
                         return u;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("getUserById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return user;
     }

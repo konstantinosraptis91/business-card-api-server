@@ -88,7 +88,7 @@ public class MySQLProfessionDao implements IProfessionDao {
                         return p;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("getProfessionById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return profession;
     }

@@ -18,10 +18,10 @@ public interface IBusinessCardDao {
     // -------------------------------------------------------------------------
     // GET
     // -------------------------------------------------------------------------
+            
+    BusinessCard getBusinessCardById(long businessCardId);
     
     BusinessCard getBusinessCardByUserId(long userId);
-    
-    BusinessCard getBusinessCardById(long businessCardId);
     
     BusinessCard getBusinessCardByUserEmail(String email);
     
@@ -52,5 +52,5 @@ public interface IBusinessCardDao {
     // -------------------------------------------------------------------------
     
     void deleteBusinessCard(long businessCardId);
-    
+      
 }

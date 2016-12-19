@@ -7,6 +7,9 @@ package gr.bc.api.controller;
 
 import gr.bc.api.entity.BusinessCard;
 import gr.bc.api.service.BusinessCardService;
+import gr.bc.api.service.ProfessionService;
+import gr.bc.api.service.TemplateService;
+import gr.bc.api.service.UserService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -33,7 +36,13 @@ public class BusinessCardController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCardController.class);
     @Autowired
     private BusinessCardService businessCardService;
-        
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TemplateService templateService;
+    @Autowired
+    private ProfessionService professionService;
+    
     // Create user business card
     @RequestMapping(
             method = RequestMethod.POST,
@@ -42,16 +51,32 @@ public class BusinessCardController {
     )
     public ResponseEntity<BusinessCard> createBusinessCard(@RequestBody BusinessCard businessCard, UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating Business Card for user id: " + businessCard.getUserId(), Constants.LOG_DATE_FORMAT.format(new Date()));
-//        BusinessCard bc = businessCardService.get
-//        if (u.getBusinessCardId() != 0) {
-//            LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
-//            return new ResponseEntity<>(HttpStatus.CONFLICT);
-//        }
-        // reuse object u
-        BusinessCard bc = businessCardService.createBusinessCard(businessCard);
+        // user not found
+        if ((userService.getUserById(businessCard.getUserId()).getId()) == 0) {
+            LOGGER.info("Unable to find user with id " + businessCard.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // template not found
+        if ((templateService.getTemplateById(businessCard.getTemplateId()).getId()) == 0) {
+            LOGGER.info("Unable to find template with id " + businessCard.getTemplateId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // profession not found
+        if ((professionService.getProfessionById(businessCard.getProfessionId()).getId()) == 0) {
+            LOGGER.info("Unable to find profession with id " + businessCard.getProfessionId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // user already owns a business card
+        BusinessCard bc = businessCardService.getBusinessCardByUserId(businessCard.getUserId());
+        if (bc.getId() != 0) {
+            LOGGER.info("User with id " + businessCard.getUserId() + " already owns a Business Card", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        // reuse object bc
+        bc = businessCardService.createBusinessCard(businessCard);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(bc.getId()).toUri());
         return new ResponseEntity<>(bc, headers, HttpStatus.CREATED);
     }
-    
+        
 }

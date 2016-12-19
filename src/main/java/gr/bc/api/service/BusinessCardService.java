@@ -26,6 +26,8 @@ public class BusinessCardService {
         return businessCardDao.createBusinessCard(businessCard);
     }
     
-    
-    
+    public BusinessCard getBusinessCardByUserId(long userId) {
+        return businessCardDao.getBusinessCardByUserId(userId);
+    }
+        
 }
