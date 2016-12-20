@@ -7,7 +7,6 @@ package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.IProfessionDao;
 import gr.bc.api.entity.Profession;
-import gr.bc.api.entity.Template;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.util.ArrayList;
@@ -111,4 +110,13 @@ public class MySQLProfessionDao implements IProfessionDao {
         return professions;
     }
     
+    // Check if profession by given id exists
+    @Override
+    public boolean isProfessionExist(long id) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.PROFESSION_TABLE + " WHERE "
+                + MySQLHelper.PROFESSION_ID + " = " + "?", Integer.class, id);
+        return result != null && result > 0;
+    }
+       
 }

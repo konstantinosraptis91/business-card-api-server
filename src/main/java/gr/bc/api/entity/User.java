@@ -5,17 +5,25 @@
  */
 package gr.bc.api.entity;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.Email;
+
 /**
  *
  * @author Konstantinos Raptis
  */
 public class User {
-    
+   
     private long id;
     private long businessCardId;
+    @NotNull @Size(min = 1, max = 254) @Email
     private String email;
+    @NotNull @Size(min = 1, max = 15)
     private String password;
+    @NotNull @Size(min = 1, max = 30)
     private String firstName;
+    @NotNull @Size(min = 1, max = 30)
     private String lastName;
         
     public User() {

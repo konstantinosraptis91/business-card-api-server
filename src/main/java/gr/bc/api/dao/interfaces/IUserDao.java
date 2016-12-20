@@ -13,33 +13,21 @@ import java.util.List;
  * @author Konstantinos Raptis
  */
 public interface IUserDao {
-    
-    // -------------------------------------------------------------------------
-    // GET
-    // -------------------------------------------------------------------------
-    
+        
     User getUserByEmail(String email);
     
     List<User> getUsersByName(String firstName, String lastName);
     
-    User getUserById(long userId);
-    
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    
+    User getUserById(long id);
+        
     User createUser(User user);
+        
+    User updateUser(long id, User user);
     
-    // -------------------------------------------------------------------------
-    // UPDATE
-    // -------------------------------------------------------------------------
+    void deleteUser(long id);
     
-    User updateUser(long userId, User user);
-
-    // -------------------------------------------------------------------------
-    // DELETE
-    // -------------------------------------------------------------------------
+    boolean isUserExist(long id);
     
-    void deleteUser(long userId);
-      
+    boolean isUserExist(String email);
+    
 }

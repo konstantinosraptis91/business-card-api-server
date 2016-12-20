@@ -38,5 +38,9 @@ public class TemplateService {
     public Template createTemplate(Template template) {
         return templateDao.createTemplate(template);
     }
-   
+    
+    public boolean isTemplateExist(long id) {
+        return templateDao.isTemplateExist(id);
+    }
+    
 }

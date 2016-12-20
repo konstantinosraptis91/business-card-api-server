@@ -29,5 +29,13 @@ public class BusinessCardService {
     public BusinessCard getBusinessCardByUserId(long userId) {
         return businessCardDao.getBusinessCardByUserId(userId);
     }
-        
+    
+    public BusinessCard getBusinessCardById(long businessCardId) {
+        return businessCardDao.getBusinessCardById(businessCardId);
+    }
+    
+    public boolean isBusinessCardExist(long id) {
+        return businessCardDao.isBusinessCardExist(id);
+    }
+    
 }

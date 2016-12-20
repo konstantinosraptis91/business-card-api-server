@@ -13,21 +13,15 @@ import java.util.List;
  * @author konstantinos
  */
 public interface IProfessionDao {
-    
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    
+        
     Profession createProfession(Profession profession);    
-    
-    // -------------------------------------------------------------------------
-    // GET
-    // -------------------------------------------------------------------------
-    
+        
     Profession getProfessionByName(String name);
     
     Profession getProfessionById(long professionId);
     
     List<Profession> getAllProfessions();
+    
+    boolean isProfessionExist(long id);
     
 }

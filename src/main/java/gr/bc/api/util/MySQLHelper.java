@@ -17,6 +17,7 @@ public class MySQLHelper {
     public static final String TEMPLATE_TABLE = "template";
     public static final String PROFESSION_TABLE = "profession";
     public static final String USER_RATING_TABLE = "user_rating";
+    public static final String USER_BUSINESS_CARD_TABLE = USER_TABLE + "_" + BUSINESS_CARD_TABLE;
     
     // user table attributes
     public static final String USER_ID = "user_id";
@@ -51,5 +52,5 @@ public class MySQLHelper {
     public static final String USER_RATING_STARS = "user_rating_stars";
     public static final String USER_RATING_TITLE = "user_rating_title";
     public static final String USER_RATING_DESCRIPTION = "user_rating_description";
-    
+       
 }

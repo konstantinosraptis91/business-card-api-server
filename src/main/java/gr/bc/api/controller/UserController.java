@@ -13,6 +13,7 @@ import gr.bc.api.util.Constants;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.validation.Valid;
 //import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,24 +42,25 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
-
-    // Add user (Create Account)    
+        
+    // Create user (Create Account)    
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user,
+            UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating User with email " + user.getEmail(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        User u = userService.getUserByEmail(user.getEmail());
-        if (u.getEmail() != null) {
+        // check if user with the same email already exist
+        if (userService.isUserExist(user.getEmail())) {
             LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // reuse object u
-        u = userService.createUser(user);
+        User response = userService.createUser(user);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(u.getId()).toUri());
-        return new ResponseEntity<>(u, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(response.getId()).toUri());
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
     // Update user (Update Account)
@@ -67,7 +69,7 @@ public class UserController {
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable("id") long id, @Valid @RequestBody User user) {
         LOGGER.info("Updating User with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
         User u1 = userService.getUserById(id);
         User u2 = userService.getUserByEmail(user.getEmail());
@@ -104,19 +106,19 @@ public class UserController {
             @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "firstName", required = false) String firstName,
             @RequestParam(value = "lastName", required = false) String lastName
-            /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
+    /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
         // Credentials crs = Credentials.getCredentials(authToken);
         List<User> users = new ArrayList<>();
         if (email != null) {
             User u = userService.getUserByEmail(email);
             if (u.getEmail() != null) {
-                users.add(u); 
+                users.add(u);
             }
         } else {
             users = userService.getUsersByName(firstName, lastName);
         }
-        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) 
-                    : new ResponseEntity<>(users, HttpStatus.OK);
+        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     // Get user by id
@@ -126,8 +128,8 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
         User u = userService.getUserById(id);
-        return u.getEmail() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT) 
+        return u.getEmail() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(u, HttpStatus.OK);
     }
-
+        
 }

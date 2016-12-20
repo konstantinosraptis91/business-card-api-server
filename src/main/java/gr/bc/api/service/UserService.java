@@ -46,5 +46,13 @@ public class UserService {
     public User getUserById(long id) {
         return userDao.getUserById(id);
     }
+
+    public boolean isUserExist(long userId) {
+        return userDao.isUserExist(userId);
+    }
+    
+    public boolean isUserExist(String email) {
+        return userDao.isUserExist(email);
+    }
     
 }

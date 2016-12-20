@@ -6,7 +6,6 @@
 package gr.bc.api.dao.interfaces;
 
 import gr.bc.api.entity.BusinessCard;
-import gr.bc.api.entity.User;
 import java.util.List;
 
 /**
@@ -14,11 +13,7 @@ import java.util.List;
  * @author Konstantinos Raptis
  */
 public interface IBusinessCardDao {
-    
-    // -------------------------------------------------------------------------
-    // GET
-    // -------------------------------------------------------------------------
-            
+                
     BusinessCard getBusinessCardById(long businessCardId);
     
     BusinessCard getBusinessCardByUserId(long userId);
@@ -26,31 +21,13 @@ public interface IBusinessCardDao {
     BusinessCard getBusinessCardByUserEmail(String email);
     
     List<BusinessCard> getBusinessCardByUserName(String firstName, String lastName);
-    
-    List<BusinessCard> getWalletByUserId(long userId);
-    
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    
+        
     BusinessCard createBusinessCard(BusinessCard businessCard);
+        
+    BusinessCard updateBusinessCard(long id, BusinessCard businessCard);
+        
+    void deleteBusinessCard(long id);
     
-    // -------------------------------------------------------------------------
-    // ADD
-    // -------------------------------------------------------------------------
-    
-    BusinessCard addBusinessCardToWallet(BusinessCard businessCard, User user);
-    
-    // -------------------------------------------------------------------------
-    // UPDATE
-    // -------------------------------------------------------------------------
-    
-    BusinessCard updateBusinessCard(long businessCardId, BusinessCard businessCard);
-    
-    // -------------------------------------------------------------------------
-    // DELETE
-    // -------------------------------------------------------------------------
-    
-    void deleteBusinessCard(long businessCardId);
-      
+    boolean isBusinessCardExist(long id);
+
 }

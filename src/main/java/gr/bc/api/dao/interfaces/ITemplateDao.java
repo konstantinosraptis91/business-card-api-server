@@ -13,21 +13,15 @@ import java.util.List;
  * @author konstantinos
  */
 public interface ITemplateDao {
-    
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    
+      
     Template createTemplate(Template template);
-    
-    // -------------------------------------------------------------------------
-    // GET
-    // -------------------------------------------------------------------------
-    
+        
     List<Template> getAllTemplates();
     
     Template getTemplateByName(String name);
     
     Template getTemplateById(long id);
+    
+    boolean isTemplateExist(long id);
     
 }

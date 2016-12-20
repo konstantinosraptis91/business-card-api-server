@@ -34,4 +34,8 @@ public class ProfessionService {
         return professionDao.getProfessionByName(name);
     }
     
+    public boolean isProfessionExist(long id) {
+        return professionDao.isProfessionExist(id);
+    }
+    
 }

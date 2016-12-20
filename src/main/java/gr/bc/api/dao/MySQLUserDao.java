@@ -165,5 +165,23 @@ public class MySQLUserDao implements IUserDao {
         }
         return users;
     }
-
+    
+    // Check if user by given id exists
+    @Override
+    public boolean isUserExist(long id) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.USER_TABLE + " WHERE "
+                + MySQLHelper.USER_ID + " = " + "?", Integer.class, id);
+        return result != null && result > 0;
+    }
+    
+    // Check if user by given email exists
+    @Override
+    public boolean isUserExist(String email) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.USER_TABLE + " WHERE "
+                + MySQLHelper.USER_EMAIL + " = " + "?", Integer.class, email);
+        return result != null && result > 0;
+    }
+      
 }

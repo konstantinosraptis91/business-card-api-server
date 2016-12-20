@@ -114,4 +114,13 @@ public class MySQLTemplateDao implements ITemplateDao {
         return template;
     }
 
+    // Check if template by given id exists
+    @Override
+    public boolean isTemplateExist(long id) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.TEMPLATE_TABLE + " WHERE "
+                + MySQLHelper.TEMPLATE_ID + " = " + "?", Integer.class, id);
+        return result != null && result > 0;
+    }
+       
 }
