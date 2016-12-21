@@ -38,7 +38,7 @@ public class MySQLProfessionDao implements IProfessionDao {
     private JdbcTemplate jdbcTemplate;
     
     @Override
-    public Profession createProfession(Profession profession) {
+    public Profession saveProfession(Profession profession) {
         try {
             SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
             jdbcInsert.withTableName(MySQLHelper.PROFESSION_TABLE).usingGeneratedKeyColumns(MySQLHelper.PROFESSION_ID);
@@ -49,13 +49,13 @@ public class MySQLProfessionDao implements IProfessionDao {
             profession.setId(key.intValue());
             return profession;
         } catch (Exception e) {
-            LOGGER.error("createProfession: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("saveProfession: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return new Profession();
     }
 
     @Override
-    public Profession getProfessionByName(String name) {
+    public Profession findByName(String name) {
         Profession profession = new Profession();
         try {
             profession = (Profession) jdbcTemplate.queryForObject("SELECT * FROM "
@@ -68,13 +68,13 @@ public class MySQLProfessionDao implements IProfessionDao {
                         return p;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error("getProfessionByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return profession;
     }
 
     @Override
-    public Profession getProfessionById(long professionId) {
+    public Profession findById(long professionId) {
         Profession profession = new Profession();
         try {
             profession = (Profession) jdbcTemplate.queryForObject("SELECT * FROM "
@@ -87,13 +87,13 @@ public class MySQLProfessionDao implements IProfessionDao {
                         return p;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error("getProfessionById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return profession;
     }
 
     @Override
-    public List<Profession> getAllProfessions() {
+    public List<Profession> findAllProfessions() {
         List<Profession> professions = new ArrayList<>();
         try {
             professions = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.PROFESSION_TABLE, 
@@ -105,9 +105,44 @@ public class MySQLProfessionDao implements IProfessionDao {
                         return p;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findAllProfessions: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return professions;
+    }
+    
+    @Override
+    public boolean deleteProfessionById(long id) {
+        Integer rows = null;
+        try {
+            String deleteQuery = "DELETE FROM " + MySQLHelper.PROFESSION_TABLE
+                    + " WHERE " + MySQLHelper.PROFESSION_ID + " = " + "?";
+            rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
+        } catch (DataAccessException e) {
+            LOGGER.error("deleteProfessionById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
+    }
+
+    @Override
+    public boolean updateProfession(Profession profession) {
+        Integer rows = null;
+        try {
+            String updateQuery = " UPDATE "
+                    + MySQLHelper.PROFESSION_TABLE
+                    + " SET "
+                    + MySQLHelper.PROFESSION_NAME + "=?,"
+                    + MySQLHelper.PROFESSION_DESCRIPTION + "=?"
+                    + " WHERE " + MySQLHelper.USER_ID + "=?";
+            rows = jdbcTemplate.update(updateQuery,
+                    new Object[]{
+                        profession.getName(),
+                        profession.getDescription(),
+                        profession.getId()
+                    });
+        } catch (DataAccessException e) {
+            LOGGER.error("updateProfession: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
     }
     
     // Check if profession by given id exists
@@ -118,5 +153,15 @@ public class MySQLProfessionDao implements IProfessionDao {
                 + MySQLHelper.PROFESSION_ID + " = " + "?", Integer.class, id);
         return result != null && result > 0;
     }
-       
+    
+    @Override
+    public boolean isProfessionExist(String name) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.PROFESSION_TABLE + " WHERE "
+                + MySQLHelper.PROFESSION_NAME + " = " + "?", Integer.class, name);
+        return result != null && result > 0;
+    }
+    
+    
+    
 }

@@ -6,9 +6,11 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.entity.Profession;
+import gr.bc.api.entity.User;
 import gr.bc.api.service.ProfessionService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,28 +31,47 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping(value = "/api/profession")
 public class ProfessionController {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionController.class);
     @Autowired
     private ProfessionService professionService;
-    
-    // Create new Profession
+
+    // Save new Profession
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> createProfession(@RequestBody Profession profession, UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating Profession " + profession.getName(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        Profession p = professionService.getProfessionByName(profession.getName());
-        if (p.getName() != null) {
-            LOGGER.info("Profession " + profession.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
+    public ResponseEntity<Profession> createProfession(@Valid @RequestBody Profession profession,
+            UriComponentsBuilder ucBuilder) {
+        LOGGER.info("Creating Profession " + profession, Constants.LOG_DATE_FORMAT.format(new Date()));
+        if (professionService.isProfessionExist(profession.getName())) {
+            LOGGER.info("Profession with name " + profession.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        // reuse object p
-        p = professionService.createProfession(profession);
+        Profession response = professionService.saveProfession(profession);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(p.getId()).toUri());
-        return new ResponseEntity<>(p, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(response.getId()).toUri());
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
-    
+
+    // Update profession
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> updateUser(@Valid @RequestBody Profession profession) {
+        LOGGER.info("Updating profession with id " + profession.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        // Check if profession who is being updated actually exists
+        if (!professionService.isProfessionExist(profession.getId())) {
+            LOGGER.info("Unable to update profession with id " + profession.getId() + ".Profession not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            // Check if profession who is being updated got the same name with a profession in database    
+        } else if (professionService.isProfessionExist(profession.getName())
+                && professionService.findByName(profession.getName()).getId() != profession.getId()) {
+            LOGGER.info("Profession with name " + profession.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(professionService.updateProfession(profession), HttpStatus.OK);
+    }
+
 }

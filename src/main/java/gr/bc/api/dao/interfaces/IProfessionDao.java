@@ -28,4 +28,6 @@ public interface IProfessionDao {
     
     boolean isProfessionExist(long id);
     
+    boolean isProfessionExist(String name);
+    
 }
