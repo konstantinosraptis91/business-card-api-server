@@ -22,7 +22,7 @@ public class WalletService {
     private IWalletDao walletDao;
     
     public long addBusinessCardToWallet(long userId, long businessCardId) {
-        return walletDao.addBusinessCardToWallet(userId, businessCardId);
+        return walletDao.saveBusinessCardToWallet(userId, businessCardId);
     }
     
 }

@@ -51,7 +51,7 @@ public class MySQLUserDao implements IUserDao {
             user.setId(key.intValue());
             return user;
         } catch (Exception e) {
-            LOGGER.error("createTemplate: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("saveUser: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return new User();
     }
@@ -77,7 +77,7 @@ public class MySQLUserDao implements IUserDao {
                         user.getId()
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("updateUser: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return rows != null && rows > 0;
     }
@@ -90,7 +90,7 @@ public class MySQLUserDao implements IUserDao {
                     + " WHERE " + MySQLHelper.USER_ID + " = " + "?";
             rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("deleteUserById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return rows != null && rows > 0;
     }
@@ -112,7 +112,7 @@ public class MySQLUserDao implements IUserDao {
                         return u;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByEmail: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return user;
     }
@@ -134,7 +134,7 @@ public class MySQLUserDao implements IUserDao {
                         return u;
                     });
         } catch (DataAccessException e) {
-            LOGGER.error("getUserById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return user;
     }
@@ -157,7 +157,7 @@ public class MySQLUserDao implements IUserDao {
                 return user;
             });
         } catch (DataAccessException e) {
-            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByFullName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return users;
     }
@@ -179,7 +179,7 @@ public class MySQLUserDao implements IUserDao {
                 return user;
             });
         } catch (DataAccessException e) {
-            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByFirstName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return users;
     }
@@ -201,7 +201,7 @@ public class MySQLUserDao implements IUserDao {
                 return user;
             });
         } catch (DataAccessException e) {
-            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByLastName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
         return users;
     }

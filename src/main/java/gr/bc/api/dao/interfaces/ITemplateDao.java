@@ -17,8 +17,10 @@ public interface ITemplateDao {
     Template saveTemplate(Template template);
         
     Template findByName(String name);
+        
+    List<Template> findByPrimaryColor(String primaryColor);
     
-    Template findByColor(String color);
+    List<Template> findBySecondaryColor(String secondaryColor);
     
     Template findById(long id);
     
@@ -29,5 +31,7 @@ public interface ITemplateDao {
     boolean updateTemplate(Template template);
     
     boolean isTemplateExist(long id);
+    
+    boolean isTemplateExist(String name);
     
 }

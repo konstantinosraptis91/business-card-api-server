@@ -50,7 +50,7 @@ public class Profession {
 
     @Override
     public String toString() {
-        return "Profession{" + "id=" + id + ", name=" + name + ", description=" + description + '}';
+        return "Profession{" + "name=" + name + ", description=" + description + '}';
     }
-        
+       
 }

@@ -57,10 +57,10 @@ public class Template {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     @Override
     public String toString() {
-        return "Template{" + "id=" + id + ", name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
+        return "Template{" + "name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
     }
-       
+           
 }

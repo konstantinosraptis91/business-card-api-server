@@ -6,7 +6,6 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.IWalletDao;
-import gr.bc.api.entity.User;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.util.Date;
@@ -32,7 +31,7 @@ public class MySQLWalletDao implements IWalletDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public long addBusinessCardToWallet(long userId, long BusinessCardId) {
+    public long saveBusinessCardToWallet(long userId, long BusinessCardId) {
         long rows = 0;
         try {
             String updateQuery = " INSERT INTO "

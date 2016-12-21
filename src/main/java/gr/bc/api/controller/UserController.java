@@ -48,9 +48,10 @@ public class UserController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user,
+    public ResponseEntity<User> saveUser(@Valid @RequestBody User user,
             UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating User with email " + user.getEmail(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Creating " + user, 
+                Constants.LOG_DATE_FORMAT.format(new Date()));
         // check if user with the same email already exist
         if (userService.isUserExist(user.getEmail())) {
             LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
@@ -99,7 +100,7 @@ public class UserController {
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUsers(
+    public ResponseEntity<List<User>> find(
             @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "firstName", required = false) String firstName,
             @RequestParam(value = "lastName", required = false) String lastName
@@ -107,12 +108,11 @@ public class UserController {
         // Credentials crs = Credentials.getCredentials(authToken);
         List<User> users = new ArrayList<>();
         if (email != null) {
-            User u = userService.getUserByEmail(email);
-            if (u.getEmail() != null) {
-                users.add(u);
+            if (userService.isUserExist(email)) {
+                users.add(userService.findByEmail(email));
             }
         } else {
-            users = userService.getUsersByName(firstName, lastName);
+            users = userService.findByName(firstName, lastName);
         }
         return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(users, HttpStatus.OK);
@@ -123,8 +123,8 @@ public class UserController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
-        User u = userService.getUserById(id);
+    public ResponseEntity<User> findById(@PathVariable("id") long id) {
+        User u = userService.findById(id);
         return u.getEmail() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(u, HttpStatus.OK);
     }

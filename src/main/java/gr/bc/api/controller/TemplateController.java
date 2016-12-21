@@ -8,7 +8,6 @@ package gr.bc.api.controller;
 import gr.bc.api.entity.Template;
 import gr.bc.api.service.TemplateService;
 import gr.bc.api.util.Constants;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -38,23 +36,23 @@ public class TemplateController {
     @Autowired
     private TemplateService templateService;
 
-    // Create new Profession
+    // Save template
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Template> createTemplate(@RequestBody Template template, UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating Template " + template.getName(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        Template t = templateService.getTemplateByName(template.getName());
-        if (t.getName() != null) {
-            LOGGER.info("Template " + template.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Creating Template " + template, Constants.LOG_DATE_FORMAT.format(new Date()));
+        // check if template with the same name already exist
+        if (templateService.isTemplateExist(template.getName())) {
+            LOGGER.info("Template with name " + template.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         // reuse object t
-        t = templateService.createTemplate(template);
+        Template response = templateService.saveTemplate(template);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/template/{id}").buildAndExpand(t.getId()).toUri());
-        return new ResponseEntity<>(t, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/template/{id}").buildAndExpand(response.getId()).toUri());
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
     // Get template by id
@@ -62,31 +60,54 @@ public class TemplateController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Template> getTemplateById(@PathVariable("id") long id) {
-        Template t = templateService.getTemplateById(id);
+    public ResponseEntity<Template> findById(@PathVariable("id") long id) {
+        Template t = templateService.findById(id);
         return t.getName() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(t, HttpStatus.OK);
     }
 
-    // Get template by name or if name is null get all templates
+    // Get all templates
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Template>> getTemplates(
-            @RequestParam(value = "name", required = false) String name
-            /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
+    public ResponseEntity<List<Template>> findAllTemplates( /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
         // Credentials crs = Credentials.getCredentials(authToken);
-        List<Template> templates = new ArrayList<>();
-        if (name != null) {
-            Template t = templateService.getTemplateByName(name);
-            if (t.getName() != null) {
-                templates.add(t);
-            }
-        } else {
-            templates = templateService.getAllTemplates();
-        }
+        List<Template> templates = templateService.findAllTemplates();
         return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
-
+    
+    // Get all the templates by given color
+    @RequestMapping(
+            value = "/color/{color}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Template>> findByColor(@PathVariable("color") String color) {
+        List<Template> templates = templateService.findByColor(color);
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+    
+    // Get all the templates by given primary color
+    @RequestMapping(
+            value = "/primarycolor/{primaryColor}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Template>> findByPrimaryColor(@PathVariable("primaryColor") String primaryColor) {
+        List<Template> templates = templateService.findByPrimaryColor(primaryColor);
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+    
+    // Get all the templates by given secondary color
+    @RequestMapping(
+            value = "/secondarycolor/{secondaryColor}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Template>> findBySecondaryColor(@PathVariable("secondaryColor") String secondaryColor) {
+        List<Template> templates = templateService.findBySecondaryColor(secondaryColor);
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+    
 }
