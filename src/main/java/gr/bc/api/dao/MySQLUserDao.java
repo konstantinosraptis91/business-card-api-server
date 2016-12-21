@@ -38,7 +38,7 @@ public class MySQLUserDao implements IUserDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public User createUser(User user) {
+    public User saveUser(User user) {
         try {
             SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
             jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
@@ -57,7 +57,8 @@ public class MySQLUserDao implements IUserDao {
     }
 
     @Override
-    public User updateUser(long id, User user) {
+    public boolean updateUser(User user) {
+        Integer rows = null;
         try {
             String updateQuery = " UPDATE "
                     + MySQLHelper.USER_TABLE
@@ -67,31 +68,35 @@ public class MySQLUserDao implements IUserDao {
                     + MySQLHelper.USER_FIRSTNAME + "=?,"
                     + MySQLHelper.USER_LASTNAME + "=?"
                     + " WHERE " + MySQLHelper.USER_ID + "=?";
-            jdbcTemplate.update(updateQuery,
+            rows = jdbcTemplate.update(updateQuery,
                     new Object[]{
                         user.getEmail(),
                         user.getPassword(),
                         user.getFirstName(),
                         user.getLastName(),
-                        id
+                        user.getId()
                     });
-            user.setId(id);
-            return user;
         } catch (DataAccessException e) {
             LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
-        return new User();
+        return rows != null && rows > 0;
     }
 
     @Override
-    public void deleteUser(long id) {
-        String deleteQuery = "DELETE FROM " + MySQLHelper.USER_TABLE
-                + " WHERE " + MySQLHelper.USER_ID + " = " + "?";
-        jdbcTemplate.update(deleteQuery, new Object[]{id});
+    public boolean deleteUserById(long id) {
+        Integer rows = null;
+        try {
+            String deleteQuery = "DELETE FROM " + MySQLHelper.USER_TABLE
+                    + " WHERE " + MySQLHelper.USER_ID + " = " + "?";
+            rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
+        } catch (DataAccessException e) {
+            LOGGER.error(e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
     }
 
     @Override
-    public User getUserByEmail(String email) {
+    public User findByEmail(String email) {
         User user = new User();
         try {
             user = (User) jdbcTemplate.queryForObject("SELECT * FROM "
@@ -113,7 +118,7 @@ public class MySQLUserDao implements IUserDao {
     }
 
     @Override
-    public User getUserById(long id) {
+    public User findById(long id) {
         User user = new User();
         try {
             user = (User) jdbcTemplate.queryForObject("SELECT * FROM "
@@ -135,19 +140,10 @@ public class MySQLUserDao implements IUserDao {
     }
 
     @Override
-    public List<User> getUsersByName(String firstName, String lastName) {
-        String selectQuery;
-        if (firstName == null) {
-            selectQuery = "SELECT * FROM "
-                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'";
-        } else if (lastName == null) {
-            selectQuery = "SELECT * FROM "
-                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'";
-        } else {
-            selectQuery = "SELECT * FROM "
-                    + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'"
-                    + " AND " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'";
-        }
+    public List<User> findByFullName(String firstName, String lastName) {
+        String selectQuery = "SELECT * FROM "
+                + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'"
+                + " AND " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'";
         List<User> users = new ArrayList<>();
         try {
             users = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
@@ -165,7 +161,51 @@ public class MySQLUserDao implements IUserDao {
         }
         return users;
     }
-    
+
+    @Override
+    public List<User> findByFirstName(String firstName) {
+        String selectQuery = "SELECT * FROM "
+                + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_FIRSTNAME + " = " + "'" + firstName + "'";
+        List<User> users = new ArrayList<>();
+        try {
+            users = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getLong(MySQLHelper.USER_ID));
+                user.setBusinessCardId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
+                user.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                return user;
+            });
+        } catch (DataAccessException e) {
+            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return users;
+    }
+
+    @Override
+    public List<User> findByLastName(String lastName) {
+        String selectQuery = "SELECT * FROM "
+                + MySQLHelper.USER_TABLE + " WHERE " + MySQLHelper.USER_LASTNAME + " = " + "'" + lastName + "'";
+        List<User> users = new ArrayList<>();
+        try {
+            users = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getLong(MySQLHelper.USER_ID));
+                user.setBusinessCardId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
+                user.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
+                user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
+                user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
+                user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                return user;
+            });
+        } catch (DataAccessException e) {
+            LOGGER.error("getUsersByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return users;
+    }
+
     // Check if user by given id exists
     @Override
     public boolean isUserExist(long id) {
@@ -174,7 +214,7 @@ public class MySQLUserDao implements IUserDao {
                 + MySQLHelper.USER_ID + " = " + "?", Integer.class, id);
         return result != null && result > 0;
     }
-    
+
     // Check if user by given email exists
     @Override
     public boolean isUserExist(String email) {
@@ -183,5 +223,5 @@ public class MySQLUserDao implements IUserDao {
                 + MySQLHelper.USER_EMAIL + " = " + "?", Integer.class, email);
         return result != null && result > 0;
     }
-      
+
 }

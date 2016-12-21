@@ -14,17 +14,21 @@ import java.util.List;
  */
 public interface IUserDao {
         
-    User getUserByEmail(String email);
+    User findByEmail(String email);
     
-    List<User> getUsersByName(String firstName, String lastName);
+    List<User> findByFullName(String firstName, String lastName);
     
-    User getUserById(long id);
+    List<User> findByFirstName(String firstName);
+    
+    List<User> findByLastName(String lastName);
+    
+    User findById(long id);
         
-    User createUser(User user);
+    User saveUser(User user);
         
-    User updateUser(long id, User user);
+    boolean updateUser(User user);
     
-    void deleteUser(long id);
+    boolean deleteUserById(long id);
     
     boolean isUserExist(long id);
     

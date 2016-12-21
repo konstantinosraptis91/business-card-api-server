@@ -14,13 +14,19 @@ import java.util.List;
  */
 public interface ITemplateDao {
       
-    Template createTemplate(Template template);
+    Template saveTemplate(Template template);
         
-    List<Template> getAllTemplates();
+    Template findByName(String name);
     
-    Template getTemplateByName(String name);
+    Template findByColor(String color);
     
-    Template getTemplateById(long id);
+    Template findById(long id);
+    
+    List<Template> findAllTemplates();
+    
+    boolean deleteTemplateById(long id);
+    
+    boolean updateTemplate(Template template);
     
     boolean isTemplateExist(long id);
     

@@ -13,21 +13,23 @@ import java.util.List;
  * @author Konstantinos Raptis
  */
 public interface IBusinessCardDao {
-                
-    BusinessCard getBusinessCardById(long businessCardId);
     
-    BusinessCard getBusinessCardByUserId(long userId);
+    BusinessCard saveBusinessCard(BusinessCard businessCard);
     
-    BusinessCard getBusinessCardByUserEmail(String email);
+    BusinessCard findById(long businessCardId);
     
-    List<BusinessCard> getBusinessCardByUserName(String firstName, String lastName);
+    BusinessCard findByUserId(long userId);
+    
+    BusinessCard findByUserEmail(String email);
+    
+    List<BusinessCard> findCardByUserName(String firstName, String lastName);
+    
+    List<BusinessCard> findCardByProfessionId(long professionId);
+           
+    boolean updateBusinessCard(BusinessCard businessCard);
         
-    BusinessCard createBusinessCard(BusinessCard businessCard);
-        
-    BusinessCard updateBusinessCard(long id, BusinessCard businessCard);
-        
-    void deleteBusinessCard(long id);
+    boolean deleteBusinessCardById(long id);
     
     boolean isBusinessCardExist(long id);
-
+    
 }

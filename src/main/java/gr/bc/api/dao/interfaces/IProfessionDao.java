@@ -14,13 +14,17 @@ import java.util.List;
  */
 public interface IProfessionDao {
         
-    Profession createProfession(Profession profession);    
+    Profession saveProfession(Profession profession);    
         
-    Profession getProfessionByName(String name);
+    Profession findByName(String name);
     
-    Profession getProfessionById(long professionId);
+    Profession findById(long id);
     
-    List<Profession> getAllProfessions();
+    List<Profession> findAllProfessions();
+    
+    boolean deleteProfessionById(long id);
+    
+    boolean updateProfession(Profession profession);
     
     boolean isProfessionExist(long id);
     

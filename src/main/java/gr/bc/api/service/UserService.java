@@ -23,28 +23,34 @@ public class UserService {
     @Qualifier("MySQLUser")
     private IUserDao userDao;
     
-    public User createUser(User user) {
-        return userDao.createUser(user);
+    public User saveUser(User user) {
+        return userDao.saveUser(user);
     }
     
-    public User updateUser(long id, User user) {
-        return userDao.updateUser(id, user);
+    public boolean updateUser(User user) {
+        return userDao.updateUser(user);
     }
     
-    public void deleteUser(long id) {
-        userDao.deleteUser(id);
+    public boolean deleteUserById(long id) {
+        return userDao.deleteUserById(id);
     }
     
-    public User getUserByEmail(String email) {
-        return userDao.getUserByEmail(email);
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email);
     }
         
-    public List<User> getUsersByName(String firstName, String lastName) {
-        return userDao.getUsersByName(firstName, lastName);
+    public List<User> findByName(String firstName, String lastName) {
+        if (firstName == null) {
+            return userDao.findByLastName(lastName);
+        } else if (lastName == null) {
+            return userDao.findByFirstName(firstName);
+        } else {
+            return userDao.findByFullName(firstName, lastName);
+        }
     }
 
-    public User getUserById(long id) {
-        return userDao.getUserById(id);
+    public User findById(long id) {
+        return userDao.findById(id);
     }
 
     public boolean isUserExist(long userId) {

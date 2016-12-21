@@ -11,6 +11,6 @@ package gr.bc.api.dao.interfaces;
  */
 public interface IWalletDao {
     
-    long addBusinessCardToWallet(long userId, long BusinessCardId);
+    long saveBusinessCardToWallet(long userId, long BusinessCardId);
     
 }
