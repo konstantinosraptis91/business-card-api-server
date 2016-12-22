@@ -22,14 +22,22 @@ public interface IBusinessCardDao {
     
     BusinessCard findByUserEmail(String email);
     
-    List<BusinessCard> findCardByUserName(String firstName, String lastName);
+    List<BusinessCard> findByUserFullName(String firstName, String lastName);
     
-    List<BusinessCard> findCardByProfessionId(long professionId);
+    List<BusinessCard> findByUserFirstName(String firstName);
+    
+    List<BusinessCard> findByUserLastName(String lastName);
+    
+    List<BusinessCard> findByProfessionId(long professionId);
            
     boolean updateBusinessCard(BusinessCard businessCard);
         
     boolean deleteBusinessCardById(long id);
     
+    boolean deleteBusinessCardByUserId(long id);
+    
     boolean isBusinessCardExist(long id);
+    
+    boolean isBusinessCardExistByUserId(long id);
     
 }

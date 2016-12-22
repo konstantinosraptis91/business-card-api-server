@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,6 +73,29 @@ public class ProfessionController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(professionService.updateProfession(profession), HttpStatus.OK);
+    }
+
+    // Delete profession
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Boolean> deleteProfessionById(@PathVariable("id") long id) {
+        LOGGER.info("Deleting Profession with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
+        if (!professionService.isProfessionExist(id)) {
+            LOGGER.info("Unable to delete Profession with id " + id + ".Profession not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(professionService.deleteProfessionById(id), HttpStatus.NO_CONTENT);
+    }
+
+    // Get profession by id
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Profession> findById(@PathVariable("id") long id) {
+        return professionService.isProfessionExist(id) ? new ResponseEntity<>(professionService.findById(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

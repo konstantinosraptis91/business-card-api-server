@@ -42,7 +42,7 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
-        
+
     // Save user (Create Account)    
     @RequestMapping(
             method = RequestMethod.POST,
@@ -50,7 +50,7 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> saveUser(@Valid @RequestBody User user,
             UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating " + user, 
+        LOGGER.info("Creating " + user,
                 Constants.LOG_DATE_FORMAT.format(new Date()));
         // check if user with the same email already exist
         if (userService.isUserExist(user.getEmail())) {
@@ -74,9 +74,9 @@ public class UserController {
         if (!userService.isUserExist(user.getId())) {
             LOGGER.info("Unable to update user with id " + user.getId() + ".User not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        // Check if user who is being updated got the same email with a user in database    
-        } else if (userService.isUserExist(user.getEmail()) && 
-                userService.findByEmail(user.getEmail()).getId() != user.getId()) {
+            // Check if user who is being updated got the same email with a user in database    
+        } else if (userService.isUserExist(user.getEmail())
+                && userService.findByEmail(user.getEmail()).getId() != user.getId()) {
             LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
@@ -114,7 +114,7 @@ public class UserController {
         } else {
             users = userService.findByName(firstName, lastName);
         }
-        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -124,9 +124,8 @@ public class UserController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> findById(@PathVariable("id") long id) {
-        User u = userService.findById(id);
-        return u.getEmail() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(u, HttpStatus.OK);
+        return userService.isUserExist(id) ? new ResponseEntity<>(userService.findById(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-        
+
 }

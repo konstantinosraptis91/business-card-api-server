@@ -130,7 +130,7 @@ public class BusinessCard {
 
     @Override
     public String toString() {
-        return "BusinessCard{" + "id=" + id + ", professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", isPublic=" + isPublic + '}';
+        return "BusinessCard{" + "professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", isPublic=" + isPublic + '}';
     }
         
 }

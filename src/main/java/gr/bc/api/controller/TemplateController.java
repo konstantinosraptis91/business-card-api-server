@@ -61,9 +61,8 @@ public class TemplateController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Template> findById(@PathVariable("id") long id) {
-        Template t = templateService.findById(id);
-        return t.getName() == null ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(t, HttpStatus.OK);
+        return templateService.isTemplateExist(id) ? new ResponseEntity<>(templateService.findById(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     // Get all templates
@@ -73,7 +72,7 @@ public class TemplateController {
     public ResponseEntity<List<Template>> findAllTemplates( /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
         // Credentials crs = Credentials.getCredentials(authToken);
         List<Template> templates = templateService.findAllTemplates();
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -84,7 +83,7 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findByColor(@PathVariable("color") String color) {
         List<Template> templates = templateService.findByColor(color);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -95,7 +94,7 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findByPrimaryColor(@PathVariable("primaryColor") String primaryColor) {
         List<Template> templates = templateService.findByPrimaryColor(primaryColor);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -106,7 +105,7 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findBySecondaryColor(@PathVariable("secondaryColor") String secondaryColor) {
         List<Template> templates = templateService.findBySecondaryColor(secondaryColor);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     

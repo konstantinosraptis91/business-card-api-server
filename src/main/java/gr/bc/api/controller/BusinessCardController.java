@@ -32,7 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping(value = "/api/businesscard")
 public class BusinessCardController {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCardController.class);
     @Autowired
     private BusinessCardService businessCardService;
@@ -42,41 +42,38 @@ public class BusinessCardController {
     private TemplateService templateService;
     @Autowired
     private ProfessionService professionService;
-    
+
     // Create user business card
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<BusinessCard> createBusinessCard(@RequestBody BusinessCard businessCard, UriComponentsBuilder ucBuilder) {
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> saveBusinessCard(@RequestBody BusinessCard businessCard, UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating Business Card for user id: " + businessCard.getUserId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // user not found
-        if ((userService.getUserById(businessCard.getUserId()).getId()) == 0) {
+        if (!userService.isUserExist(businessCard.getUserId())) {
             LOGGER.info("Unable to find user with id " + businessCard.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // template not found
-        if ((templateService.getTemplateById(businessCard.getTemplateId()).getId()) == 0) {
+        if (!templateService.isTemplateExist(businessCard.getTemplateId())) {
             LOGGER.info("Unable to find template with id " + businessCard.getTemplateId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // profession not found
-        if ((professionService.getProfessionById(businessCard.getProfessionId()).getId()) == 0) {
+        if (!professionService.isProfessionExist(businessCard.getProfessionId())) {
             LOGGER.info("Unable to find profession with id " + businessCard.getProfessionId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // user already owns a business card
-        BusinessCard bc = businessCardService.getBusinessCardByUserId(businessCard.getUserId());
-        if (bc.getId() != 0) {
+        if (businessCardService.isBusinessCardExistByUserId(businessCard.getUserId())) {
             LOGGER.info("User with id " + businessCard.getUserId() + " already owns a Business Card", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        // reuse object bc
-        bc = businessCardService.createBusinessCard(businessCard);
+        BusinessCard response = businessCardService.saveBusinessCard(businessCard);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(bc.getId()).toUri());
-        return new ResponseEntity<>(bc, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(response.getId()).toUri());
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
-        
+    
 }
