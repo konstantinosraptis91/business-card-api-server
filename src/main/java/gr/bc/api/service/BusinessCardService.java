@@ -42,19 +42,17 @@ public class BusinessCardService {
     public BusinessCard findByUserEmail(String email) {
         return businessCardDao.findByUserEmail(email);
     }
-    
-    public List<BusinessCard> findByUserFirstName(String firstName) {
-        return businessCardDao.findByUserFirstName(firstName);
+       
+    public List<BusinessCard> findByUserName(String firstName, String lastName) {
+        if (firstName == null) {
+            return businessCardDao.findByUserLastName(lastName);
+        } else if (lastName == null) {
+            return businessCardDao.findByUserFirstName(firstName);
+        } else {
+            return businessCardDao.findByUserFullName(firstName, lastName);
+        }
     }
-    
-    public List<BusinessCard> findByUserFullName(String firstName, String lastName) {
-        return businessCardDao.findByUserFullName(firstName, lastName);
-    }
-    
-    public List<BusinessCard> findByUserLastName(String lastName) {
-        return businessCardDao.findByUserLastName(lastName);
-    }
-        
+            
     public boolean isBusinessCardExist(long id) {
         return businessCardDao.isBusinessCardExist(id);
     }
@@ -73,6 +71,10 @@ public class BusinessCardService {
     
     public boolean isBusinessCardExistByUserId(long id) {
         return businessCardDao.isBusinessCardExistByUserId(id);
+    }
+    
+    public boolean isBusinessCardExistByUserEmail(String email) {
+        return businessCardDao.isBusinessCardExistByUserEmail(email);
     }
     
 }

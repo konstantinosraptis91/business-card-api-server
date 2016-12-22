@@ -6,12 +6,15 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.entity.BusinessCard;
+import gr.bc.api.entity.User;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.ProfessionService;
 import gr.bc.api.service.TemplateService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.util.Constants;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +22,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -43,7 +48,7 @@ public class BusinessCardController {
     @Autowired
     private ProfessionService professionService;
 
-    // Create user business card
+    // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -74,6 +79,57 @@ public class BusinessCardController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(response.getId()).toUri());
         return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
+    }
+    
+    // Get business card id
+    @RequestMapping(
+            value="/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> findById(@PathVariable("id") long id) {
+        return businessCardService.isBusinessCardExist(id) ? new ResponseEntity<>(businessCardService.findById(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    
+    // Get business card by user id
+    @RequestMapping(
+            value="/user/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> findByUserId(@PathVariable("id") long id) {
+        return businessCardService.isBusinessCardExistByUserId(id) ? new ResponseEntity<>(businessCardService.findByUserId(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    
+    // Get business card by profession id
+    @RequestMapping(
+            value="/profession/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BusinessCard>> findByProfessionId(@PathVariable("id") long id) {
+        List<BusinessCard> bcs = businessCardService.findByProfessionId(id);
+        return !bcs.isEmpty() ? new ResponseEntity<>(bcs, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    
+    // Get business card by email or first name and/or last name
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BusinessCard>> find(
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName) {
+        List<BusinessCard> bcs = new ArrayList<>();
+        if (email != null) {
+            if (businessCardService.isBusinessCardExistByUserEmail(email)) {
+                bcs.add(businessCardService.findByUserEmail(email));
+            }
+        } else {
+            bcs = businessCardService.findByUserName(firstName, lastName);
+        }
+        return bcs.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                : new ResponseEntity<>(bcs, HttpStatus.OK);
     }
     
 }

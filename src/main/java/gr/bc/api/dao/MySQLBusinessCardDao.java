@@ -423,4 +423,9 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
         return result != null && result > 0;
     }
 
+    @Override
+    public boolean isBusinessCardExistByUserEmail(String email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+      
 }
