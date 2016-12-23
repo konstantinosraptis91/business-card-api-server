@@ -63,7 +63,12 @@ public class WalletController {
             LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Adding Bussines card " + businessCardId + " to users wallet " + userId);
+        // Check if business card which user willing to add in his wallet already exist
+        if (walletService.isBusinessCardExistInWallet(userId, businessCardId)) {
+            LOGGER.info("User with id " + userId + " already got business card with id " + businessCardId + " in his wallet...");
+            return new ResponseEntity<>(HttpStatus.CONFLICT); 
+        }
+        LOGGER.info("Adding Bussines card with id " + businessCardId + " to users wallet " + userId);
         return new ResponseEntity<>(walletService.addBusinessCardToWallet(userId, businessCardId), HttpStatus.OK);
     }
     
@@ -76,4 +81,32 @@ public class WalletController {
         return userService.isUserExist(id) ? new ResponseEntity<>(walletService.findAllBusinessCardInWalletByUserId(id), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+    
+    // Delete a business card from user wallet
+    @RequestMapping(
+            value = "/user/{userId}/businesscard/{businessCardId}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Boolean> deleteBusinessCardFromWallet(
+            @PathVariable("userId") long userId,
+            @PathVariable("businessCardId") long businessCardId) {
+        // check if user exists
+        if (!userService.isUserExist(userId)) {
+            LOGGER.info("Unable to find user " + userId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // check if business card exists
+        if (!businessCardService.isBusinessCardExist(businessCardId)) {
+            LOGGER.info("Unable to find business card " + businessCardId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // check if user got this business card in his wallet
+        if (!walletService.isBusinessCardExistInWallet(userId, businessCardId)) {
+            LOGGER.info("Unable to find business card " + businessCardId + " in user with id " + userId + " wallet");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(
+                walletService.deleteBusinessCardFromWallet(userId, businessCardId), 
+                HttpStatus.NO_CONTENT);
+    }
+    
 }

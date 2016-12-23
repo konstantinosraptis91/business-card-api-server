@@ -31,4 +31,12 @@ public class WalletService {
         return walletDao.findAllBusinessCardInWalletByUserId(id);
     }
     
+    public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) {
+        return walletDao.deleteBusinessCardFromWallet(userId, businessCardId);
+    }
+    
+    public boolean isBusinessCardExistInWallet(long userId, long BusinessCardId) {
+        return walletDao.isBusinessCardExistInWallet(userId, BusinessCardId);
+    }
+    
 }

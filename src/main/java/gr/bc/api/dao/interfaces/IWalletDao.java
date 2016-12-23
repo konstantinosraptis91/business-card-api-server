@@ -14,8 +14,12 @@ import java.util.List;
  */
 public interface IWalletDao {
     
-    boolean saveBusinessCardToWallet(long userId, long BusinessCardId);
+    boolean saveBusinessCardToWallet(long userId, long businessCardId);
     
     List<BusinessCard> findAllBusinessCardInWalletByUserId(long id);
+    
+    boolean deleteBusinessCardFromWallet(long userId, long businessCardId);
+    
+    boolean isBusinessCardExistInWallet(long userId, long businessCardId);
     
 }

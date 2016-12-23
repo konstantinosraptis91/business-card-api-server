@@ -34,7 +34,7 @@ public class MySQLWalletDao implements IWalletDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public boolean saveBusinessCardToWallet(long userId, long BusinessCardId) {
+    public boolean saveBusinessCardToWallet(long userId, long businessCardId) {
         long rows = 0;
         try {
             String insertQuery = " INSERT INTO "
@@ -46,7 +46,7 @@ public class MySQLWalletDao implements IWalletDao {
             rows = jdbcTemplate.update(insertQuery,
                     new Object[]{
                         userId,
-                        BusinessCardId
+                        businessCardId
                     });
         } catch (DataAccessException e) {
             LOGGER.error("saveBusinessCardToWallet: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
@@ -97,4 +97,30 @@ public class MySQLWalletDao implements IWalletDao {
         return bcs;        
     }
 
+    @Override
+    public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) {
+        Integer rows = null;
+        try {
+            String deleteQuery = "DELETE FROM " + MySQLHelper.USER_BUSINESS_CARD_TABLE
+                    + " WHERE " + MySQLHelper.USER_ID + " = " + "?"
+                    + " AND "
+                    + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
+            rows = jdbcTemplate.update(deleteQuery, new Object[]{userId, businessCardId});
+        } catch (DataAccessException e) {
+            LOGGER.error("deleteBusinessCardFromWallet: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
+    }
+   
+    @Override
+    public boolean isBusinessCardExistInWallet(long userId, long businessCardId) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.USER_BUSINESS_CARD_TABLE + " WHERE "
+                + MySQLHelper.USER_ID + " = " + "?"
+                + " AND "
+                + MySQLHelper.BUSINESS_CARD_ID + " = " + "?", 
+                Integer.class, userId, businessCardId);
+        return result != null && result > 0;
+    }
+   
 }
