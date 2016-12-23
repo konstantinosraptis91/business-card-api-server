@@ -6,7 +6,6 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.entity.BusinessCard;
-import gr.bc.api.entity.User;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.ProfessionService;
 import gr.bc.api.service.TemplateService;
@@ -15,6 +14,7 @@ import gr.bc.api.util.Constants;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +130,47 @@ public class BusinessCardController {
         }
         return bcs.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(bcs, HttpStatus.OK);
+    }
+    
+    // Update business card
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> updateBusinessCard(@Valid @RequestBody BusinessCard businessCard) {
+        LOGGER.info("Updating business card with id " + businessCard.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        // Check if business card which actually updated exists
+        if (!businessCardService.isBusinessCardExist(businessCard.getId())) {
+            LOGGER.info("Unable to update business card with id " + businessCard.getId() + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(businessCardService.updateBusinessCard(businessCard), HttpStatus.OK);
+    }
+    
+    // Delete business card by id
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Boolean> deleteBusinessCardById(@PathVariable("id") long id) {
+        LOGGER.info("Deleting business card with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
+        if (!businessCardService.isBusinessCardExist(id)) {
+            LOGGER.info("Unable to delete business card with id " + id + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(businessCardService.deleteBusinessCardById(id), HttpStatus.NO_CONTENT);
+    }
+    
+    // Delete business card by user id
+    @RequestMapping(
+            value = "/user/{id}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Boolean> deleteBusinessCardByUserId(@PathVariable("id") long id) {
+        LOGGER.info("Deleting business card with user id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
+        if (!businessCardService.isBusinessCardExistByUserId(id)) {
+            LOGGER.info("Unable to delete business card with user id " + id + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(businessCardService.deleteBusinessCardByUserId(id), HttpStatus.NO_CONTENT);
     }
     
 }

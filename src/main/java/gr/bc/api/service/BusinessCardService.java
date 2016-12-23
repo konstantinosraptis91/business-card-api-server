@@ -77,4 +77,8 @@ public class BusinessCardService {
         return businessCardDao.isBusinessCardExistByUserEmail(email);
     }
     
+    public boolean isBusinessCardBelongToUserById(long businessCardId, long userId) {
+        return businessCardDao.isBusinessCardBelongToUserById(businessCardId, userId);
+    }
+    
 }

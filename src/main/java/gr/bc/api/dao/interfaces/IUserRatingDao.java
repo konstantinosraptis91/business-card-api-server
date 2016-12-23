@@ -5,17 +5,10 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.BusinessCard;
-import java.util.List;
-
 /**
  *
  * @author Konstantinos Raptis
  */
-public interface IWalletDao {
-    
-    boolean saveBusinessCardToWallet(long userId, long BusinessCardId);
-    
-    List<BusinessCard> findAllBusinessCardInWalletByUserId(long id);
-    
+public class IUserRatingDao {
+        
 }

@@ -5,13 +5,16 @@
  */
 package gr.bc.api.controller;
 
+import gr.bc.api.entity.BusinessCard;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.WalletService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,9 +38,10 @@ public class WalletController {
     private BusinessCardService businessCardService;
     
     // Add business card to user wallet (user_business_card)
-    @RequestMapping(value = "/user/{userId}/businesscard/{businessCardId}",
+    @RequestMapping(
+            value = "/user/{userId}/businesscard/{businessCardId}",
             method = RequestMethod.POST)           
-    public ResponseEntity<Long> addBusinessCardToWallet(
+    public ResponseEntity<Boolean> addBusinessCardToWallet(
             @PathVariable("userId") long userId,
             @PathVariable("businessCardId") long businessCardId) {
         if (businessCardId < 1 || userId < 1) {
@@ -54,8 +58,22 @@ public class WalletController {
             LOGGER.info("Unable to find business card " + businessCardId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // Check if user trying to add his own card in wallet
+        if (businessCardService.isBusinessCardBelongToUserById(businessCardId, userId)) {
+            LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         LOGGER.info("Adding Bussines card " + businessCardId + " to users wallet " + userId);
         return new ResponseEntity<>(walletService.addBusinessCardToWallet(userId, businessCardId), HttpStatus.OK);
     }
     
+    // Get all business card a user got in his wallet by user id
+    @RequestMapping(
+            value = "/user/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BusinessCard>> findAllBusinessCardInWalletByUserId(@PathVariable("id") long id) {
+        return userService.isUserExist(id) ? new ResponseEntity<>(walletService.findAllBusinessCardInWalletByUserId(id), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

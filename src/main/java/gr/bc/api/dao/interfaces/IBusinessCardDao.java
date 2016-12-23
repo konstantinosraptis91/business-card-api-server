@@ -42,4 +42,6 @@ public interface IBusinessCardDao {
     
     boolean isBusinessCardExistByUserEmail(String email);
     
+    boolean isBusinessCardBelongToUserById(long businessCardId, long userId);
+    
 }

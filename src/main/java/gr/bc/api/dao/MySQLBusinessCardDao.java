@@ -119,15 +119,15 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     @Override
     public List<BusinessCard> findByUserFullName(String firstName, String lastName) {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
@@ -168,15 +168,15 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     @Override
     public List<BusinessCard> findByUserFirstName(String firstName) {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
@@ -213,15 +213,15 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     @Override
     public List<BusinessCard> findByUserLastName(String lastName) {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
@@ -258,15 +258,15 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     @Override
     public BusinessCard findByUserEmail(String email) {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
@@ -303,15 +303,15 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     @Override
     public List<BusinessCard> findByProfessionId(long id) {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
@@ -411,7 +411,8 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
     public boolean isBusinessCardExist(long id) {
         Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
                 + MySQLHelper.BUSINESS_CARD_TABLE + " WHERE "
-                + MySQLHelper.BUSINESS_CARD_ID + " = " + "?", Integer.class, id);
+                + MySQLHelper.BUSINESS_CARD_ID + " = " + "?"
+                , Integer.class, id);
         return result != null && result > 0;
     }
 
@@ -425,7 +426,30 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
 
     @Override
     public boolean isBusinessCardExistByUserEmail(String email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.BUSINESS_CARD_TABLE
+                + " INNER JOIN " + MySQLHelper.USER_TABLE
+                + " ON "
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_ID
+                + "="
+                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
+                + " WHERE "
+                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_EMAIL + "=" + "'" + email + "'"
+                // case sensitive search for last name
+                + " COLLATE utf8_bin"
+                , Integer.class, email);
+        return result != null && result > 0; 
     }
-      
+
+    @Override
+    public boolean isBusinessCardBelongToUserById(long businessCardId, long userId) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.BUSINESS_CARD_TABLE + " WHERE "
+                + MySQLHelper.BUSINESS_CARD_ID + " = " + "?"
+                + " AND "
+                + MySQLHelper.USER_ID + " = " + "?",
+                Integer.class, businessCardId, userId);
+        return result != null && result > 0;
+    }
+       
 }

@@ -69,7 +69,7 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> updateUser(@Valid @RequestBody User user) {
-        LOGGER.info("Updating User with id " + user.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Updating user with id " + user.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // Check if user who is being updated actually exists
         if (!userService.isUserExist(user.getId())) {
             LOGGER.info("Unable to update user with id " + user.getId() + ".User not found", Constants.LOG_DATE_FORMAT.format(new Date()));
