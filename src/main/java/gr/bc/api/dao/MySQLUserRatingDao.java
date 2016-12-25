@@ -70,7 +70,9 @@ public class MySQLUserRatingDao implements IUserRatingDao {
                         ur.setId(rs.getLong(MySQLHelper.USER_RATING_ID));
                         ur.setUserId(rs.getLong(MySQLHelper.USER_ID));
                         ur.setBusinessCardId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
-                        
+                        ur.setStars(rs.getInt(MySQLHelper.USER_RATING_STARS));
+                        ur.setTitle(rs.getString(MySQLHelper.USER_RATING_TITLE));
+                        ur.setDescription(rs.getString(MySQLHelper.USER_RATING_DESCRIPTION));
                         return ur;
                     });
         } catch (DataAccessException e) {
@@ -81,17 +83,60 @@ public class MySQLUserRatingDao implements IUserRatingDao {
 
     @Override
     public List<UserRating> findByUserId(long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<UserRating> urs = new ArrayList<>();
+        try {
+            urs = jdbcTemplate.query("SELECT * FROM "
+                    + MySQLHelper.USER_RATING_TABLE + " WHERE " + MySQLHelper.USER_ID + " = " + "'" + id + "'",
+                    (rs, rowNum) -> {
+                        UserRating ur = new UserRating();
+                        ur.setId(rs.getLong(MySQLHelper.USER_RATING_ID));
+                        ur.setUserId(rs.getLong(MySQLHelper.USER_ID));
+                        ur.setBusinessCardId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
+                        ur.setStars(rs.getInt(MySQLHelper.USER_RATING_STARS));
+                        ur.setTitle(rs.getString(MySQLHelper.USER_RATING_TITLE));
+                        ur.setDescription(rs.getString(MySQLHelper.USER_RATING_DESCRIPTION));
+                        return ur;
+                    });
+        } catch (DataAccessException e) {
+            LOGGER.error("findByUserId: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return urs;
     }
 
     @Override
     public boolean updateUserRating(UserRating userRating) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Integer rows = null;
+        try {
+            String updateQuery = " UPDATE "
+                    + MySQLHelper.USER_RATING_TABLE
+                    + " SET "
+                    + MySQLHelper.USER_RATING_STARS + "=?,"
+                    + MySQLHelper.USER_RATING_TITLE + "=?,"
+                    + MySQLHelper.USER_RATING_DESCRIPTION + "=?"
+                    + " WHERE " + MySQLHelper.USER_RATING_ID + "=?";
+            rows = jdbcTemplate.update(updateQuery,
+                    new Object[]{
+                        userRating.getStars(),
+                        userRating.getTitle(),
+                        userRating.getDescription()
+                    });
+        } catch (DataAccessException e) {
+            LOGGER.error("updateUserRating: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
     }
 
     @Override
-    public boolean deleteUserRatingByUserId(long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean deleteUserRatingById(long id) {
+        Integer rows = null;
+        try {
+            String deleteQuery = "DELETE FROM " + MySQLHelper.USER_RATING_TABLE
+                    + " WHERE " + MySQLHelper.USER_RATING_ID + " = " + "?";
+            rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
+        } catch (DataAccessException e) {
+            LOGGER.error("deleteUserRatingById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+        return rows != null && rows > 0;
     }
     
 }

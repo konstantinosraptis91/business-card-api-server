@@ -22,6 +22,6 @@ public interface IUserRatingDao {
     
     boolean updateUserRating(UserRating userRating);
     
-    boolean deleteUserRatingByUserId(long id);    
-    
+    boolean deleteUserRatingById(long id);
+      
 }

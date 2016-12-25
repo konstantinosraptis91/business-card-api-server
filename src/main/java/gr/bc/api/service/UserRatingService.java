@@ -39,8 +39,8 @@ public class UserRatingService {
         return userRatingDao.updateUserRating(userRating);
     }
     
-    boolean deleteUserRatingByUserId(long id) {
-        return userRatingDao.deleteUserRatingByUserId(id);
+    boolean deleteUserRatingById(long id) {
+        return userRatingDao.deleteUserRatingById(id);
     }
     
 }
