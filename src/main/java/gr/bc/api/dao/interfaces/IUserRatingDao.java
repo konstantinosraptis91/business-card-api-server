@@ -5,10 +5,23 @@
  */
 package gr.bc.api.dao.interfaces;
 
+import gr.bc.api.entity.UserRating;
+import java.util.List;
+
 /**
  *
  * @author Konstantinos Raptis
  */
-public class IUserRatingDao {
-        
+public interface IUserRatingDao {
+    
+    UserRating saveUserRating(UserRating userRating);
+    
+    List<UserRating> findByBusinessCardId(long id);
+    
+    List<UserRating> findByUserId(long id);
+    
+    boolean updateUserRating(UserRating userRating);
+    
+    boolean deleteUserRatingByUserId(long id);    
+    
 }
