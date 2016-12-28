@@ -5,6 +5,8 @@
  */
 package gr.bc.api.entity;
 
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Konstantinos Raptis
@@ -15,12 +17,16 @@ public class BusinessCard {
     private long professionId;
     private long templateId;
     private long userId;
+    @NotNull
     private String title;
+    @NotNull
     private String description;
+    @NotNull
     private String phoneNumber1;
     private String phoneNumber2;
     private String linkedIn;
     private String website;
+    @NotNull
     private boolean isPublic;
 
     public BusinessCard() {

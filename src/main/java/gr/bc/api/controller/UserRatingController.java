@@ -52,6 +52,22 @@ public class UserRatingController {
             UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating " + userRating, 
                 Constants.LOG_DATE_FORMAT.format(new Date()));
+        // Check if user exist
+        if (!userService.isUserExist(userRating.getUserId())) {
+            LOGGER.info("Unable to find user with id " + userRating.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Check if business card exist
+        if (!businessCardService.isBusinessCardExist(userRating.getBusinessCardId())) {
+            LOGGER.info("Unable to find business card with id " + userRating.getBusinessCardId() + ". Business card does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // Cehck if user try to save user rating for his own business card
+        if (businessCardService.findByUserId(userRating.getUserId()).getId() ==
+                userRating.getBusinessCardId()) {
+            LOGGER.info("User with id " + userRating.getUserId() + " is trying to rate his own business card. Action is not allowed...", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         UserRating response = userRatingService.saveUserRating(userRating);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/userrating/{id}").buildAndExpand(response.getId()).toUri());

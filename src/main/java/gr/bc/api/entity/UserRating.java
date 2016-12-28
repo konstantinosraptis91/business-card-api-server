@@ -5,6 +5,10 @@
  */
 package gr.bc.api.entity;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Konstantinos Raptis
@@ -14,6 +18,7 @@ public class UserRating {
     private long id;
     private long userId;
     private long businessCardId;
+    @NotNull @Min(1) @Max(5)
     private int stars;
     private String title;
     private String description;

@@ -5,6 +5,8 @@
  */
 package gr.bc.api.entity;
 
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Konstantinos Raptis
@@ -12,6 +14,7 @@ package gr.bc.api.entity;
 public class Profession {
     
     private long id;
+    @NotNull
     private String name;
     private String description;
 

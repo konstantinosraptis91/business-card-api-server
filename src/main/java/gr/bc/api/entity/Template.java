@@ -5,6 +5,9 @@
  */
 package gr.bc.api.entity;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 /**
  *
  * @author Konstantinos Raptis
@@ -12,8 +15,11 @@ package gr.bc.api.entity;
 public class Template {
     
     private long id;
+    @NotNull
     private String name;
+    @NotNull @Size(min = 6, max = 6)
     private String primaryColor;
+    @NotNull @Size(min = 6, max = 6)
     private String secondaryColor;
 
     public Template() {
