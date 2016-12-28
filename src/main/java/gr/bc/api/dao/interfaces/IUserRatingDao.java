@@ -23,5 +23,7 @@ public interface IUserRatingDao {
     boolean updateUserRating(UserRating userRating);
     
     boolean deleteUserRatingById(long id);
-      
+    
+    boolean isUserRatingExixst(long id);
+    
 }

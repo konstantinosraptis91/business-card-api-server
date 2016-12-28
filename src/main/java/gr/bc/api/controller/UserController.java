@@ -88,7 +88,7 @@ public class UserController {
             value = "/{id}",
             method = RequestMethod.DELETE)
     public ResponseEntity<Boolean> deleteUserById(@PathVariable("id") long id) {
-        LOGGER.info("Deleting User with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Deleting user with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
         if (!userService.isUserExist(id)) {
             LOGGER.info("Unable to delete user with id " + id + ".User not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

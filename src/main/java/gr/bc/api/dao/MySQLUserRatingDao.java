@@ -6,8 +6,6 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.IUserRatingDao;
-import gr.bc.api.entity.BusinessCard;
-import gr.bc.api.entity.User;
 import gr.bc.api.entity.UserRating;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -33,12 +31,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Qualifier("MySQLUserRating")
 public class MySQLUserRatingDao implements IUserRatingDao {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MySQLUserRatingDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+
     @Override
     public UserRating saveUserRating(UserRating userRating) {
         try {
@@ -138,5 +136,13 @@ public class MySQLUserRatingDao implements IUserRatingDao {
         }
         return rows != null && rows > 0;
     }
-    
+
+    @Override
+    public boolean isUserRatingExixst(long id) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.USER_RATING_TABLE + " WHERE "
+                + MySQLHelper.USER_RATING_ID + " = " + "?", Integer.class, id);
+        return result != null && result > 0;
+    }
+
 }

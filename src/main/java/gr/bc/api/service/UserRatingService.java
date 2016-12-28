@@ -35,12 +35,16 @@ public class UserRatingService {
         return userRatingDao.findByUserId(id);
     }
     
-    boolean updateUserRating(UserRating userRating) {
+    public boolean updateUserRating(UserRating userRating) {
         return userRatingDao.updateUserRating(userRating);
     }
     
-    boolean deleteUserRatingById(long id) {
+    public boolean deleteUserRatingById(long id) {
         return userRatingDao.deleteUserRatingById(id);
+    }
+    
+    public boolean isUserRatingExixst(long id) {
+        return userRatingDao.isUserRatingExixst(id);
     }
     
 }
