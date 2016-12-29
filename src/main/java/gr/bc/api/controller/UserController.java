@@ -48,10 +48,8 @@ public class UserController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> saveUser(@Valid @RequestBody User user,
-            UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating " + user,
-                Constants.LOG_DATE_FORMAT.format(new Date()));
+    public ResponseEntity<User> saveUser(@Valid @RequestBody User user, UriComponentsBuilder ucBuilder) {
+        LOGGER.info("Creating " + user, Constants.LOG_DATE_FORMAT.format(new Date()));
         // check if user with the same email already exist
         if (userService.isUserExist(user.getEmail())) {
             LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
@@ -66,9 +64,8 @@ public class UserController {
     // Update user (Update Account)
     @RequestMapping(
             method = RequestMethod.PUT,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> updateUser(@Valid @RequestBody User user) {
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateUser(@Valid @RequestBody User user) {
         LOGGER.info("Updating user with id " + user.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // Check if user who is being updated actually exists
         if (!userService.isUserExist(user.getId())) {
@@ -80,20 +77,22 @@ public class UserController {
             LOGGER.info("User with email " + user.getEmail() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(userService.updateUser(user), HttpStatus.OK);
+        return userService.updateUser(user) ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
 
     // Delete user (Delete Account)
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Boolean> deleteUserById(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable("id") long id) {
         LOGGER.info("Deleting user with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
         if (!userService.isUserExist(id)) {
             LOGGER.info("Unable to delete user with id " + id + ".User not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(userService.deleteUserById(id), HttpStatus.NO_CONTENT);
+        return userService.deleteUserById(id) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
 
     // Get users by email or first name and/or last name
@@ -110,11 +109,13 @@ public class UserController {
         if (email != null) {
             if (userService.isUserExist(email)) {
                 users.add(userService.findByEmail(email));
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } else {
             users = userService.findByName(firstName, lastName);
         }
-        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        return users.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(users, HttpStatus.OK);
     }
 

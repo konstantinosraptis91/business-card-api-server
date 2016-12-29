@@ -79,14 +79,14 @@ public class WalletController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BusinessCard>> findAllBusinessCardInWalletByUserId(@PathVariable("id") long id) {
         return userService.isUserExist(id) ? new ResponseEntity<>(walletService.findAllBusinessCardInWalletByUserId(id), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                : new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
     // Delete a business card from user wallet
     @RequestMapping(
             value = "/user/{userId}/businesscard/{businessCardId}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Boolean> deleteBusinessCardFromWallet(
+    public ResponseEntity<Void> deleteBusinessCardFromWallet(
             @PathVariable("userId") long userId,
             @PathVariable("businessCardId") long businessCardId) {
         // check if user exists
@@ -104,9 +104,8 @@ public class WalletController {
             LOGGER.info("Unable to find business card " + businessCardId + " in user with id " + userId + " wallet");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(
-                walletService.deleteBusinessCardFromWallet(userId, businessCardId), 
-                HttpStatus.NO_CONTENT);
+        return walletService.deleteBusinessCardFromWallet(userId, businessCardId) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
     
 }

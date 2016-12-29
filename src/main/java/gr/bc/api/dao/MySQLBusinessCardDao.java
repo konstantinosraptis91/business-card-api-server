@@ -52,7 +52,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
             params.put(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2, businessCard.getPhoneNumber2());
             params.put(MySQLHelper.BUSINESS_CARD_LINKEDIN, businessCard.getLinkedIn());
             params.put(MySQLHelper.BUSINESS_CARD_WEBSITE, businessCard.getWebsite());
-            params.put(MySQLHelper.BUSINESS_CARD_IS_PUBLIC, businessCard.isPublic());
+            params.put(MySQLHelper.BUSINESS_CARD_UNIVERSAL, businessCard.isUniversal());
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
             businessCard.setId(key.intValue());
             return businessCard;
@@ -80,7 +80,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                         bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                         bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                         bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                        bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                        bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                         return bc;
                     });
         } catch (DataAccessException e) {
@@ -107,7 +107,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                         bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                         bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                         bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                        bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                        bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                         return bc;
                     });
         } catch (DataAccessException e) {
@@ -128,7 +128,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
                 + " ON "
@@ -138,11 +138,11 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + " WHERE "
                 + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_FIRSTNAME + "=" + "'" + firstName + "'"
                 // case sensitive search for first name
-                + " COLLATE utf8_bin"
+                // + " COLLATE utf8_bin"
                 + " AND "
-                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_LASTNAME + "=" + "'" + lastName + "'"
+                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_LASTNAME + "=" + "'" + lastName + "'";
                 // case sensitive search for last name
-                + " COLLATE utf8_bin";
+                // + " COLLATE utf8_bin";
         List<BusinessCard> bcs = new ArrayList<>();
         try {
             bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
@@ -156,7 +156,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {
@@ -177,7 +177,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
                 + " ON "
@@ -185,9 +185,9 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + "="
                 + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
                 + " WHERE "
-                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_FIRSTNAME + "=" + "'" + firstName + "'"
+                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_FIRSTNAME + "=" + "'" + firstName + "'";
                 // case sensitive search for first name
-                + " COLLATE utf8_bin";
+                // + " COLLATE utf8_bin";
         List<BusinessCard> bcs = new ArrayList<>();
         try {
             bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
@@ -201,7 +201,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {
@@ -222,7 +222,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
                 + " ON "
@@ -230,9 +230,9 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + "="
                 + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
                 + " WHERE "
-                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_LASTNAME + "=" + "'" + lastName + "'"
+                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_LASTNAME + "=" + "'" + lastName + "'";
                 // case sensitive search for last name
-                + " COLLATE utf8_bin";
+                // + " COLLATE utf8_bin";
         List<BusinessCard> bcs = new ArrayList<>();
         try {
             bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
@@ -246,7 +246,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {
@@ -267,7 +267,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
                 + " ON "
@@ -291,7 +291,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {
@@ -312,7 +312,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
                 + " ON "
@@ -320,9 +320,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 + "="
                 + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
                 + " WHERE "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + "=" + "'" + id + "'"
-                // case sensitive search for last name
-                + " COLLATE utf8_bin";
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + "=" + "'" + id + "'";
         List<BusinessCard> bcs = new ArrayList<>();
         try {
             bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
@@ -336,7 +334,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {
@@ -360,7 +358,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                     + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + "=?,"
                     + MySQLHelper.BUSINESS_CARD_LINKEDIN + "=?,"
                     + MySQLHelper.BUSINESS_CARD_WEBSITE + "=?,"
-                    + MySQLHelper.BUSINESS_CARD_IS_PUBLIC + "=?"
+                    + MySQLHelper.BUSINESS_CARD_UNIVERSAL + "=?"
                     + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + "=?";
             rows = jdbcTemplate.update(updateQuery,
                     new Object[]{
@@ -372,7 +370,7 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
                         businessCard.getPhoneNumber2(),
                         businessCard.getLinkedIn(),
                         businessCard.getWebsite(),
-                        businessCard.isPublic(),
+                        businessCard.isUniversal(),
                         businessCard.getId()
                     });
         } catch (DataAccessException e) {

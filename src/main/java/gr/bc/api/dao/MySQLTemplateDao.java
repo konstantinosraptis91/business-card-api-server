@@ -119,7 +119,7 @@ public class MySQLTemplateDao implements ITemplateDao {
         List<Template> templates = new ArrayList<>();
         try {
             templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
-                    + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_PRIMARY_COLOR + " = " + "'" + primaryColor + "'",
+                    + " WHERE " + MySQLHelper.TEMPLATE_PRIMARY_COLOR + " = " + "'" + primaryColor + "'",
                     (rs, rowNum) -> {
                         Template t = new Template();
                         t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
@@ -139,7 +139,7 @@ public class MySQLTemplateDao implements ITemplateDao {
         List<Template> templates = new ArrayList<>();
         try {
             templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
-                    + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_SECONDARY_COLOR + " = " + "'" + secondaryColor + "'",
+                    + " WHERE " + MySQLHelper.TEMPLATE_SECONDARY_COLOR + " = " + "'" + secondaryColor + "'",
                     (rs, rowNum) -> {
                         Template t = new Template();
                         t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));

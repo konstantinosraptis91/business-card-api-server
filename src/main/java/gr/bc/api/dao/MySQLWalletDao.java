@@ -66,7 +66,7 @@ public class MySQLWalletDao implements IWalletDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","       
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_IS_PUBLIC                                         
+                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL                                         
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_BUSINESS_CARD_TABLE
                 + " ON "
@@ -88,7 +88,7 @@ public class MySQLWalletDao implements IWalletDao {
                 bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
                 bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
                 bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setIsPublic(rs.getBoolean(MySQLHelper.BUSINESS_CARD_IS_PUBLIC));
+                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
                 return bc;
             });
         } catch (DataAccessException e) {

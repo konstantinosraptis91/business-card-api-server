@@ -81,7 +81,7 @@ public class UserRatingController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserRating>> findByBusinessCardId(@PathVariable("id") long id) {
         return businessCardService.isBusinessCardExist(id) ? new ResponseEntity<>(userRatingService.findByBusinessCardId(id), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                : new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
     // get user rating by user id
@@ -97,29 +97,30 @@ public class UserRatingController {
     // update user rating
     @RequestMapping(
             method = RequestMethod.PUT,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> updateUserRating(@Valid @RequestBody UserRating userRating) {
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateUserRating(@Valid @RequestBody UserRating userRating) {
         LOGGER.info("Updating user rating with id " + userRating.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // check if user rating which is being updated actually exists
         if (!userRatingService.isUserRatingExixst(userRating.getId())) {
             LOGGER.info("Unable to update user rating with id " + userRating.getId() + ".User rating not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(userRatingService.updateUserRating(userRating), HttpStatus.OK);
+        return userRatingService.updateUserRating(userRating) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
     
     // delete user rating
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Boolean> deleteUserRatingById(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteUserRatingById(@PathVariable("id") long id) {
         LOGGER.info("Deleting user rating with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
         if (!userRatingService.isUserRatingExixst(id)) {
             LOGGER.info("Unable to delete user rating with id " + id + ".User rating not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(userRatingService.deleteUserRatingById(id), HttpStatus.NO_CONTENT);
+        return userRatingService.deleteUserRatingById(id) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
     
 }

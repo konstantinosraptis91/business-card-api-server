@@ -27,12 +27,12 @@ public class BusinessCard {
     private String linkedIn;
     private String website;
     @NotNull
-    private boolean isPublic;
+    private boolean universal;
 
     public BusinessCard() {
     }
 
-    public BusinessCard(long id, long professionId, long templateId, long userId, String title, String description, String phoneNumber1, String phoneNumber2, String linkedIn, String website, boolean isPublic) {
+    public BusinessCard(long id, long professionId, long templateId, long userId, String title, String description, String phoneNumber1, String phoneNumber2, String linkedIn, String website, boolean universal) {
         this.id = id;
         this.professionId = professionId;
         this.templateId = templateId;
@@ -43,7 +43,7 @@ public class BusinessCard {
         this.phoneNumber2 = phoneNumber2;
         this.linkedIn = linkedIn;
         this.website = website;
-        this.isPublic = isPublic;
+        this.universal = universal;
     }
 
     public long getId() {
@@ -126,17 +126,17 @@ public class BusinessCard {
         this.website = website;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public boolean isUniversal() {
+        return universal;
     }
 
-    public void setIsPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setUniversal(boolean universal) {
+        this.universal = universal;
     }
 
     @Override
     public String toString() {
-        return "BusinessCard{" + "professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", isPublic=" + isPublic + '}';
+        return "BusinessCard{" + "professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", universal=" + universal + '}';
     }
         
 }

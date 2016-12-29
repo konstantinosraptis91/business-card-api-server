@@ -34,7 +34,7 @@ public class MySQLHelper {
     public static final String BUSINESS_CARD_PHONE_NUMBER2 = "business_card_phone_number_2";
     public static final String BUSINESS_CARD_LINKEDIN = "business_card_linkedin";
     public static final String BUSINESS_CARD_WEBSITE = "business_card_website";
-    public static final String BUSINESS_CARD_IS_PUBLIC = "business_card_is_public";
+    public static final String BUSINESS_CARD_UNIVERSAL = "business_card_universal";
        
     // template table attributes
     public static final String TEMPLATE_ID = "template_id";

@@ -6,10 +6,10 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.entity.Profession;
-import gr.bc.api.entity.User;
 import gr.bc.api.service.ProfessionService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
+import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class ProfessionController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> createProfession(@Valid @RequestBody Profession profession,
+    public ResponseEntity<Profession> saveProfession(@Valid @RequestBody Profession profession,
             UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating Profession " + profession, Constants.LOG_DATE_FORMAT.format(new Date()));
         if (professionService.isProfessionExist(profession.getName())) {
@@ -58,34 +58,35 @@ public class ProfessionController {
     // Update profession
     @RequestMapping(
             method = RequestMethod.PUT,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> updateUser(@Valid @RequestBody Profession profession) {
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateProfession(@Valid @RequestBody Profession profession) {
         LOGGER.info("Updating profession with id " + profession.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // Check if profession who is being updated actually exists
         if (!professionService.isProfessionExist(profession.getId())) {
             LOGGER.info("Unable to update profession with id " + profession.getId() + ".Profession not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            // Check if profession who is being updated got the same name with a profession in database    
+         // Check if profession who is being updated got the same name with a profession in database    
         } else if (professionService.isProfessionExist(profession.getName())
                 && professionService.findByName(profession.getName()).getId() != profession.getId()) {
             LOGGER.info("Profession with name " + profession.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(professionService.updateProfession(profession), HttpStatus.OK);
+        return professionService.updateProfession(profession) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
 
     // Delete profession
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Boolean> deleteProfessionById(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteProfessionById(@PathVariable("id") long id) {
         LOGGER.info("Deleting Profession with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
         if (!professionService.isProfessionExist(id)) {
             LOGGER.info("Unable to delete Profession with id " + id + ".Profession not found", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(professionService.deleteProfessionById(id), HttpStatus.NO_CONTENT);
+        return professionService.deleteProfessionById(id) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
 
     // Get profession by id
@@ -97,5 +98,15 @@ public class ProfessionController {
         return professionService.isProfessionExist(id) ? new ResponseEntity<>(professionService.findById(id), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    
+    // Get all professions
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Profession>> findAllProfessions() {
+        List<Profession> professions = professionService.findAllProfessions();
+        return professions.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(professions, HttpStatus.OK);
+    }
+    
 }

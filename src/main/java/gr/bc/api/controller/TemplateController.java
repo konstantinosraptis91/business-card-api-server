@@ -10,6 +10,7 @@ import gr.bc.api.service.TemplateService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import java.util.List;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,13 @@ public class TemplateController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Template> createTemplate(@RequestBody Template template, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<Template> saveTemplate(@RequestBody Template template, UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating Template " + template, Constants.LOG_DATE_FORMAT.format(new Date()));
         // check if template with the same name already exist
         if (templateService.isTemplateExist(template.getName())) {
             LOGGER.info("Template with name " + template.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        // reuse object t
         Template response = templateService.saveTemplate(template);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/template/{id}").buildAndExpand(response.getId()).toUri());
@@ -69,10 +69,9 @@ public class TemplateController {
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Template>> findAllTemplates( /*@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken*/) {
-        // Credentials crs = Credentials.getCredentials(authToken);
+    public ResponseEntity<List<Template>> findAllTemplates() {
         List<Template> templates = templateService.findAllTemplates();
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -83,7 +82,7 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findByColor(@PathVariable("color") String color) {
         List<Template> templates = templateService.findByColor(color);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -94,7 +93,7 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findByPrimaryColor(@PathVariable("primaryColor") String primaryColor) {
         List<Template> templates = templateService.findByPrimaryColor(primaryColor);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
     }
     
@@ -105,8 +104,42 @@ public class TemplateController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Template>> findBySecondaryColor(@PathVariable("secondaryColor") String secondaryColor) {
         List<Template> templates = templateService.findBySecondaryColor(secondaryColor);
-        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        return templates.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+    
+    // Delete template
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteTemplateById(@PathVariable("id") long id) {
+        LOGGER.info("Deleting Profession with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
+        if (!templateService.isTemplateExist(id)) {
+            LOGGER.info("Unable to delete template with id " + id + ".Template not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return templateService.deleteTemplateById(id) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
+    }
+    
+    // Update Template
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateProfession(@Valid @RequestBody Template template) {
+        LOGGER.info("Updating template with id " + template.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
+        // Check if template who is being updated actually exists
+        if (!templateService.isTemplateExist(template.getId())) {
+            LOGGER.info("Unable to update template with id " + template.getId() + ".Template not found", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+         // Check if template who is being updated got the same name with a template in database    
+        } else if (templateService.isTemplateExist(template.getName())
+                && templateService.findByName(template.getName()).getId() != template.getId()) {
+            LOGGER.info("Template with name " + template.getName() + " already exists", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return templateService.updateTemplate(template) ? new ResponseEntity<>(HttpStatus.OK) 
+                : new ResponseEntity<>(HttpStatus.CONFLICT); 
     }
     
 }

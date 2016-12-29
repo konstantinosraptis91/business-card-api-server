@@ -116,7 +116,8 @@ public class MySQLUserRatingDao implements IUserRatingDao {
                     new Object[]{
                         userRating.getStars(),
                         userRating.getTitle(),
-                        userRating.getDescription()
+                        userRating.getDescription(),
+                        userRating.getId()
                     });
         } catch (DataAccessException e) {
             LOGGER.error("updateUserRating: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));

@@ -132,7 +132,7 @@ public class MySQLProfessionDao implements IProfessionDao {
                     + " SET "
                     + MySQLHelper.PROFESSION_NAME + "=?,"
                     + MySQLHelper.PROFESSION_DESCRIPTION + "=?"
-                    + " WHERE " + MySQLHelper.USER_ID + "=?";
+                    + " WHERE " + MySQLHelper.PROFESSION_ID + "=?";
             rows = jdbcTemplate.update(updateQuery,
                     new Object[]{
                         profession.getName(),
