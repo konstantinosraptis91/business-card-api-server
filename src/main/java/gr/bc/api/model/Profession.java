@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.bc.api.entity;
+package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.NotNull;
 
 /**
  *
  * @author Konstantinos Raptis
  */
-public class Profession {
+public class Profession extends BCWResponse {
     
     private long id;
     @NotNull
@@ -50,7 +51,18 @@ public class Profession {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    @Override
+    public void setMessage(String message) {
+        super.setMessage(message);
+    }
 
+    @Override
+    @JsonIgnore
+    public String getMessage() {
+        return super.getMessage();
+    }
+    
     @Override
     public String toString() {
         return "Profession{" + "name=" + name + ", description=" + description + '}';

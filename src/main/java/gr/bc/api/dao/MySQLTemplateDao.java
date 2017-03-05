@@ -6,7 +6,7 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.ITemplateDao;
-import gr.bc.api.entity.Template;
+import gr.bc.api.model.Template;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.util.ArrayList;

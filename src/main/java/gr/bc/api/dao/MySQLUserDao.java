@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.IUserDao;
-import gr.bc.api.entity.User;
+import gr.bc.api.model.User;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.util.ArrayList;
@@ -221,6 +216,16 @@ public class MySQLUserDao implements IUserDao {
         Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
                 + MySQLHelper.USER_TABLE + " WHERE "
                 + MySQLHelper.USER_EMAIL + " = " + "?", Integer.class, email);
+        return result != null && result > 0;
+    }
+
+    @Override
+    public boolean isUserExist(String email, String password) {
+        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
+                + MySQLHelper.USER_TABLE + " WHERE "
+                + MySQLHelper.USER_EMAIL + " = " + "?" + " AND "
+                + MySQLHelper.USER_PASSWORD + " = " + "?"
+                , Integer.class, email, password);
         return result != null && result > 0;
     }
 

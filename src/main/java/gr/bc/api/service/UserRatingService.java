@@ -6,7 +6,7 @@
 package gr.bc.api.service;
 
 import gr.bc.api.dao.interfaces.IUserRatingDao;
-import gr.bc.api.entity.UserRating;
+import gr.bc.api.model.UserRating;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

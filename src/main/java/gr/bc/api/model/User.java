@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package gr.bc.api.entity;
+package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
@@ -13,7 +9,7 @@ import org.hibernate.validator.constraints.Email;
  *
  * @author Konstantinos Raptis
  */
-public class User {
+public class User extends BCWResponse {
    
     private long id;
     private long businessCardId;
@@ -29,7 +25,7 @@ public class User {
     public User() {
         
     }
-
+        
     public User(long id, String email, String password, String firstName, String lastName) {
         this.id = id;
         this.email = email;
@@ -53,7 +49,7 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
+        
     public String getPassword() {
         return password;
     }
@@ -86,6 +82,17 @@ public class User {
         this.businessCardId = businessCardId;
     }
 
+    @Override
+    public void setMessage(String message) {
+        super.setMessage(message);
+    }
+
+    @Override
+    @JsonIgnore
+    public String getMessage() {
+        return super.getMessage();
+    }
+        
     @Override
     public String toString() {
         return "User{" + "email=" + email + ", firstName=" + firstName + ", lastName=" + lastName + '}';

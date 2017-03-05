@@ -5,7 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.User;
+import gr.bc.api.model.User;
 import java.util.List;
 
 /**
@@ -33,5 +33,7 @@ public interface IUserDao {
     boolean isUserExist(long id);
     
     boolean isUserExist(String email);
+    
+    boolean isUserExist(String email, String password);
     
 }

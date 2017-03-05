@@ -5,11 +5,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
       <group>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/controller/UserRatingController.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/controller/UserController.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/service/UserRatingService.java</file>
+        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/controller/BusinessCardController.java</file>
       </group>
     </open-files>
     <editor-bookmarks lastBookmarkId="0" xmlns="http://www.netbeans.org/ns/editor-bookmarks/2"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+      <group>
+        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/entity/User.java</file>
+      </group>
+    </open-files>
   </auxiliary>
 </gradle-project-properties>

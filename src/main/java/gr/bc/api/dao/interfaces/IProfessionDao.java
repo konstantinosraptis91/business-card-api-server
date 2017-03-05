@@ -5,7 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.Profession;
+import gr.bc.api.model.Profession;
 import java.util.List;
 
 /**

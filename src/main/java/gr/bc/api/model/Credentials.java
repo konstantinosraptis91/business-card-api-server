@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.bc.api.entity;
+package gr.bc.api.model;
 
 import gr.bc.api.util.Constants;
 import java.util.StringTokenizer;
@@ -51,7 +51,7 @@ public class Credentials {
         cr.setPassword(tokenizer.nextToken());
         return cr;
     }
-    
+        
     @Override
     public String toString() {
         return "Credentials{" + "username=" + username + ", password=" + password + '}';

@@ -5,7 +5,7 @@
  */
 package gr.bc.api.controller;
 
-import gr.bc.api.entity.Template;
+import gr.bc.api.model.Template;
 import gr.bc.api.service.TemplateService;
 import gr.bc.api.util.Constants;
 import java.util.Date;

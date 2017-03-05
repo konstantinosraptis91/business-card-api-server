@@ -5,7 +5,7 @@
  */
 package gr.bc.api.controller;
 
-import gr.bc.api.entity.BusinessCard;
+import gr.bc.api.model.BusinessCard;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.WalletService;

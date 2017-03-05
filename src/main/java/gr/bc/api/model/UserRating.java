@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.bc.api.entity;
+package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Konstantinos Raptis
  */
-public class UserRating {
+public class UserRating extends BCWResponse {
     
     private long id;
     private long userId;
@@ -82,7 +83,18 @@ public class UserRating {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    @Override
+    public void setMessage(String message) {
+        super.setMessage(message);
+    }
 
+    @Override
+    @JsonIgnore
+    public String getMessage() {
+        return super.getMessage();
+    }
+    
     @Override
     public String toString() {
         return "UserRating{" + "id=" + id + ", userId=" + userId + ", businessCardId=" + businessCardId + ", stars=" + stars + ", title=" + title + ", description=" + description + '}';

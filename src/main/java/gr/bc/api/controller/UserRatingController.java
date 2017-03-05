@@ -5,7 +5,7 @@
  */
 package gr.bc.api.controller;
 
-import gr.bc.api.entity.UserRating;
+import gr.bc.api.model.UserRating;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserRatingService;
 import gr.bc.api.service.UserService;

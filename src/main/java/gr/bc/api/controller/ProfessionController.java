@@ -5,7 +5,7 @@
  */
 package gr.bc.api.controller;
 
-import gr.bc.api.entity.Profession;
+import gr.bc.api.model.Profession;
 import gr.bc.api.service.ProfessionService;
 import gr.bc.api.util.Constants;
 import java.util.Date;

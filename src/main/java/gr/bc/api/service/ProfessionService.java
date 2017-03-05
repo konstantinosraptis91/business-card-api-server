@@ -6,7 +6,7 @@
 package gr.bc.api.service;
 
 import gr.bc.api.dao.interfaces.IProfessionDao;
-import gr.bc.api.entity.Profession;
+import gr.bc.api.model.Profession;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

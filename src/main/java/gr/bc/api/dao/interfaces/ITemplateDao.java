@@ -5,7 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.Template;
+import gr.bc.api.model.Template;
 import java.util.List;
 
 /**

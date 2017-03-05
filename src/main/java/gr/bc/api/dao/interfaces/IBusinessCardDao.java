@@ -5,7 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.BusinessCard;
+import gr.bc.api.model.BusinessCard;
 import java.util.List;
 
 /**

@@ -6,7 +6,7 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.dao.interfaces.IProfessionDao;
-import gr.bc.api.entity.Profession;
+import gr.bc.api.model.Profession;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.util.ArrayList;

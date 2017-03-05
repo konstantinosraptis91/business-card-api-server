@@ -5,7 +5,7 @@
  */
 package gr.bc.api.dao.interfaces;
 
-import gr.bc.api.entity.UserRating;
+import gr.bc.api.model.UserRating;
 import java.util.List;
 
 /**

@@ -6,7 +6,7 @@
 package gr.bc.api.service;
 
 import gr.bc.api.dao.interfaces.IUserDao;
-import gr.bc.api.entity.User;
+import gr.bc.api.model.User;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,6 +59,10 @@ public class UserService {
     
     public boolean isUserExist(String email) {
         return userDao.isUserExist(email);
+    }
+    
+    public boolean isUserExist(String email, String password) {
+        return userDao.isUserExist(email, password);
     }
     
 }
