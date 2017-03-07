@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Konstantinos Raptis
  */
-public class UserRating extends BCWResponse {
+public class UserRating {
     
     private long id;
     private long userId;
@@ -83,18 +83,7 @@ public class UserRating extends BCWResponse {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    @Override
-    public void setMessage(String message) {
-        super.setMessage(message);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getMessage() {
-        return super.getMessage();
-    }
-    
+        
     @Override
     public String toString() {
         return "UserRating{" + "id=" + id + ", userId=" + userId + ", businessCardId=" + businessCardId + ", stars=" + stars + ", title=" + title + ", description=" + description + '}';

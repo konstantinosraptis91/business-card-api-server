@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Email;
  *
  * @author Konstantinos Raptis
  */
-public class User extends BCWResponse {
+public class User {
    
     private long id;
     private long businessCardId;
@@ -80,17 +80,6 @@ public class User extends BCWResponse {
 
     public void setBusinessCardId(long businessCardId) {
         this.businessCardId = businessCardId;
-    }
-
-    @Override
-    public void setMessage(String message) {
-        super.setMessage(message);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getMessage() {
-        return super.getMessage();
     }
         
     @Override

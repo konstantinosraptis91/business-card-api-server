@@ -9,24 +9,24 @@ package gr.bc.api.model;
  *
  * @author Konstantinos Raptis
  */
-public class BCWResponse {
-    
-    protected String message;
-    
-    public BCWResponse() {
-        
-    }
-
-    public BCWResponse(String message) {
-        this.message = message;
-    }
-        
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-       
-}
+//public class BCWResponse {
+//    
+//    protected String message;
+//    
+//    public BCWResponse() {
+//        
+//    }
+//
+//    public BCWResponse(String message) {
+//        this.message = message;
+//    }
+//        
+//    public String getMessage() {
+//        return message;
+//    }
+//
+//    public void setMessage(String message) {
+//        this.message = message;
+//    }
+//       
+//}

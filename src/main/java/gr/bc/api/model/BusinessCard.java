@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Konstantinos Raptis
  */
-public class BusinessCard extends BCWResponse {
+public class BusinessCard {
     
     private long id;
     private long professionId;
@@ -134,18 +134,7 @@ public class BusinessCard extends BCWResponse {
     public void setUniversal(boolean universal) {
         this.universal = universal;
     }
-    
-    @Override
-    public void setMessage(String message) {
-        super.setMessage(message);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getMessage() {
-        return super.getMessage();
-    }
-    
+        
     @Override
     public String toString() {
         return "BusinessCard{" + "professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", universal=" + universal + '}';

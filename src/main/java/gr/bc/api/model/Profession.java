@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Konstantinos Raptis
  */
-public class Profession extends BCWResponse {
+public class Profession {
     
     private long id;
     @NotNull
@@ -51,18 +51,7 @@ public class Profession extends BCWResponse {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    @Override
-    public void setMessage(String message) {
-        super.setMessage(message);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getMessage() {
-        return super.getMessage();
-    }
-    
+        
     @Override
     public String toString() {
         return "Profession{" + "name=" + name + ", description=" + description + '}';

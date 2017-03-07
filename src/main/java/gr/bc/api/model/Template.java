@@ -5,7 +5,6 @@
  */
 package gr.bc.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -13,7 +12,7 @@ import javax.validation.constraints.Size;
  *
  * @author Konstantinos Raptis
  */
-public class Template extends BCWResponse {
+public class Template {
     
     private long id;
     @NotNull
@@ -64,18 +63,7 @@ public class Template extends BCWResponse {
     public void setName(String name) {
         this.name = name;
     }
-    
-    @Override
-    public void setMessage(String message) {
-        super.setMessage(message);
-    }
-
-    @Override
-    @JsonIgnore
-    public String getMessage() {
-        return super.getMessage();
-    }
-    
+        
     @Override
     public String toString() {
         return "Template{" + "name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
