@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.util;
 
 import java.text.SimpleDateFormat;
@@ -18,5 +13,7 @@ public class Constants {
     
     public static final String APPLICATION_NAME = "bc_wallet";
     public static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
-    
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+   
+    public static final String DEFAULT_IMAGE_PATH = "default_image";
 }

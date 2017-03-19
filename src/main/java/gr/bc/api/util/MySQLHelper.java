@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.util;
 
 /**
@@ -25,7 +20,11 @@ public class MySQLHelper {
     public static final String USER_PASSWORD = "user_password";
     public static final String USER_FIRSTNAME = "user_firstname";
     public static final String USER_LASTNAME = "user_lastname";
-           
+    public static final String USER_LAST_UPDATED = "user_last_updated";
+    public static final String USER_CREATED_AT = "user_created_at";
+    public static final String USER_TOKEN = "user_token";
+    public static final String USER_IMAGE_PATH = "user_image_path";
+    
     // business card table attributes
     public static final String BUSINESS_CARD_ID = "business_card_id";
     public static final String BUSINESS_CARD_TITLE = "business_card_title";
@@ -35,7 +34,9 @@ public class MySQLHelper {
     public static final String BUSINESS_CARD_LINKEDIN = "business_card_linkedin";
     public static final String BUSINESS_CARD_WEBSITE = "business_card_website";
     public static final String BUSINESS_CARD_UNIVERSAL = "business_card_universal";
-       
+    public static final String BUSINESS_CARD_ADDRESS_1 = "business_card_address_1";    
+    public static final String BUSINESS_CARD_ADDRESS_2 = "business_card_address_2";    
+    
     // template table attributes
     public static final String TEMPLATE_ID = "template_id";
     public static final String TEMPLATE_NAME = "template_name";

@@ -56,7 +56,7 @@ public class BusinessCardController {
     public ResponseEntity<BusinessCard> saveBusinessCard(@RequestBody BusinessCard businessCard, UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating Business Card for user id: " + businessCard.getUserId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         // user not found
-        if (!userService.isUserExist(businessCard.getUserId())) {
+        if (!userService.isUserExistById(businessCard.getUserId())) {
             LOGGER.info("Unable to find user with id " + businessCard.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

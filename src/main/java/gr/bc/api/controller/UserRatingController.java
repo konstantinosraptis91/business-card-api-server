@@ -53,7 +53,7 @@ public class UserRatingController {
         LOGGER.info("Creating " + userRating, 
                 Constants.LOG_DATE_FORMAT.format(new Date()));
         // Check if user exist
-        if (!userService.isUserExist(userRating.getUserId())) {
+        if (!userService.isUserExistById(userRating.getUserId())) {
             LOGGER.info("Unable to find user with id " + userRating.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -90,7 +90,7 @@ public class UserRatingController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserRating>> findByUserId(@PathVariable("id") long id) {
-        return userService.isUserExist(id) ? new ResponseEntity<>(userRatingService.findByUserId(id), HttpStatus.OK)
+        return userService.isUserExistById(id) ? new ResponseEntity<>(userRatingService.findByUserId(id), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     

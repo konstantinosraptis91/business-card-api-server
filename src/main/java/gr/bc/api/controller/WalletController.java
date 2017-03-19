@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.controller;
 
 import gr.bc.api.model.BusinessCard;
@@ -49,7 +44,7 @@ public class WalletController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // check if user exist
-        if (!userService.isUserExist(userId)) {
+        if (!userService.isUserExistById(userId)) {
             LOGGER.info("Unable to find user " + userId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -78,7 +73,7 @@ public class WalletController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BusinessCard>> findAllBusinessCardInWalletByUserId(@PathVariable("id") long id) {
-        return userService.isUserExist(id) ? new ResponseEntity<>(walletService.findAllBusinessCardInWalletByUserId(id), HttpStatus.OK)
+        return userService.isUserExistById(id) ? new ResponseEntity<>(walletService.findAllBusinessCardInWalletByUserId(id), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
@@ -90,7 +85,7 @@ public class WalletController {
             @PathVariable("userId") long userId,
             @PathVariable("businessCardId") long businessCardId) {
         // check if user exists
-        if (!userService.isUserExist(userId)) {
+        if (!userService.isUserExistById(userId)) {
             LOGGER.info("Unable to find user " + userId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
