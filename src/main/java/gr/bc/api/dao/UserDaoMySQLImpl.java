@@ -1,6 +1,5 @@
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.IUserDao;
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
 import gr.bc.api.util.Constants;
@@ -27,9 +26,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLUser")
-public class MySQLUserDao implements IUserDao {
+public class UserDaoMySQLImpl implements UserDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLUserDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -44,7 +43,7 @@ public class MySQLUserDao implements IUserDao {
             params.put(MySQLHelper.USER_PASSWORD, user.getPassword());
             params.put(MySQLHelper.USER_FIRSTNAME, user.getFirstName());
             params.put(MySQLHelper.USER_LASTNAME, user.getLastName());
-            params.put(MySQLHelper.USER_LAST_UPDATED, user.getTokenLastUpdated());
+            params.put(MySQLHelper.USER_LAST_UPDATED, user.getLastUpdated());
             params.put(MySQLHelper.USER_CREATED_AT, user.getCreatedAt());
             params.put(MySQLHelper.USER_TOKEN, user.getToken());
             params.put(MySQLHelper.USER_IMAGE_PATH, user.getFileName());
@@ -67,7 +66,8 @@ public class MySQLUserDao implements IUserDao {
                     + MySQLHelper.USER_EMAIL + "=?,"
                     + MySQLHelper.USER_PASSWORD + "=?,"
                     + MySQLHelper.USER_FIRSTNAME + "=?,"
-                    + MySQLHelper.USER_LASTNAME + "=?"
+                    + MySQLHelper.USER_LASTNAME + "=?,"
+                    + MySQLHelper.USER_TOKEN + "=?"
                     + " WHERE " + MySQLHelper.USER_ID + "=?";
             rows = jdbcTemplate.update(updateQuery,
                     new Object[]{
@@ -75,6 +75,7 @@ public class MySQLUserDao implements IUserDao {
                         user.getPassword(),
                         user.getFirstName(),
                         user.getLastName(),
+                        user.getToken(),
                         user.getId()
                     });
         } catch (DataAccessException e) {
@@ -110,6 +111,9 @@ public class MySQLUserDao implements IUserDao {
                         u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                         u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                         u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        u.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                        u.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                        u.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                         return u;
                     });
         } catch (DataAccessException e) {
@@ -132,6 +136,9 @@ public class MySQLUserDao implements IUserDao {
                         u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                         u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                         u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        u.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                        u.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                        u.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                         return u;
                     });
         } catch (DataAccessException e) {
@@ -154,6 +161,9 @@ public class MySQLUserDao implements IUserDao {
                         u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                         u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                         u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                        u.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                        u.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                        u.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                         return u;
                     });
         } catch (DataAccessException e) {
@@ -177,6 +187,9 @@ public class MySQLUserDao implements IUserDao {
                 user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                 user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                 user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                user.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                user.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                user.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                 return user;
             });
         } catch (DataAccessException e) {
@@ -199,6 +212,9 @@ public class MySQLUserDao implements IUserDao {
                 user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                 user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                 user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                user.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                user.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                user.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                 return user;
             });
         } catch (DataAccessException e) {
@@ -221,6 +237,9 @@ public class MySQLUserDao implements IUserDao {
                 user.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
                 user.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
                 user.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
+                user.setToken(rs.getString(MySQLHelper.USER_TOKEN));
+                user.setCreatedAt(rs.getDate(MySQLHelper.USER_CREATED_AT));
+                user.setLastUpdated(rs.getDate(MySQLHelper.USER_LAST_UPDATED));
                 return user;
             });
         } catch (DataAccessException e) {

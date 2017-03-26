@@ -5,18 +5,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
       <group>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/dao/MySQLUserDao.java</file>
         <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/controller/UserController.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/service/UserService.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/Application.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/util/Constants.java</file>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/model/User.java</file>
       </group>
     </open-files>
     <editor-bookmarks lastBookmarkId="0" xmlns="http://www.netbeans.org/ns/editor-bookmarks/2"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
       <group>
-        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/controller/UserController.java</file>
+        <file>file:/E:/NetbeansProjects/Business-Cards-API-Server/src/main/java/gr/bc/api/dao/BusinessCardDaoMySQLImpl.java</file>
       </group>
     </open-files>
   </auxiliary>

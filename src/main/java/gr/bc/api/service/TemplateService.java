@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.service;
 
-import gr.bc.api.dao.interfaces.ITemplateDao;
 import gr.bc.api.model.Template;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +7,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import gr.bc.api.dao.TemplateDao;
 
 /**
  *
@@ -23,9 +18,10 @@ public class TemplateService {
     
     @Autowired
     @Qualifier("MySQLTemplate")
-    private ITemplateDao templateDao;
+    private TemplateDao templateDao;
 
     public Template saveTemplate(Template template) {
+        template.init();
         return templateDao.saveTemplate(template);
     }
     

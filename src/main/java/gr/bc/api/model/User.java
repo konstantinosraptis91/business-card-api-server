@@ -1,6 +1,5 @@
 package gr.bc.api.model;
 
-import gr.bc.api.util.Constants;
 import gr.bc.api.util.TokenUtils;
 import java.util.Date;
 import javax.validation.constraints.NotNull;
@@ -24,33 +23,44 @@ public class User {
     private String firstName;
     @NotNull @Size(min = 1, max = 30)
     private String lastName;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createdAt;
     private String token;
-    private Date tokenLastUpdated;
     // Profile Image File Name
     private String fileName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdated;
     
     public User() {
         
     }
-        
+
+    public User(long id, String token) {
+        this.id = id;
+        this.token = token;
+    }
+    
+    public User(long id, long businessCardId, String firstName, String lastName) {
+        this.id = id;
+        this.businessCardId = businessCardId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+    
     public User(long id, String email, String password, String firstName, String lastName, String fileName) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.createdAt = new Date();
         this.token = new TokenUtils().createToken(TokenUtils.TOKEN_SIZE);
-        this.tokenLastUpdated = new Date();
         this.fileName = fileName;
     }
-
+    
     public void init() {
-        createdAt = new Date();
-        tokenLastUpdated = createdAt;
-        token = new TokenUtils().createToken(TokenUtils.TOKEN_SIZE);
+        this.createdAt = new Date();
+        this.lastUpdated = this.createdAt;
+        this.token = new TokenUtils().createToken(TokenUtils.TOKEN_SIZE);
     }
     
     public long getId() {
@@ -117,14 +127,6 @@ public class User {
         this.token = token;
     }
 
-    public Date getTokenLastUpdated() {
-        return tokenLastUpdated;
-    }
-
-    public void setTokenLastUpdated(Date tokenLastUpdated) {
-        this.tokenLastUpdated = tokenLastUpdated;
-    }
-
     public String getFileName() {
         return fileName;
     }
@@ -132,10 +134,18 @@ public class User {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
-        return "User{" + "email=" + email + ", firstName=" + firstName + ", lastName=" + lastName + '}';
+        return "User{" + "id=" + id + ", businessCardId=" + businessCardId + ", email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", token=" + token + ", fileName=" + fileName + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
     }
           
 }

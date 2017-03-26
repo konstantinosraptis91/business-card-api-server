@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package gr.bc.api.dao.interfaces;
+package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
 import java.util.List;
@@ -12,7 +7,7 @@ import java.util.List;
  *
  * @author Konstantinos Raptis
  */
-public interface IWalletDao {
+public interface WalletDao {
     
     boolean saveBusinessCardToWallet(long userId, long businessCardId);
     

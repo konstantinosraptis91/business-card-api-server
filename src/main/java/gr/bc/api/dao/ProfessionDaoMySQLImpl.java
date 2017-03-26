@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.IProfessionDao;
 import gr.bc.api.model.Profession;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -30,9 +24,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLProfession")
-public class MySQLProfessionDao implements IProfessionDao {
+public class ProfessionDaoMySQLImpl implements ProfessionDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLProfessionDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -45,6 +39,8 @@ public class MySQLProfessionDao implements IProfessionDao {
             Map<String, Object> params = new HashMap<>();
             params.put(MySQLHelper.PROFESSION_NAME, profession.getName());
             params.put(MySQLHelper.PROFESSION_DESCRIPTION, profession.getDescription());
+            params.put(MySQLHelper.PROFESSION_LAST_UPDATED, profession.getLastUpdated());
+            params.put(MySQLHelper.PROFESSION_CREATED_AT, profession.getCreatedAt());
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
             profession.setId(key.intValue());
             return profession;

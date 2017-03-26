@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.service;
 
-import gr.bc.api.dao.interfaces.IProfessionDao;
 import gr.bc.api.model.Profession;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import gr.bc.api.dao.ProfessionDao;
 
 /**
  *
@@ -21,9 +16,10 @@ public class ProfessionService {
     
     @Autowired
     @Qualifier("MySQLProfession")
-    private IProfessionDao professionDao;
+    private ProfessionDao professionDao;
     
     public Profession saveProfession(Profession profession) {
+        profession.init();
         return professionDao.saveProfession(profession);
     }
     

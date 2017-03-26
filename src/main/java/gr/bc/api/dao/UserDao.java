@@ -1,4 +1,4 @@
-package gr.bc.api.dao.interfaces;
+package gr.bc.api.dao;
 
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Konstantinos Raptis
  */
-public interface IUserDao {
+public interface UserDao {
         
     User findByEmail(String email);
     

@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
 import javax.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -29,11 +25,18 @@ public class BusinessCard {
     private String website;
     @NotNull
     private boolean universal;
-
+    private String email;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdated;
+    
     public BusinessCard() {
     }
 
-    public BusinessCard(long id, long professionId, long templateId, long userId, String title, String description, String phoneNumber1, String phoneNumber2, String linkedIn, String website, boolean universal) {
+    public BusinessCard(long id, long professionId, long templateId, long userId, 
+            String title, String description, String phoneNumber1, String phoneNumber2, 
+            String linkedIn, String website, boolean universal, String email) {
         this.id = id;
         this.professionId = professionId;
         this.templateId = templateId;
@@ -45,8 +48,14 @@ public class BusinessCard {
         this.linkedIn = linkedIn;
         this.website = website;
         this.universal = universal;
+        this.email = email;
     }
-
+    
+    public void init() {
+        this.createdAt = new Date();
+        this.lastUpdated = this.createdAt;
+    }
+    
     public long getId() {
         return id;
     }
@@ -134,10 +143,34 @@ public class BusinessCard {
     public void setUniversal(boolean universal) {
         this.universal = universal;
     }
-        
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
-        return "BusinessCard{" + "professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", universal=" + universal + '}';
+        return "BusinessCard{" + "id=" + id + ", professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", universal=" + universal + ", email=" + email + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
     }
         
 }

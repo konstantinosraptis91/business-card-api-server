@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.IBusinessCardDao;
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -30,9 +24,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLBusinessCard")
-public class MySQLBusinessCardDao implements IBusinessCardDao {
+public class BusinessCardDaoMySQLImpl implements BusinessCardDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLBusinessCardDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCardDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -53,6 +47,9 @@ public class MySQLBusinessCardDao implements IBusinessCardDao {
             params.put(MySQLHelper.BUSINESS_CARD_LINKEDIN, businessCard.getLinkedIn());
             params.put(MySQLHelper.BUSINESS_CARD_WEBSITE, businessCard.getWebsite());
             params.put(MySQLHelper.BUSINESS_CARD_UNIVERSAL, businessCard.isUniversal());
+            params.put(MySQLHelper.BUSINESS_CARD_EMAIL, businessCard.getEmail());
+            params.put(MySQLHelper.BUSINESS_CARD_LAST_UPDATED, businessCard.getLastUpdated());
+            params.put(MySQLHelper.BUSINESS_CARD_CREATED_AT, businessCard.getCreatedAt());
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
             businessCard.setId(key.intValue());
             return businessCard;

@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.IWalletDao;
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -26,9 +20,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLWallet")
-public class MySQLWalletDao implements IWalletDao {
+public class WalletDaoMySQLImpl implements WalletDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLWalletDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WalletDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,16 +31,21 @@ public class MySQLWalletDao implements IWalletDao {
     public boolean saveBusinessCardToWallet(long userId, long businessCardId) {
         long rows = 0;
         try {
+            Date now = new Date();
             String insertQuery = " INSERT INTO "
                     + MySQLHelper.USER_BUSINESS_CARD_TABLE
                     + " ("
                     + MySQLHelper.USER_ID + ","
-                    + MySQLHelper.BUSINESS_CARD_ID + ")"
-                    + " VALUES " + "(?,?)";
+                    + MySQLHelper.BUSINESS_CARD_ID + "," 
+                    + MySQLHelper.USER_BUSINESS_CARD_LAST_UPDATED + "," 
+                    + MySQLHelper.USER_BUSINESS_CARD_CREATED_AT + ")"
+                    + " VALUES " + "(?,?,?,?)";
             rows = jdbcTemplate.update(insertQuery,
                     new Object[]{
                         userId,
-                        businessCardId
+                        businessCardId,
+                        now,
+                        now
                     });
         } catch (DataAccessException e) {
             LOGGER.error("saveBusinessCardToWallet: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));

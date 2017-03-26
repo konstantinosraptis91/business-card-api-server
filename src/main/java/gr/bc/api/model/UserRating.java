@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -23,7 +19,11 @@ public class UserRating {
     private int stars;
     private String title;
     private String description;
-
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdated;
+    
     public UserRating() {
     }
 
@@ -36,6 +36,11 @@ public class UserRating {
         this.description = description;
     }
 
+    public void init() {
+        this.createdAt = new Date();
+        this.lastUpdated = this.createdAt;
+    }
+    
     public long getId() {
         return id;
     }
@@ -83,10 +88,26 @@ public class UserRating {
     public void setDescription(String description) {
         this.description = description;
     }
-        
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
-        return "UserRating{" + "id=" + id + ", userId=" + userId + ", businessCardId=" + businessCardId + ", stars=" + stars + ", title=" + title + ", description=" + description + '}';
+        return "UserRating{" + "id=" + id + ", userId=" + userId + ", businessCardId=" + businessCardId + ", stars=" + stars + ", title=" + title + ", description=" + description + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
     }
         
 }

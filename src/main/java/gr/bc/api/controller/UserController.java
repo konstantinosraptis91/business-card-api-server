@@ -43,7 +43,7 @@ public class UserController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> saveUser(@Valid @RequestBody User user, 
+    public ResponseEntity<User> saveUser(@Valid @RequestBody User user, 
                                          /*@RequestParam(value = "file", required = false) MultipartFile file,*/
                                          UriComponentsBuilder ucBuilder) {
         LOGGER.info("Creating " + user, Constants.LOG_DATE_FORMAT.format(new Date()));
@@ -59,24 +59,26 @@ public class UserController {
 //        if (file != null) {
 //            storageService.store(file);
 //        }
-        return new ResponseEntity<>(response.getToken(), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(new User(response.getId(), response.getToken()),
+                headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(
             value = "/authenticate",
             produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST)
-    public ResponseEntity<String> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+    public ResponseEntity<User> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         Credentials crs = Credentials.getCredentials(authToken);
         String newToken;
         
         if((newToken = userService.authenticate(crs)) != null) {
-            return new ResponseEntity<>(newToken, HttpStatus.OK);
+            User user = userService.findByEmail(crs.getUsername());
+            return new ResponseEntity<>(new User(user.getId(), newToken), HttpStatus.OK);
         }
         
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);    
     }
-    
+        
     // Update user (Update Account)
     @RequestMapping(
             method = RequestMethod.PUT,
@@ -211,7 +213,12 @@ public class UserController {
                 
                 // Check if asking User has the right to claim asked user 
                 if (theUser.getToken().equals(authToken)) {
-                    return new ResponseEntity<>(theUser, HttpStatus.OK);
+                    return new ResponseEntity<>(new User(
+                            theUser.getId(),
+                            theUser.getBusinessCardId(),
+                            theUser.getFirstName(),
+                            theUser.getLastName()
+                    ), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }

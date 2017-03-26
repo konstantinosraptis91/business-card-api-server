@@ -1,11 +1,11 @@
 package gr.bc.api.service;
 
-import gr.bc.api.dao.interfaces.IWalletDao;
 import gr.bc.api.model.BusinessCard;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import gr.bc.api.dao.WalletDao;
 
 /**
  *
@@ -16,7 +16,7 @@ public class WalletService {
     
     @Autowired
     @Qualifier("MySQLWallet")
-    private IWalletDao walletDao;
+    private WalletDao walletDao;
     
     public boolean addBusinessCardToWallet(long userId, long businessCardId) {
         return walletDao.saveBusinessCardToWallet(userId, businessCardId);

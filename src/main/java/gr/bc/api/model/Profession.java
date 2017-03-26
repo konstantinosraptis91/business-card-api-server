@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
 import javax.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -18,7 +14,11 @@ public class Profession {
     @NotNull
     private String name;
     private String description;
-
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdated;
+    
     public Profession() {
     }
 
@@ -28,6 +28,11 @@ public class Profession {
         this.description = description;
     }
 
+    public void init() {
+        this.createdAt = new Date();
+        this.lastUpdated = this.createdAt;
+    }
+    
     public long getId() {
         return id;
     }
@@ -51,10 +56,26 @@ public class Profession {
     public void setDescription(String description) {
         this.description = description;
     }
-        
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
-        return "Profession{" + "name=" + name + ", description=" + description + '}';
+        return "Profession{" + "id=" + id + ", name=" + name + ", description=" + description + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
     }
        
 }

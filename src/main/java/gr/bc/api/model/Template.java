@@ -1,7 +1,9 @@
 package gr.bc.api.model;
 
+import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -16,7 +18,11 @@ public class Template {
     private String primaryColor;
     @NotNull @Size(min = 6, max = 6)
     private String secondaryColor;
-
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdated;
+    
     public Template() {
     }
 
@@ -27,6 +33,11 @@ public class Template {
         this.secondaryColor = secondaryColor;
     }
 
+    public void init() {
+        this.createdAt = new Date();
+        this.lastUpdated = this.createdAt;
+    }
+    
     public long getId() {
         return id;
     }
@@ -58,10 +69,26 @@ public class Template {
     public void setName(String name) {
         this.name = name;
     }
-        
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
-        return "Template{" + "name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + '}';
+        return "Template{" + "id=" + id + ", name=" + name + ", primaryColor=" + primaryColor + ", secondaryColor=" + secondaryColor + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
     }
            
 }

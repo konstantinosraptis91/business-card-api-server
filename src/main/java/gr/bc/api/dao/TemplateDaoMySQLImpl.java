@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.ITemplateDao;
 import gr.bc.api.model.Template;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -30,9 +24,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLTemplate")
-public class MySQLTemplateDao implements ITemplateDao {
+public class TemplateDaoMySQLImpl implements TemplateDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLTemplateDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -46,6 +40,8 @@ public class MySQLTemplateDao implements ITemplateDao {
             params.put(MySQLHelper.TEMPLATE_NAME, template.getName());
             params.put(MySQLHelper.TEMPLATE_PRIMARY_COLOR, template.getPrimaryColor());
             params.put(MySQLHelper.TEMPLATE_SECONDARY_COLOR, template.getSecondaryColor());
+            params.put(MySQLHelper.TEMPLATE_LAST_UPDATED, template.getLastUpdated());
+            params.put(MySQLHelper.TEMPLATE_CREATED_AT, template.getCreatedAt());
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
             template.setId(key.intValue());
             return template;

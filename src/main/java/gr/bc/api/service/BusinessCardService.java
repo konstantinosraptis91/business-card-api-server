@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.service;
 
-import gr.bc.api.dao.interfaces.IBusinessCardDao;
 import gr.bc.api.model.BusinessCard;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import gr.bc.api.dao.BusinessCardDao;
 
 /**
  *
@@ -21,9 +16,10 @@ public class BusinessCardService {
     
     @Autowired
     @Qualifier("MySQLBusinessCard")
-    private IBusinessCardDao businessCardDao;
+    private BusinessCardDao businessCardDao;
 
     public BusinessCard saveBusinessCard(BusinessCard businessCard) {
+        businessCard.init();
         return businessCardDao.saveBusinessCard(businessCard);
     }
     

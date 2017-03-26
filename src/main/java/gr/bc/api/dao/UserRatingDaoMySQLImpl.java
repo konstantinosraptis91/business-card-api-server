@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.bc.api.dao;
 
-import gr.bc.api.dao.interfaces.IUserRatingDao;
 import gr.bc.api.model.UserRating;
 import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
@@ -30,9 +24,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLUserRating")
-public class MySQLUserRatingDao implements IUserRatingDao {
+public class UserRatingDaoMySQLImpl implements UserRatingDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLUserRatingDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserRatingDaoMySQLImpl.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -48,6 +42,8 @@ public class MySQLUserRatingDao implements IUserRatingDao {
             params.put(MySQLHelper.USER_RATING_STARS, userRating.getStars());
             params.put(MySQLHelper.USER_RATING_TITLE, userRating.getTitle());
             params.put(MySQLHelper.USER_RATING_DESCRIPTION, userRating.getDescription());
+            params.put(MySQLHelper.USER_RATING_LAST_UPDATED, userRating.getLastUpdated());
+            params.put(MySQLHelper.USER_RATING_CREATED_AT, userRating.getCreatedAt());
             Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
             userRating.setId(key.intValue());
             return userRating;
