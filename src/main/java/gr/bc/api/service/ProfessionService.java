@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.ProfessionDao;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -18,37 +19,28 @@ public class ProfessionService {
     @Qualifier("MySQLProfession")
     private ProfessionDao professionDao;
     
-    public Profession saveProfession(Profession profession) {
-        profession.init();
+    public Profession saveProfession(Profession profession) throws DataAccessException {
         return professionDao.saveProfession(profession);
     }
     
-    public Profession findById(long id) {
+    public Profession findById(long id) throws DataAccessException {
         return professionDao.findById(id);
     }
     
-    public Profession findByName(String name) {
+    public Profession findByName(String name) throws DataAccessException {
         return professionDao.findByName(name);
     }
     
-    public List<Profession> findAllProfessions() {
+    public List<Profession> findAllProfessions() throws DataAccessException {
         return professionDao.findAllProfessions();
     }
     
-    public boolean deleteProfessionById(long id) {
+    public boolean deleteProfessionById(long id) throws DataAccessException {
         return professionDao.deleteProfessionById(id);
     }
     
-    public boolean updateProfession(Profession profession) {
-        return professionDao.updateProfession(profession);
+    public boolean updateProfession(long id, Profession profession) throws DataAccessException {
+        return professionDao.updateProfession(id, profession);
     } 
-    
-    public boolean isProfessionExist(long id) {
-        return professionDao.isProfessionExist(id);
-    }
-    
-    public boolean isProfessionExist(String name) {
-        return professionDao.isProfessionExist(name);
-    }
     
 }

@@ -1,7 +1,7 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
-import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -9,34 +9,16 @@ import java.util.List;
  */
 public interface BusinessCardDao {
     
-    BusinessCard saveBusinessCard(BusinessCard businessCard);
+    BusinessCard saveBusinessCard(BusinessCard businessCard) throws DataAccessException;
     
-    BusinessCard findById(long businessCardId);
+    BusinessCard findById(long businessCardId) throws DataAccessException;
     
-    BusinessCard findByUserId(long userId);
+    BusinessCard findByUserId(long userId) throws DataAccessException;
     
-    BusinessCard findByUserEmail(String email);
-    
-    List<BusinessCard> findByUserFullName(String firstName, String lastName);
-    
-    List<BusinessCard> findByUserFirstName(String firstName);
-    
-    List<BusinessCard> findByUserLastName(String lastName);
-    
-    List<BusinessCard> findByProfessionId(long professionId);
+    BusinessCard findByUserEmail(String email) throws DataAccessException;
            
-    boolean updateBusinessCard(BusinessCard businessCard);
+    boolean updateBusinessCard(long id, BusinessCard businessCard) throws DataAccessException;
         
-    boolean deleteBusinessCardById(long id);
-    
-    boolean deleteBusinessCardByUserId(long id);
-    
-    boolean isBusinessCardExist(long id);
-    
-    boolean isBusinessCardExistByUserId(long id);
-    
-    boolean isBusinessCardExistByUserEmail(String email);
-    
-    boolean isBusinessCardBelongToUserById(long businessCardId, long userId);
-    
+    boolean deleteBusinessCardById(long id) throws DataAccessException;
+              
 }

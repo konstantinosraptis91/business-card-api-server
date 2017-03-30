@@ -2,6 +2,7 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.Template;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -9,24 +10,20 @@ import java.util.List;
  */
 public interface TemplateDao {
       
-    Template saveTemplate(Template template);
+    Template saveTemplate(Template template) throws DataAccessException;
         
-    Template findByName(String name);
+    Template findByName(String name) throws DataAccessException;
         
-    List<Template> findByPrimaryColor(String primaryColor);
+    List<Template> findByPrimaryColor(String primaryColor) throws DataAccessException;
     
-    List<Template> findBySecondaryColor(String secondaryColor);
+    List<Template> findBySecondaryColor(String secondaryColor) throws DataAccessException;
     
-    Template findById(long id);
+    Template findById(long id) throws DataAccessException;
     
-    List<Template> findAllTemplates();
+    List<Template> findAllTemplates() throws DataAccessException;
     
-    boolean deleteTemplateById(long id);
+    boolean deleteTemplateById(long id) throws DataAccessException;
     
-    boolean updateTemplate(Template template);
-    
-    boolean isTemplateExist(long id);
-    
-    boolean isTemplateExist(String name);
+    boolean updateTemplate(long id, Template template) throws DataAccessException;
     
 }

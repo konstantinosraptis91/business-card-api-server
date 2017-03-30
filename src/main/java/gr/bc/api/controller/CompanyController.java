@@ -1,7 +1,7 @@
 package gr.bc.api.controller;
 
-import gr.bc.api.model.Profession;
-import gr.bc.api.service.ProfessionService;
+import gr.bc.api.model.Company;
+import gr.bc.api.service.CompanyService;
 import gr.bc.api.util.Constants;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,91 +26,91 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
- * @author konstantinos
+ * @author Konstantinos Raptis
  */
 @RestController
-@RequestMapping(value = "/api/profession")
-public class ProfessionController {
+@RequestMapping(value = "/api/company")
+public class CompanyController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyController.class);
     @Autowired
-    private ProfessionService professionService;
+    private CompanyService companyService;
 
-    // Save new Profession
+    // Save new company
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> saveProfession(@Valid @RequestBody Profession profession,
+    public ResponseEntity<Company> saveCompany(@Valid @RequestBody Company company,
             UriComponentsBuilder ucBuilder) {
 
-        Profession theProfession;
+        Company theCompany;
         try {
-            theProfession = professionService.saveProfession(profession);
+            theCompany = companyService.saveCompany(company);
         } catch (DataAccessException ex) {
-            LOGGER.error("saveProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("saveCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Profession " + theProfession.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Company " + theCompany.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(theProfession.getId()).toUri());
-        return new ResponseEntity<>(theProfession, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/company/{id}").buildAndExpand(theCompany.getId()).toUri());
+        return new ResponseEntity<>(theCompany, headers, HttpStatus.CREATED);
     }
 
-    // Update profession
+    // Update company
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateProfession(@PathVariable("id") long id, 
-            @Valid @RequestBody Profession profession) {
+    public ResponseEntity<Void> updateCompany(@PathVariable("id") long id, 
+            @Valid @RequestBody Company company) {
         boolean response;
 
         try {
-            response = professionService.updateProfession(id, profession);
+            response = companyService.updateCompany(id, company);
         } catch (DataAccessException ex) {
-            LOGGER.error("updateProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("updateCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         if (response) {
-            LOGGER.info("Profession " + profession.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Company " + company.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Delete profession
+    // Delete company
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteProfessionById(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteCompanyById(@PathVariable("id") long id) {
         boolean response;
 
         try {
-            response = professionService.deleteProfessionById(id);
+            response = companyService.deleteCompanyById(id);
         } catch (DataAccessException ex) {
-            LOGGER.error("deleteProfessionById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("deleteCompanyById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         if (response) {
-            LOGGER.info("Profession with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Company with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Get profession by id
+    // Get company by id
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> findById(@PathVariable("id") long id) {
-        Profession response;
+    public ResponseEntity<Company> findById(@PathVariable("id") long id) {
+        Company theCompany;
 
         try {
-            response = professionService.findById(id);
+            theCompany = companyService.findById(id);
         } catch (DataAccessException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
@@ -118,29 +118,29 @@ public class ProfessionController {
             }
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(theCompany, HttpStatus.OK);
     }
 
     // find
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Profession>> find(@RequestParam(value = "name", required = false) String name) {
-        List<Profession> response;
+    public ResponseEntity<List<Company>> find(@RequestParam(value = "name", required = false) String name) {
+        List<Company> companyList;
 
-        // Get all professions
+        // Get all companies
         if (name == null) {
             try {
-                response = professionService.findAllProfessions();
+                companyList = companyService.findAllCompanies();
             } catch (DataAccessException ex) {
-                LOGGER.error("findAllProfessions: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+                LOGGER.error("findAllCompanies: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
                 return new ResponseEntity<>(HttpStatus.CONFLICT);
             }
-        // Get profession by name
+        // Get company by name
         } else {
             try {
-                response = new ArrayList<>();
-                response.add(professionService.findByName(name));
+                companyList = new ArrayList<>();
+                companyList.add(companyService.findByName(name));
             } catch (DataAccessException ex) {
                 LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
                 if (ex instanceof EmptyResultDataAccessException) {
@@ -150,8 +150,8 @@ public class ProfessionController {
             }
         }
 
-        return response.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(response, HttpStatus.OK);
+        return companyList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(companyList, HttpStatus.OK);
     }
 
 }

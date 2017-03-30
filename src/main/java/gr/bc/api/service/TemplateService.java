@@ -2,12 +2,11 @@ package gr.bc.api.service;
 
 import gr.bc.api.model.Template;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.TemplateDao;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -20,50 +19,36 @@ public class TemplateService {
     @Qualifier("MySQLTemplate")
     private TemplateDao templateDao;
 
-    public Template saveTemplate(Template template) {
-        template.init();
+    public Template saveTemplate(Template template) throws DataAccessException {
         return templateDao.saveTemplate(template);
     }
     
-    public Template findByName(String name) {
+    public Template findByName(String name) throws DataAccessException {
         return templateDao.findByName(name);
     }
-    
-    public List<Template> findByColor(String color) {
-        return Stream.concat(templateDao.findByPrimaryColor(color).stream(), templateDao.findBySecondaryColor(color).stream())
-                .collect(Collectors.toList());
-    }
-    
-    public List<Template> findByPrimaryColor(String primaryColor) {
+      
+    public List<Template> findByPrimaryColor(String primaryColor) throws DataAccessException {
         return templateDao.findByPrimaryColor(primaryColor);
     }
     
-    public List<Template> findBySecondaryColor(String secondaryColor) {
+    public List<Template> findBySecondaryColor(String secondaryColor) throws DataAccessException {
         return templateDao.findBySecondaryColor(secondaryColor);
     }
     
-    public Template findById(long id) {
+    public Template findById(long id) throws DataAccessException {
         return templateDao.findById(id);
     }
     
-    public List<Template> findAllTemplates() {
+    public List<Template> findAllTemplates() throws DataAccessException {
         return templateDao.findAllTemplates();
     }
     
-    public boolean deleteTemplateById(long id) {
+    public boolean deleteTemplateById(long id) throws DataAccessException {
         return templateDao.deleteTemplateById(id);
     }
     
-    public boolean updateTemplate(Template template) {
-        return templateDao.updateTemplate(template);
-    }
-    
-    public boolean isTemplateExist(long id) {
-        return templateDao.isTemplateExist(id);
-    }
-    
-    public boolean isTemplateExist(String name) {
-        return templateDao.isTemplateExist(name);
+    public boolean updateTemplate(long id, Template template) throws DataAccessException {
+        return templateDao.updateTemplate(id, template);
     }
     
 }

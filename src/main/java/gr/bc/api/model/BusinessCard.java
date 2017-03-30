@@ -1,75 +1,38 @@
 package gr.bc.api.model;
 
-import java.util.Date;
-import javax.validation.constraints.NotNull;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.hibernate.validator.constraints.Email;
 
 /**
  *
  * @author Konstantinos Raptis
  */
-public class BusinessCard {
-    
-    private long id;
-    private long professionId;
-    private long templateId;
+public class BusinessCard extends DBEntity {
+      
     private long userId;
-    @NotNull
-    private String title;
-    @NotNull
-    private String description;
-    @NotNull
+    private long templateId;
+    private long professionId;
+    private long companyId;
+    @Email
+    private String email1;
+    private String email2;
     private String phoneNumber1;
     private String phoneNumber2;
     private String linkedIn;
     private String website;
-    @NotNull
-    private boolean universal;
-    private String email;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createdAt;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date lastUpdated;
-    
+    private Boolean universal;
+    private String address1;
+    private String address2;
+        
     public BusinessCard() {
+        super();
+    }
+   
+    public long getUserId() {
+        return userId;
     }
 
-    public BusinessCard(long id, long professionId, long templateId, long userId, 
-            String title, String description, String phoneNumber1, String phoneNumber2, 
-            String linkedIn, String website, boolean universal, String email) {
-        this.id = id;
-        this.professionId = professionId;
-        this.templateId = templateId;
+    public void setUserId(long userId) {
         this.userId = userId;
-        this.title = title;
-        this.description = description;
-        this.phoneNumber1 = phoneNumber1;
-        this.phoneNumber2 = phoneNumber2;
-        this.linkedIn = linkedIn;
-        this.website = website;
-        this.universal = universal;
-        this.email = email;
-    }
-    
-    public void init() {
-        this.createdAt = new Date();
-        this.lastUpdated = this.createdAt;
-    }
-    
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getProfessionId() {
-        return professionId;
-    }
-
-    public void setProfessionId(long professionId) {
-        this.professionId = professionId;
     }
 
     public long getTemplateId() {
@@ -80,28 +43,36 @@ public class BusinessCard {
         this.templateId = templateId;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getProfessionId() {
+        return professionId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setProfessionId(long professionId) {
+        this.professionId = professionId;
     }
 
-    public String getTitle() {
-        return title;
+    public long getCompanyId() {
+        return companyId;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getEmail1() {
+        return email1;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setEmail1(String email1) {
+        this.email1 = email1;
+    }
+
+    public String getEmail2() {
+        return email2;
+    }
+
+    public void setEmail2(String email2) {
+        this.email2 = email2;
     }
 
     public String getPhoneNumber1() {
@@ -136,41 +107,50 @@ public class BusinessCard {
         this.website = website;
     }
 
-    public boolean isUniversal() {
+    public Boolean isUniversal() {
         return universal;
     }
 
-    public void setUniversal(boolean universal) {
+    public void setUniversal(Boolean universal) {
         this.universal = universal;
     }
 
-    public String getEmail() {
-        return email;
+    public String getAddress1() {
+        return address1;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAddress1(String address1) {
+        this.address1 = address1;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getAddress2() {
+        return address2;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
+    public void setAddress2(String address2) {
+        this.address2 = address2;
     }
 
     @Override
     public String toString() {
-        return "BusinessCard{" + "id=" + id + ", professionId=" + professionId + ", templateId=" + templateId + ", userId=" + userId + ", title=" + title + ", description=" + description + ", phoneNumber1=" + phoneNumber1 + ", phoneNumber2=" + phoneNumber2 + ", linkedIn=" + linkedIn + ", website=" + website + ", universal=" + universal + ", email=" + email + ", createdAt=" + createdAt + ", lastUpdated=" + lastUpdated + '}';
+        return "BusinessCard{"
+                + "id=" + id
+                + ", userId=" + userId 
+                + ", templateId=" + templateId 
+                + ", professionId=" + professionId 
+                + ", companyId=" + companyId 
+                + ", email1=" + email1 
+                + ", email2=" + email2 
+                + ", phoneNumber1=" + phoneNumber1 
+                + ", phoneNumber2=" + phoneNumber2 
+                + ", linkedIn=" + linkedIn 
+                + ", website=" + website 
+                + ", universal=" + universal 
+                + ", address1=" + address1 
+                + ", address2=" + address2 
+                + ", lastUpdated=" + lastUpdated
+                + ", createdAt=" + createdAt
+                + '}';
     }
         
 }

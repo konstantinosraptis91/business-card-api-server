@@ -1,19 +1,17 @@
 package gr.bc.api.model;
 
-import javax.validation.constraints.NotNull;
-
 /**
  *
  * @author Konstantinos Raptis
  */
-public class Profession extends DBEntity {
-   
+public class Company extends DBEntity {
+
     private String name;
-            
-    public Profession() {
+
+    public Company() {
         super();
     }
-
+    
     public String getName() {
         return name;
     }
@@ -24,14 +22,12 @@ public class Profession extends DBEntity {
 
     @Override
     public String toString() {
-        return "Profession{"
+        return "Company{"
                 + "id=" + id
-                + ", name=" + name 
+                + ", name=" + name
                 + ", lastUpdated=" + lastUpdated
                 + ", createdAt=" + createdAt
                 + '}';
     }
-    
-    
-       
+
 }

@@ -14,6 +14,7 @@ public class Credentials {
     private String password;
 
     public Credentials() {
+        super();
     }
 
     public Credentials(String username, String password) {

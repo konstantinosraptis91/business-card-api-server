@@ -1,10 +1,7 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
-import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,98 +25,47 @@ public class WalletDaoMySQLImpl implements WalletDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public boolean saveBusinessCardToWallet(long userId, long businessCardId) {
-        long rows = 0;
-        try {
-            Date now = new Date();
-            String insertQuery = " INSERT INTO "
-                    + MySQLHelper.USER_BUSINESS_CARD_TABLE
-                    + " ("
-                    + MySQLHelper.USER_ID + ","
-                    + MySQLHelper.BUSINESS_CARD_ID + "," 
-                    + MySQLHelper.USER_BUSINESS_CARD_LAST_UPDATED + "," 
-                    + MySQLHelper.USER_BUSINESS_CARD_CREATED_AT + ")"
-                    + " VALUES " + "(?,?,?,?)";
-            rows = jdbcTemplate.update(insertQuery,
-                    new Object[]{
-                        userId,
-                        businessCardId,
-                        now,
-                        now
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("saveBusinessCardToWallet: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
+    public boolean saveBusinessCardToWallet(long userId, long businessCardId) throws DataAccessException {
+        String insertQuery = " INSERT INTO "
+                + MySQLHelper.USER_BUSINESS_CARD_TABLE
+                + " ("
+                + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + ","
+                + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + ")"
+                + " VALUES " + "(?,?)";
+        int rows = jdbcTemplate.update(insertQuery,
+                new Object[]{
+                    userId,
+                    businessCardId
+                });
         return rows != 0;
     }
 
     @Override
-    public List<BusinessCard> findAllBusinessCardInWalletByUserId(long id) {
+    public List<BusinessCard> findAllBusinessCardInWalletByUserId(long id) throws DataAccessException {
         String selectQuery = "SELECT "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.PROFESSION_ID + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.TEMPLATE_ID + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TITLE + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_DESCRIPTION + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_LINKEDIN + ","
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_WEBSITE + ","       
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_UNIVERSAL                                         
+                + BusinessCardDaoMySQLImpl.getAllAttributes()
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_BUSINESS_CARD_TABLE
                 + " ON "
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
                 + "="
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
+                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID
                 + " WHERE "
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_ID + "=" + "'" + id + "'";
-        List<BusinessCard> bcs = new ArrayList<>();
-        try {
-            bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
-                BusinessCard bc = new BusinessCard();
-                bc.setId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
-                bc.setProfessionId(rs.getLong(MySQLHelper.PROFESSION_ID));
-                bc.setTemplateId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                bc.setTitle(rs.getString(MySQLHelper.BUSINESS_CARD_TITLE));
-                bc.setDescription(rs.getString(MySQLHelper.BUSINESS_CARD_DESCRIPTION));
-                bc.setPhoneNumber1(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1));
-                bc.setPhoneNumber2(rs.getString(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2));
-                bc.setLinkedIn(rs.getString(MySQLHelper.BUSINESS_CARD_LINKEDIN));
-                bc.setWebsite(rs.getString(MySQLHelper.BUSINESS_CARD_WEBSITE));
-                bc.setUniversal(rs.getBoolean(MySQLHelper.BUSINESS_CARD_UNIVERSAL));
-                return bc;
-            });
-        } catch (DataAccessException e) {
-            LOGGER.error("findAllBusinessCardInWalletByUserId: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-        return bcs;        
+                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + "=" + "'" + id + "'";
+        List<BusinessCard> bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
+            return BusinessCardDaoMySQLImpl.extractBusinessCard(rs);
+        });
+        return bcs;
     }
 
     @Override
-    public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) {
-        Integer rows = null;
-        try {
-            String deleteQuery = "DELETE FROM " + MySQLHelper.USER_BUSINESS_CARD_TABLE
-                    + " WHERE " + MySQLHelper.USER_ID + " = " + "?"
-                    + " AND "
-                    + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
-            rows = jdbcTemplate.update(deleteQuery, new Object[]{userId, businessCardId});
-        } catch (DataAccessException e) {
-            LOGGER.error("deleteBusinessCardFromWallet: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-        return rows != null && rows > 0;
-    }
-   
-    @Override
-    public boolean isBusinessCardExistInWallet(long userId, long businessCardId) {
-        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE + " WHERE "
-                + MySQLHelper.USER_ID + " = " + "?"
+    public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) throws DataAccessException {
+        String deleteQuery = "DELETE FROM " + MySQLHelper.USER_BUSINESS_CARD_TABLE
+                + " WHERE " + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + " = " + "?"
                 + " AND "
-                + MySQLHelper.BUSINESS_CARD_ID + " = " + "?", 
-                Integer.class, userId, businessCardId);
-        return result != null && result > 0;
+                + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
+        int rows = jdbcTemplate.update(deleteQuery, new Object[]{userId, businessCardId});
+        return rows > 0;
     }
-   
+
 }

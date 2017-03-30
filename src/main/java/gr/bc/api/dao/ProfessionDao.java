@@ -2,6 +2,7 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.Profession;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -9,20 +10,16 @@ import java.util.List;
  */
 public interface ProfessionDao {
         
-    Profession saveProfession(Profession profession);    
+    Profession saveProfession(Profession profession) throws DataAccessException;    
         
-    Profession findByName(String name);
+    Profession findByName(String name) throws DataAccessException;
     
-    Profession findById(long id);
+    Profession findById(long id) throws DataAccessException;
     
-    List<Profession> findAllProfessions();
+    List<Profession> findAllProfessions() throws DataAccessException;
     
-    boolean deleteProfessionById(long id);
+    boolean deleteProfessionById(long id) throws DataAccessException;
     
-    boolean updateProfession(Profession profession);
-    
-    boolean isProfessionExist(long id);
-    
-    boolean isProfessionExist(String name);
+    boolean updateProfession(long id, Profession profession) throws DataAccessException;
     
 }

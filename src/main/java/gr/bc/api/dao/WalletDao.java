@@ -2,6 +2,7 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
 import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -9,12 +10,10 @@ import java.util.List;
  */
 public interface WalletDao {
     
-    boolean saveBusinessCardToWallet(long userId, long businessCardId);
+    boolean saveBusinessCardToWallet(long userId, long businessCardId) throws DataAccessException ;
     
-    List<BusinessCard> findAllBusinessCardInWalletByUserId(long id);
+    List<BusinessCard> findAllBusinessCardInWalletByUserId(long id) throws DataAccessException ;
     
-    boolean deleteBusinessCardFromWallet(long userId, long businessCardId);
-    
-    boolean isBusinessCardExistInWallet(long userId, long businessCardId);
+    boolean deleteBusinessCardFromWallet(long userId, long businessCardId) throws DataAccessException ;
     
 }

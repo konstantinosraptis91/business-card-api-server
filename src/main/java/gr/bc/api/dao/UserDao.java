@@ -2,7 +2,7 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
-import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -10,32 +10,16 @@ import java.util.List;
  */
 public interface UserDao {
         
-    User findByEmail(String email);
-    
-    List<User> findByFullName(String firstName, String lastName);
-    
-    List<User> findByFirstName(String firstName);
-    
-    List<User> findByLastName(String lastName);
+    User findByEmail(String email) throws DataAccessException;
         
-    User findById(long id);
-
-    User findByToken(String token);
+    User findById(long id) throws DataAccessException;
     
-    User saveUser(User user);
+    User saveUser(User user) throws DataAccessException;
     
-    String authenticate(Credentials credentials);
+    String authenticate(Credentials credentials) throws DataAccessException;
     
-    boolean updateUser(User user);
+    boolean updateUser(long id, User user) throws DataAccessException;
     
-    boolean deleteUserById(long id);
-    
-    boolean isUserExistById(long id);
-    
-    boolean isUserExistByEmail(String email);
-    
-    boolean isUserExistByToken(String token);
-    
-    boolean isUserExistByCredentials(Credentials credentials);
+    boolean deleteUserById(long id) throws DataAccessException;
     
 }

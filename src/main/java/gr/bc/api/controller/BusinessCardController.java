@@ -1,24 +1,25 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.model.BusinessCard;
+import gr.bc.api.model.User;
 import gr.bc.api.service.BusinessCardService;
-import gr.bc.api.service.ProfessionService;
-import gr.bc.api.service.TemplateService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.util.Constants;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,139 +39,209 @@ public class BusinessCardController {
     private BusinessCardService businessCardService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private TemplateService templateService;
-    @Autowired
-    private ProfessionService professionService;
 
     // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BusinessCard> saveBusinessCard(@RequestBody BusinessCard businessCard, UriComponentsBuilder ucBuilder) {
-        LOGGER.info("Creating Business Card for user id: " + businessCard.getUserId(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        // user not found
-        if (!userService.isUserExistById(businessCard.getUserId())) {
-            LOGGER.info("Unable to find user with id " + businessCard.getUserId() + ". User does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        // template not found
-        if (!templateService.isTemplateExist(businessCard.getTemplateId())) {
-            LOGGER.info("Unable to find template with id " + businessCard.getTemplateId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        // profession not found
-        if (!professionService.isProfessionExist(businessCard.getProfessionId())) {
-            LOGGER.info("Unable to find profession with id " + businessCard.getProfessionId() + ". Template does not exist.", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        // user already owns a business card
-        if (businessCardService.isBusinessCardExistByUserId(businessCard.getUserId())) {
-            LOGGER.info("User with id " + businessCard.getUserId() + " already owns a Business Card", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-        BusinessCard response = businessCardService.saveBusinessCard(businessCard);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(response.getId()).toUri());
-        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
-    }
-    
-    // Get business card id
-    @RequestMapping(
-            value="/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BusinessCard> findById(@PathVariable("id") long id) {
-        return businessCardService.isBusinessCardExist(id) ? new ResponseEntity<>(businessCardService.findById(id), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    
-    // Get business card by user id
-    @RequestMapping(
-            value="/user/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BusinessCard> findByUserId(@PathVariable("id") long id) {
-        return businessCardService.isBusinessCardExistByUserId(id) ? new ResponseEntity<>(businessCardService.findByUserId(id), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    
-    // Get business card by profession id
-    @RequestMapping(
-            value="/profession/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<BusinessCard>> findByProfessionId(@PathVariable("id") long id) {
-        List<BusinessCard> bcs = businessCardService.findByProfessionId(id);
-        return !bcs.isEmpty() ? new ResponseEntity<>(bcs, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-    
-    // Get business card by email or first name and/or last name
-    @RequestMapping(
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<BusinessCard>> find(
-            @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "firstName", required = false) String firstName,
-            @RequestParam(value = "lastName", required = false) String lastName) {
-        List<BusinessCard> bcs = new ArrayList<>();
-        if (email != null) {
-            if (businessCardService.isBusinessCardExistByUserEmail(email)) {
-                bcs.add(businessCardService.findByUserEmail(email));
+    public ResponseEntity<BusinessCard> saveBusinessCard(@Valid @RequestBody BusinessCard businessCard,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
+            UriComponentsBuilder ucBuilder) {
+
+        User owner;
+        BusinessCard theBusinessCard;
+
+        try {
+
+            owner = userService.findById(businessCard.getUserId());
+
+            // if tokens are equal then autorized to proceed and save given business card for owner user
+            if (owner.getToken().equals(authToken)) {
+                
+                // prevent creation of a second business card from the same user
+                // By removing this feature a lot of error will be appered, 
+                // because queryForObject return 1 or 0 rows, not more
+                // therefore in findById method may return more rows and throw an exception
+                if (businessCardService.findByUserId(owner.getId()) != null) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                
+                theBusinessCard = businessCardService.saveBusinessCard(businessCard);
             } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("saveBusinessCard: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            bcs = businessCardService.findByUserName(firstName, lastName);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return bcs.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(bcs, HttpStatus.OK);
+
+        LOGGER.info("Business Card: " + theBusinessCard.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(theBusinessCard.getId()).toUri());
+        return new ResponseEntity<>(theBusinessCard, headers, HttpStatus.CREATED);
     }
-    
+
+    // Get business card id
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> findById(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        BusinessCard theBusinessCard;
+
+        try {
+            theBusinessCard = businessCardService.findById(id);
+            User owner = userService.findById(theBusinessCard.getUserId());
+
+            // Check if asking User has the right to claim this business card
+            if (!owner.getToken().equals(authToken)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(theBusinessCard, HttpStatus.OK);
+    }
+
+    // Get business card by user id
+    @RequestMapping(
+            value = "/user/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> findByUserId(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        BusinessCard theBusinessCard;
+
+        try {
+            theBusinessCard = businessCardService.findByUserId(id);
+            User owner = userService.findById(theBusinessCard.getUserId());
+
+            // Check if asking User has the right to claim this business card
+            if (!owner.getToken().equals(authToken)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findByUserId: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(theBusinessCard, HttpStatus.OK);
+    }
+
+    // Get business card by email
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCard> find(@NotNull @RequestParam(value = "email", required = true) String email,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        BusinessCard theBusinessCard;
+
+        try {
+            theBusinessCard = businessCardService.findByUserEmail(email);
+            User owner = userService.findById(theBusinessCard.getUserId());
+
+            // Check if asking User has the right to claim this business card
+            if (!owner.getToken().equals(authToken)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findByUserId: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(theBusinessCard, HttpStatus.OK);
+    }
+
     // Update business card
     @RequestMapping(
+            value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateBusinessCard(@Valid @RequestBody BusinessCard businessCard) {
-        LOGGER.info("Updating business card with id " + businessCard.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        LOGGER.info(businessCard.toString());
-        // Check if business card which actually updated exists
-        if (!businessCardService.isBusinessCardExist(businessCard.getId())) {
-            LOGGER.info("Unable to update business card with id " + businessCard.getId() + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> updateBusinessCard(@PathVariable("id") long id,
+            @Valid @RequestBody BusinessCard businessCard,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        boolean response;
+        BusinessCard theBusinessCard;
+
+        try {
+            theBusinessCard = businessCardService.findById(id);
+            User owner = userService.findById(theBusinessCard.getUserId());
+
+            // if tokens are equal then autorized to proceed with update
+            if (owner.getToken().equals(authToken)) {
+                response = businessCardService.updateBusinessCard(theBusinessCard.getId(), businessCard);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("updateBusinessCard: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return businessCardService.updateBusinessCard(businessCard) ? new ResponseEntity<>(HttpStatus.OK) 
-                : new ResponseEntity<>(HttpStatus.CONFLICT); 
+
+        if (response) {
+            LOGGER.info("Business Card " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
+
+        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    
+
     // Delete business card by id
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteBusinessCardById(@PathVariable("id") long id) {
-        LOGGER.info("Deleting business card with id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
-        if (!businessCardService.isBusinessCardExist(id)) {
-            LOGGER.info("Unable to delete business card with id " + id + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> deleteBusinessCardById(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        boolean response;
+        BusinessCard theBusinessCard;
+        
+        try {
+            theBusinessCard = businessCardService.findById(id);
+            User owner = userService.findById(theBusinessCard.getUserId());
+            
+            // if tokens are equal then autorized to proceed with deletion
+            if (owner.getToken().equals(authToken)) {
+                response = businessCardService.deleteBusinessCardById(id);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            
+        } catch (DataAccessException ex) {
+            LOGGER.error("deleteBusinessCardById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return businessCardService.deleteBusinessCardById(id) ? new ResponseEntity<>(HttpStatus.OK) 
-                : new ResponseEntity<>(HttpStatus.CONFLICT); 
-    }
-    
-    // Delete business card by user id
-    @RequestMapping(
-            value = "/user/{id}",
-            method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteBusinessCardByUserId(@PathVariable("id") long id) {
-        LOGGER.info("Deleting business card with user id " + id, Constants.LOG_DATE_FORMAT.format(new Date()));
-        if (!businessCardService.isBusinessCardExistByUserId(id)) {
-            LOGGER.info("Unable to delete business card with user id " + id + ".Business card not found", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        
+        if (response) {
+            LOGGER.info("Business Card " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
-        return businessCardService.deleteBusinessCardByUserId(id) ? new ResponseEntity<>(HttpStatus.OK) 
-                : new ResponseEntity<>(HttpStatus.CONFLICT); 
+
+        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    
+
 }

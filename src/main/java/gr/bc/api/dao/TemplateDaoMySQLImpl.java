@@ -2,7 +2,10 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.Template;
 import gr.bc.api.util.Constants;
+import gr.bc.api.util.ExtractionBundle;
 import gr.bc.api.util.MySQLHelper;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,178 +35,128 @@ public class TemplateDaoMySQLImpl implements TemplateDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Template saveTemplate(Template template) {
-        try {
-            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            jdbcInsert.withTableName(MySQLHelper.TEMPLATE_TABLE).usingGeneratedKeyColumns(MySQLHelper.TEMPLATE_ID);
-            Map<String, Object> params = new HashMap<>();
-            params.put(MySQLHelper.TEMPLATE_NAME, template.getName());
-            params.put(MySQLHelper.TEMPLATE_PRIMARY_COLOR, template.getPrimaryColor());
-            params.put(MySQLHelper.TEMPLATE_SECONDARY_COLOR, template.getSecondaryColor());
-            params.put(MySQLHelper.TEMPLATE_LAST_UPDATED, template.getLastUpdated());
-            params.put(MySQLHelper.TEMPLATE_CREATED_AT, template.getCreatedAt());
-            Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-            template.setId(key.intValue());
-            return template;
-        } catch (Exception e) {
-            LOGGER.error("saveTemplate: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-        return new Template();
-    }
-
-    @Override
-    public List<Template> findAllTemplates() {
-        List<Template> templates = new ArrayList<>();
-        try {
-            templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE,
-                    (rs, rowNum) -> {
-                        Template t = new Template();
-                        t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                        t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
-                        t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
-                        t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
-                        return t;
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("findAllTemplates: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-        return templates;
-    }
-
-    @Override
-    public Template findById(long id) {
-        Template template = new Template();
-        try {
-            template = (Template) jdbcTemplate.queryForObject("SELECT * FROM "
-                    + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_ID + " = " + "'" + id + "'",
-                    (rs, rowNum) -> {
-                        Template t = new Template();
-                        t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                        t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
-                        t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
-                        t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
-                        return t;
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("findById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
+    public Template saveTemplate(Template template) throws DataAccessException {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        jdbcInsert.withTableName(MySQLHelper.TEMPLATE_TABLE).usingGeneratedKeyColumns(MySQLHelper.TEMPLATE_ID);
+        Map<String, Object> params = new HashMap<>();
+        params.put(MySQLHelper.TEMPLATE_NAME, template.getName());
+        params.put(MySQLHelper.TEMPLATE_PRIMARY_COLOR, template.getPrimaryColor());
+        params.put(MySQLHelper.TEMPLATE_SECONDARY_COLOR, template.getSecondaryColor());
+        Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
+        template.setId(key.intValue());
         return template;
     }
 
     @Override
-    public Template findByName(String name) {
-        Template template = new Template();
-        try {
-            template = (Template) jdbcTemplate.queryForObject("SELECT * FROM "
-                    + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_NAME + " = " + "'" + name + "'",
-                    (rs, rowNum) -> {
-                        Template t = new Template();
-                        t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                        t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
-                        t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
-                        t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
-                        return t;
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("findByName: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
+    public List<Template> findAllTemplates() throws DataAccessException {
+        List<Template> templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE,
+                (rs, rowNum) -> {
+                    return extractTemplate(rs);
+                });
+        return templates;
+    }
+
+    @Override
+    public Template findById(long id) throws DataAccessException {
+        Template template = (Template) jdbcTemplate.queryForObject("SELECT * FROM "
+                + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_ID + " = " + "'" + id + "'",
+                (rs, rowNum) -> {
+                    return extractTemplate(rs);
+                });
         return template;
     }
 
     @Override
-    public List<Template> findByPrimaryColor(String primaryColor) {
-        List<Template> templates = new ArrayList<>();
-        try {
-            templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
-                    + " WHERE " + MySQLHelper.TEMPLATE_PRIMARY_COLOR + " = " + "'" + primaryColor + "'",
-                    (rs, rowNum) -> {
-                        Template t = new Template();
-                        t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                        t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
-                        t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
-                        t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
-                        return t;
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("findByPrimaryColor: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
+    public Template findByName(String name) throws DataAccessException {
+        Template template = (Template) jdbcTemplate.queryForObject("SELECT * FROM "
+                + MySQLHelper.TEMPLATE_TABLE + " WHERE " + MySQLHelper.TEMPLATE_NAME + " = " + "'" + name + "'",
+                (rs, rowNum) -> {
+                    return extractTemplate(rs);
+                });
+        return template;
+    }
+
+    @Override
+    public List<Template> findByPrimaryColor(String primaryColor) throws DataAccessException {
+        List<Template> templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
+                + " WHERE " + MySQLHelper.TEMPLATE_PRIMARY_COLOR + " = " + "'" + primaryColor + "'",
+                (rs, rowNum) -> {
+                    return extractTemplate(rs);
+                });
         return templates;
     }
 
     @Override
-    public List<Template> findBySecondaryColor(String secondaryColor) {
-        List<Template> templates = new ArrayList<>();
-        try {
-            templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
-                    + " WHERE " + MySQLHelper.TEMPLATE_SECONDARY_COLOR + " = " + "'" + secondaryColor + "'",
-                    (rs, rowNum) -> {
-                        Template t = new Template();
-                        t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
-                        t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
-                        t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
-                        t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
-                        return t;
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("findBySecondaryColor: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
+    public List<Template> findBySecondaryColor(String secondaryColor) throws DataAccessException {
+        List<Template> templates = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.TEMPLATE_TABLE
+                + " WHERE " + MySQLHelper.TEMPLATE_SECONDARY_COLOR + " = " + "'" + secondaryColor + "'",
+                (rs, rowNum) -> {
+                    return extractTemplate(rs);
+                });
         return templates;
     }
-    
-    
-    
+
     @Override
-    public boolean deleteTemplateById(long id) {
-        Integer rows = null;
+    public boolean deleteTemplateById(long id) throws DataAccessException {
+        String deleteQuery = "DELETE FROM " + MySQLHelper.TEMPLATE_TABLE
+                + " WHERE " + MySQLHelper.TEMPLATE_ID + " = " + "?";
+        int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
+        return rows > 0;
+    }
+
+    @Override
+    public boolean updateTemplate(long id, Template template) throws DataAccessException {
+        ExtractionBundle bundle = extractNotNull(id, template);
+        
+        String updateQuery = " UPDATE "
+                + MySQLHelper.TEMPLATE_TABLE
+                + " SET "
+                + bundle.getAttributes()
+                + " WHERE " + MySQLHelper.TEMPLATE_ID + "=?";
+        int rows = jdbcTemplate.update(updateQuery, bundle.getValues().toArray());
+        return rows > 0;
+    }
+
+    public static Template extractTemplate(ResultSet rs) throws DataAccessException {
+        Template t = new Template();
         try {
-            String deleteQuery = "DELETE FROM " + MySQLHelper.TEMPLATE_TABLE
-                    + " WHERE " + MySQLHelper.TEMPLATE_ID + " = " + "?";
-            rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
-        } catch (DataAccessException e) {
-            LOGGER.error("deleteTemplateById: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            t.setId(rs.getLong(MySQLHelper.TEMPLATE_ID));
+            t.setName(rs.getString(MySQLHelper.TEMPLATE_NAME));
+            t.setPrimaryColor(rs.getString(MySQLHelper.TEMPLATE_PRIMARY_COLOR));
+            t.setSecondaryColor(rs.getString(MySQLHelper.TEMPLATE_SECONDARY_COLOR));
+            t.setLastUpdated(rs.getTimestamp(MySQLHelper.TEMPLATE_LAST_UPDATED));
+            t.setCreatedAt(rs.getTimestamp(MySQLHelper.TEMPLATE_CREATED_AT));
+        } catch (SQLException ex) {
+            LOGGER.error("extractTemplate: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
-        return rows != null && rows > 0;
+        return t;
     }
 
-    @Override
-    public boolean updateTemplate(Template template) {
-        Integer rows = null;
-        try {
-            String updateQuery = " UPDATE "
-                    + MySQLHelper.TEMPLATE_TABLE
-                    + " SET "
-                    + MySQLHelper.TEMPLATE_NAME + "=?,"
-                    + MySQLHelper.TEMPLATE_PRIMARY_COLOR + "=?,"
-                    + MySQLHelper.TEMPLATE_SECONDARY_COLOR + "=?"
-                    + " WHERE " + MySQLHelper.TEMPLATE_ID + "=?";
-            rows = jdbcTemplate.update(updateQuery,
-                    new Object[]{
-                        template.getName(),
-                        template.getPrimaryColor(),
-                        template.getSecondaryColor(),
-                        template.getId()
-                    });
-        } catch (DataAccessException e) {
-            LOGGER.error("updateTemplate: " + e.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+    public static ExtractionBundle extractNotNull(long id, Template template) {
+        StringBuilder builder = new StringBuilder();
+        List<Object> notNullList = new ArrayList<>();
+
+        if (template.getName() != null) {
+            builder.append(MySQLHelper.TEMPLATE_NAME + "=?,");
+            notNullList.add(template.getName());
         }
-        return rows != null && rows > 0;
+
+        if (template.getPrimaryColor() != null) {
+            builder.append(MySQLHelper.TEMPLATE_PRIMARY_COLOR + "=?,");
+            notNullList.add(template.getPrimaryColor());
+        }
+
+        if (template.getSecondaryColor() != null) {
+            builder.append(MySQLHelper.TEMPLATE_SECONDARY_COLOR + "=?");
+            notNullList.add(template.getSecondaryColor());
+        }
+
+        // remove last comma
+        String result = builder.toString().substring(0, builder.toString().length() - 1);
+        // add id 
+        notNullList.add(id);
+
+        return new ExtractionBundle(result, notNullList);
     }
 
-    // Check if template by given id exists
-    @Override
-    public boolean isTemplateExist(long id) {
-        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
-                + MySQLHelper.TEMPLATE_TABLE + " WHERE "
-                + MySQLHelper.TEMPLATE_ID + " = " + "?", Integer.class, id);
-        return result != null && result > 0;
-    }
-
-    @Override
-    public boolean isTemplateExist(String name) {
-        Integer result = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM "
-                + MySQLHelper.TEMPLATE_TABLE + " WHERE "
-                + MySQLHelper.TEMPLATE_NAME + " = " + "?", Integer.class, name);
-        return result != null && result > 0;
-    }
-       
 }

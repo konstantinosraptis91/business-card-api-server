@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.UserDao;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -19,58 +20,27 @@ public class UserService {
     @Qualifier("MySQLUser")
     private UserDao userDao;
         
-    public User saveUser(User user) {
-        user.init();
+    public User saveUser(User user) throws DataAccessException {
         return userDao.saveUser(user);
     }
     
-    public boolean updateUser(User user) {
-        return userDao.updateUser(user);
+    public boolean updateUser(long id, User user) throws DataAccessException {
+        return userDao.updateUser(id, user);
     }
     
-    public boolean deleteUserById(long id) {
+    public boolean deleteUserById(long id) throws DataAccessException {
         return userDao.deleteUserById(id);
     }
     
-    public User findByEmail(String email) {
+    public User findByEmail(String email) throws DataAccessException {
         return userDao.findByEmail(email);
     }
-       
-    public User findByToken(String token) {
-        return userDao.findByToken(token);
-    }
-    
-    public List<User> findByName(String firstName, String lastName) {
-        if (firstName == null) {
-            return userDao.findByLastName(lastName);
-        } else if (lastName == null) {
-            return userDao.findByFirstName(firstName);
-        } else {
-            return userDao.findByFullName(firstName, lastName);
-        }
-    }
 
-    public User findById(long id) {
+    public User findById(long id) throws DataAccessException {
         return userDao.findById(id);
     }
-
-    public boolean isUserExistById(long userId) {
-        return userDao.isUserExistById(userId);
-    }
     
-    public boolean isUserExistByEmail(String email) {
-        return userDao.isUserExistByEmail(email);
-    }
-    
-    public boolean isUserExistByToken(String token) {
-        return userDao.isUserExistByToken(token);
-    }
-    
-    public boolean isUserExistByCredentials(Credentials credentials) {
-        return userDao.isUserExistByCredentials(credentials);
-    }
-    
-    public String authenticate(Credentials credentials) {
+    public String authenticate(Credentials credentials) throws DataAccessException {
         return userDao.authenticate(credentials);
     }
     

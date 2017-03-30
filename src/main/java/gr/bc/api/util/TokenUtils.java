@@ -8,7 +8,7 @@ import java.security.SecureRandom;
  */
 public class TokenUtils {
         
-    private final String VOCABULARY = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private final String VOCABULARY = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; // 1 / (62^64)
     private final SecureRandom srnd;
     public static final int TOKEN_SIZE = 64;
     
