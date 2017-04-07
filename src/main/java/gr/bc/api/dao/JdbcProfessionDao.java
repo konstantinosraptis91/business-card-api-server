@@ -1,11 +1,9 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.Profession;
-import gr.bc.api.util.Constants;
 import gr.bc.api.util.MySQLHelper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -25,9 +24,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLProfession")
-public class ProfessionDaoMySQLImpl implements ProfessionDao {
+public class JdbcProfessionDao implements ProfessionDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionDaoMySQLImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcProfessionDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -45,67 +44,66 @@ public class ProfessionDaoMySQLImpl implements ProfessionDao {
 
     @Override
     public Profession findByName(String name) throws DataAccessException {
-        Profession profession = (Profession) jdbcTemplate.queryForObject("SELECT * FROM "
-                + MySQLHelper.PROFESSION_TABLE + " WHERE " + MySQLHelper.PROFESSION_NAME + " = " + "'" + name + "'",
-                (rs, rowNum) -> {
-                    return extractProfession(rs);
-                });
+        
+        String selectQuery = "SELECT * FROM " + MySQLHelper.PROFESSION_TABLE 
+                + " WHERE " + MySQLHelper.PROFESSION_NAME + " = " + "'" + name + "'";
+        
+        Profession profession = jdbcTemplate.queryForObject(selectQuery, new JdbcProfessionDao.ProfessionMapper());
         return profession;
     }
 
     @Override
     public Profession findById(long professionId) throws DataAccessException {
-        Profession profession = (Profession) jdbcTemplate.queryForObject("SELECT * FROM "
-                + MySQLHelper.PROFESSION_TABLE + " WHERE " + MySQLHelper.PROFESSION_ID + " = " + "'" + professionId + "'",
-                (rs, rowNum) -> {
-                    return extractProfession(rs);
-                });
+        
+        String selectQuery = "SELECT * FROM " + MySQLHelper.PROFESSION_TABLE 
+                + " WHERE " + MySQLHelper.PROFESSION_ID + " = " + "'" + professionId + "'";
+        
+        Profession profession = jdbcTemplate.queryForObject(selectQuery, new JdbcProfessionDao.ProfessionMapper());
         return profession;
     }
 
     @Override
     public List<Profession> findAllProfessions() throws DataAccessException {
-        List<Profession> professions = jdbcTemplate.query("SELECT * FROM " + MySQLHelper.PROFESSION_TABLE,
-                (rs, rowNum) -> {
-                    return extractProfession(rs);
-                });
+        
+        String selectQuery = "SELECT * FROM " + MySQLHelper.PROFESSION_TABLE;
+        
+        List<Profession> professions = jdbcTemplate.query(selectQuery, new JdbcProfessionDao.ProfessionMapper());
         return professions;
     }
 
     @Override
     public boolean deleteProfessionById(long id) throws DataAccessException {
+        
         String deleteQuery = "DELETE FROM " + MySQLHelper.PROFESSION_TABLE
                 + " WHERE " + MySQLHelper.PROFESSION_ID + " = " + "?";
+        
         int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
         return rows > 0;
     }
 
     @Override
     public boolean updateProfession(long id, Profession profession) throws DataAccessException {
-        String updateQuery = " UPDATE "
-                + MySQLHelper.PROFESSION_TABLE
-                + " SET "
-                + MySQLHelper.PROFESSION_NAME + "=?,"
+        
+        String updateQuery = " UPDATE " + MySQLHelper.PROFESSION_TABLE
+                + " SET " + MySQLHelper.PROFESSION_NAME + "=?"
                 + " WHERE " + MySQLHelper.PROFESSION_ID + "=?";
-        int rows = jdbcTemplate.update(updateQuery,
-                new Object[]{
-                    profession.getName(),
-                    id
-                });
+        
+        int rows = jdbcTemplate.update(updateQuery, new Object[]{profession.getName(), id});
         return rows > 0;
     }
+    
+    public static final class ProfessionMapper implements RowMapper<Profession> {
 
-    public static Profession extractProfession(ResultSet rs) throws DataAccessException {
-        Profession p = new Profession();
-        try {
+        @Override
+        public Profession mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Profession p = new Profession();
             p.setId(rs.getLong(MySQLHelper.PROFESSION_ID));
             p.setName(rs.getString(MySQLHelper.PROFESSION_NAME));
             p.setLastUpdated(rs.getTimestamp(MySQLHelper.PROFESSION_LAST_UPDATED));
             p.setCreatedAt(rs.getTimestamp(MySQLHelper.PROFESSION_CREATED_AT));
-        } catch (SQLException ex) {
-            LOGGER.error("extractProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return p;
         }
-        return p;
+        
     }
-
+    
 }

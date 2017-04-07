@@ -1,6 +1,7 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
+import java.util.List;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -13,9 +14,9 @@ public interface BusinessCardDao {
     
     BusinessCard findById(long businessCardId) throws DataAccessException;
     
-    BusinessCard findByUserId(long userId) throws DataAccessException;
+    List<BusinessCard> findByUserId(long userId) throws DataAccessException;
     
-    BusinessCard findByUserEmail(String email) throws DataAccessException;
+    List<BusinessCard> findByUserEmail(String email) throws DataAccessException;
            
     boolean updateBusinessCard(long id, BusinessCard businessCard) throws DataAccessException;
         

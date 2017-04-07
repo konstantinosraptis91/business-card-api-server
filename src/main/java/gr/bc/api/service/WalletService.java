@@ -30,5 +30,9 @@ public class WalletService {
     public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) throws DataAccessException {
         return walletDao.deleteBusinessCardFromWallet(userId, businessCardId);
     }
-        
+      
+    public boolean isDuplicate(long userId, long businessCardId) throws DataAccessException {
+        return walletDao.isDuplicate(userId, businessCardId);
+    }
+    
 }

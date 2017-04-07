@@ -8,6 +8,7 @@ import gr.bc.api.service.WalletService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,14 +64,26 @@ public class WalletController {
                     LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);
                 }
-
+                
+                // Check if business card not public
+                if (!theBusinessCard.isUniversal()) {
+                    LOGGER.info("Business card not public...");
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+                
+                // avoid duplicates
+                if (walletService.isDuplicate(userId, businessCardId)) {
+                    LOGGER.info("This card is already in that wallet...");
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+                
                 response = walletService.addBusinessCardToWallet(userId, businessCardId);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
         } catch (DataAccessException ex) {
-            LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("addBusinessCardToWallet: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -100,6 +113,14 @@ public class WalletController {
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
                 businessCardList = walletService.findAllBusinessCardInWalletByUserId(walletOwner.getId());
+                
+                // (1) remove from wallet business cards which are not public
+                // (2) remove duplicate values
+                businessCardList = businessCardList
+                        .stream()
+                        .filter(bc -> bc.isUniversal())
+                        .collect(Collectors.toList());
+                
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -142,7 +163,7 @@ public class WalletController {
             }
 
         } catch (DataAccessException ex) {
-            LOGGER.error("findAllBusinessCardInWalletByUserId: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("deleteBusinessCardFromWallet: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

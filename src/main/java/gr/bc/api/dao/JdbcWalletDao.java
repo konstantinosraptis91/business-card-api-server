@@ -17,55 +17,58 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLWallet")
-public class WalletDaoMySQLImpl implements WalletDao {
+public class JdbcWalletDao implements WalletDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WalletDaoMySQLImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcWalletDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
     public boolean saveBusinessCardToWallet(long userId, long businessCardId) throws DataAccessException {
-        String insertQuery = " INSERT INTO "
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE
-                + " ("
+        
+        String insertQuery = " INSERT INTO " + MySQLHelper.USER_BUSINESS_CARD_TABLE + " ("
                 + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + ","
                 + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + ")"
                 + " VALUES " + "(?,?)";
-        int rows = jdbcTemplate.update(insertQuery,
-                new Object[]{
-                    userId,
-                    businessCardId
-                });
+        
+        int rows = jdbcTemplate.update(insertQuery, new Object[]{userId, businessCardId});
         return rows != 0;
     }
 
     @Override
     public List<BusinessCard> findAllBusinessCardInWalletByUserId(long id) throws DataAccessException {
-        String selectQuery = "SELECT "
-                + BusinessCardDaoMySQLImpl.getAllAttributes()
+        
+        String selectQuery = "SELECT " + JdbcBusinessCardDao.getAllAttributes()
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_BUSINESS_CARD_TABLE
-                + " ON "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID
-                + "="
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID
-                + " WHERE "
-                + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + "=" + "'" + id + "'";
-        List<BusinessCard> bcs = jdbcTemplate.query(selectQuery, (rs, rowNum) -> {
-            return BusinessCardDaoMySQLImpl.extractBusinessCard(rs);
-        });
+                + " ON " + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_ID + "=" + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID
+                + " WHERE " + MySQLHelper.USER_BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + "=" + "'" + id + "'";
+        
+        List<BusinessCard> bcs = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
         return bcs;
     }
 
     @Override
     public boolean deleteBusinessCardFromWallet(long userId, long businessCardId) throws DataAccessException {
+        
         String deleteQuery = "DELETE FROM " + MySQLHelper.USER_BUSINESS_CARD_TABLE
                 + " WHERE " + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + " = " + "?"
-                + " AND "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
+                + " AND " + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
+        
         int rows = jdbcTemplate.update(deleteQuery, new Object[]{userId, businessCardId});
         return rows > 0;
+    }
+
+    @Override
+    public boolean isDuplicate(long userId, long businessCardId) throws DataAccessException {
+        
+        String selectQuery = "SELECT COUNT(*) FROM " + MySQLHelper.USER_BUSINESS_CARD_TABLE 
+                + " WHERE " + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + "=?"
+                + " AND " + MySQLHelper.BUSINESS_CARD_TABLE + "_" + MySQLHelper.BUSINESS_CARD_ID + "=?";
+        
+        int rowCount = jdbcTemplate.queryForObject(selectQuery, Integer.class, userId, businessCardId);
+        return rowCount > 0;        
     }
 
 }

@@ -1,13 +1,11 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
-import gr.bc.api.util.Constants;
 import gr.bc.api.util.ExtractionBundle;
 import gr.bc.api.util.MySQLHelper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -27,9 +26,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLBusinessCard")
-public class BusinessCardDaoMySQLImpl implements BusinessCardDao {
+public class JdbcBusinessCardDao implements BusinessCardDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessCardDaoMySQLImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcBusinessCardDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -58,62 +57,60 @@ public class BusinessCardDaoMySQLImpl implements BusinessCardDao {
     }
 
     @Override
-    public BusinessCard findByUserId(long userId) throws DataAccessException {
-        BusinessCard businessCard = (BusinessCard) jdbcTemplate.queryForObject("SELECT * FROM "
-                + MySQLHelper.BUSINESS_CARD_TABLE + " WHERE " + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + " = " + "'" + userId + "'",
-                (rs, rowNum) -> {
-                    return extractBusinessCard(rs);
-                });
-        return businessCard;
+    public List<BusinessCard> findByUserId(long userId) throws DataAccessException {
+
+        String selectQuery = "SELECT * FROM " + MySQLHelper.BUSINESS_CARD_TABLE
+                + " WHERE " + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + " = " + "'" + userId + "'";
+
+        List<BusinessCard> businessCards = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
+        return businessCards;
     }
 
     @Override
     public BusinessCard findById(long businessCardId) throws DataAccessException {
-        BusinessCard businessCard = (BusinessCard) jdbcTemplate.queryForObject("SELECT * FROM "
-                + MySQLHelper.BUSINESS_CARD_TABLE + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + " = " + "'" + businessCardId + "'",
-                (rs, rowNum) -> {
-                    return extractBusinessCard(rs);
-                });
+
+        String selectQuery = "SELECT * FROM " + MySQLHelper.BUSINESS_CARD_TABLE
+                + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + " = " + "'" + businessCardId + "'";
+
+        BusinessCard businessCard = jdbcTemplate.queryForObject(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
         return businessCard;
     }
 
     @Override
-    public BusinessCard findByUserEmail(String email) throws DataAccessException {
-        String selectQuery = "SELECT "
-                + getAllAttributes()
+    public List<BusinessCard> findByUserEmail(String email) throws DataAccessException {
+
+        String selectQuery = "SELECT " + getAllAttributes()
                 + " FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " INNER JOIN " + MySQLHelper.USER_TABLE
-                + " ON "
-                + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID
-                + "="
-                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
-                + " WHERE "
-                + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_EMAIL + "=" + "'" + email + "'"
+                + " ON " + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID + "=" + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_ID
+                + " WHERE " + MySQLHelper.USER_TABLE + "." + MySQLHelper.USER_EMAIL + "=" + "'" + email + "'"
+                + " AND " + MySQLHelper.BUSINESS_CARD_UNIVERSAL + "=" + "'" + 1 + "'"
                 // case sensitive search for last name
                 + " COLLATE utf8_bin";
-        BusinessCard businessCard = (BusinessCard) jdbcTemplate.queryForObject(selectQuery, (rs, rowNum) -> {
-            return extractBusinessCard(rs);
-        });
-        return businessCard;
+
+        List<BusinessCard> businessCardList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
+        return businessCardList;
     }
 
     @Override
     public boolean updateBusinessCard(long id, BusinessCard businessCard) throws DataAccessException {
+
         ExtractionBundle bundle = extractNotNull(id, businessCard);
-            String updateQuery = " UPDATE "
-                    + MySQLHelper.BUSINESS_CARD_TABLE
-                    + " SET "
-                    + bundle.getAttributes()
-                    + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + "=?";
-            int rows = jdbcTemplate.update(updateQuery, bundle.getValues().toArray());
+
+        String updateQuery = " UPDATE " + MySQLHelper.BUSINESS_CARD_TABLE
+                + " SET " + bundle.getAttributes()
+                + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + "=?";
         
+        int rows = jdbcTemplate.update(updateQuery, bundle.getValues().toArray());
         return rows > 0;
     }
 
     @Override
     public boolean deleteBusinessCardById(long id) throws DataAccessException {
+        
         String deleteQuery = "DELETE FROM " + MySQLHelper.BUSINESS_CARD_TABLE
                 + " WHERE " + MySQLHelper.BUSINESS_CARD_ID + " = " + "?";
+        
         int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
         return rows > 0;
     }
@@ -137,9 +134,83 @@ public class BusinessCardDaoMySQLImpl implements BusinessCardDao {
                 + MySQLHelper.BUSINESS_CARD_TABLE + "." + MySQLHelper.BUSINESS_CARD_CREATED_AT;
     }
 
-    public static BusinessCard extractBusinessCard(ResultSet rs) {
-        BusinessCard bc = new BusinessCard();
-        try {
+    public static ExtractionBundle extractNotNull(long id, BusinessCard businessCard) {
+        StringBuilder builder = new StringBuilder();
+        List<Object> notNullList = new ArrayList<>();
+
+        if (businessCard.getTemplateId() > 0) {
+            builder.append(MySQLHelper.TEMPLATE_TABLE + "_" + MySQLHelper.TEMPLATE_ID + "=?,");
+            notNullList.add(businessCard.getTemplateId());
+        }
+
+        if (businessCard.getProfessionId() > 0) {
+            builder.append(MySQLHelper.PROFESSION_TABLE + "_" + MySQLHelper.PROFESSION_ID + "=?,");
+            notNullList.add(businessCard.getProfessionId());
+        }
+
+        if (businessCard.getCompanyId() > 0) {
+            builder.append(MySQLHelper.COMPANY_TABLE + "_" + MySQLHelper.COMPANY_ID + "=?,");
+            notNullList.add(businessCard.getCompanyId());
+        }
+
+        if (businessCard.getEmail1() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_EMAIL_1 + "=?,");
+            notNullList.add(businessCard.getEmail1());
+        }
+
+        if (businessCard.getEmail2() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_EMAIL_2 + "=?,");
+            notNullList.add(businessCard.getEmail2());
+        }
+
+        if (businessCard.getPhoneNumber1() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + "=?,");
+            notNullList.add(businessCard.getPhoneNumber1());
+        }
+
+        if (businessCard.getPhoneNumber2() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + "=?,");
+            notNullList.add(businessCard.getPhoneNumber2());
+        }
+
+        if (businessCard.getLinkedIn() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_LINKEDIN + "=?,");
+            notNullList.add(businessCard.getLinkedIn());
+        }
+
+        if (businessCard.getWebsite() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_WEBSITE + "=?,");
+            notNullList.add(businessCard.getWebsite());
+        }
+
+        if (businessCard.isUniversal() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_UNIVERSAL + "=?,");
+            notNullList.add(businessCard.isUniversal());
+        }
+
+        if (businessCard.getAddress1() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_ADDRESS_1 + "=?,");
+            notNullList.add(businessCard.getAddress1());
+        }
+
+        if (businessCard.getAddress2() != null) {
+            builder.append(MySQLHelper.BUSINESS_CARD_ADDRESS_2 + "=?,");
+            notNullList.add(businessCard.getAddress2());
+        }
+
+        // remove last comma
+        String result = builder.toString().substring(0, builder.toString().length() - 1);
+        // add id 
+        notNullList.add(id);
+
+        return new ExtractionBundle(result, notNullList);
+    }
+
+    public static final class BusinessCardMapper implements RowMapper<BusinessCard> {
+
+        @Override
+        public BusinessCard mapRow(ResultSet rs, int rowNum) throws SQLException {
+            BusinessCard bc = new BusinessCard();
             bc.setId(rs.getLong(MySQLHelper.BUSINESS_CARD_ID));
             bc.setUserId(rs.getLong(MySQLHelper.USER_TABLE + "_" + MySQLHelper.USER_ID));
             bc.setTemplateId(rs.getLong(MySQLHelper.TEMPLATE_TABLE + "_" + MySQLHelper.TEMPLATE_ID));
@@ -156,82 +227,9 @@ public class BusinessCardDaoMySQLImpl implements BusinessCardDao {
             bc.setAddress2(rs.getString(MySQLHelper.BUSINESS_CARD_ADDRESS_2));
             bc.setLastUpdated(rs.getTimestamp(MySQLHelper.BUSINESS_CARD_LAST_UPDATED));
             bc.setCreatedAt(rs.getTimestamp(MySQLHelper.BUSINESS_CARD_CREATED_AT));
-        } catch (SQLException ex) {
-            LOGGER.error("extractBusinessCard: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return bc;
         }
-        return bc;
+
     }
-    
-    public static ExtractionBundle extractNotNull(long id, BusinessCard businessCard) {
-        StringBuilder builder = new StringBuilder();
-        List<Object> notNullList = new ArrayList<>();
-        
-        if (businessCard.getTemplateId() > 0) {
-            builder.append(MySQLHelper.TEMPLATE_TABLE + "_" + MySQLHelper.TEMPLATE_ID + "=?,");
-            notNullList.add(businessCard.getTemplateId());
-        }
-        
-        if (businessCard.getProfessionId() > 0)  {
-            builder.append(MySQLHelper.PROFESSION_TABLE + "_" + MySQLHelper.PROFESSION_ID + "=?,");
-            notNullList.add(businessCard.getProfessionId());
-        }
-               
-        if (businessCard.getCompanyId() > 0) {
-            builder.append(MySQLHelper.COMPANY_TABLE + "_" + MySQLHelper.COMPANY_ID + "=?,");
-            notNullList.add(businessCard.getCompanyId());
-        }
-        
-        if (businessCard.getEmail1() != null) {
-            builder.append(MySQLHelper.BUSINESS_CARD_EMAIL_1 + "=?,");
-            notNullList.add(businessCard.getEmail1());
-        }
-        
-        if (businessCard.getEmail2() != null)  {
-            builder.append(MySQLHelper.BUSINESS_CARD_EMAIL_2 + "=?,");
-            notNullList.add(businessCard.getEmail2());
-        }
-        
-        if (businessCard.getPhoneNumber1() != null)  {
-            builder.append(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER1 + "=?,");
-            notNullList.add(businessCard.getPhoneNumber1());
-        }
-        
-        if (businessCard.getPhoneNumber2() != null) {
-            builder.append(MySQLHelper.BUSINESS_CARD_PHONE_NUMBER2 + "=?,");
-            notNullList.add(businessCard.getPhoneNumber2());
-        }
-        
-        if (businessCard.getLinkedIn() != null) {
-            builder.append(MySQLHelper.BUSINESS_CARD_LINKEDIN + "=?,");
-            notNullList.add(businessCard.getLinkedIn());
-        }
-        
-        if (businessCard.getWebsite() != null) {
-            builder.append(MySQLHelper.BUSINESS_CARD_WEBSITE + "=?,");
-            notNullList.add(businessCard.getWebsite());
-        }
-        
-        if (businessCard.isUniversal() != null)  {
-            builder.append(MySQLHelper.BUSINESS_CARD_UNIVERSAL + "=?,");
-            notNullList.add(businessCard.isUniversal());
-        }
-        
-        if (businessCard.getAddress1() != null)  {
-            builder.append(MySQLHelper.BUSINESS_CARD_ADDRESS_1 + "=?,");
-            notNullList.add(businessCard.getAddress1());
-        }
-        
-        if (businessCard.getAddress2() != null) {
-            builder.append(MySQLHelper.BUSINESS_CARD_ADDRESS_2 + "=?,");
-            notNullList.add(businessCard.getAddress2());
-        }
-        
-        // remove last comma
-        String result = builder.toString().substring(0, builder.toString().length() - 1);
-        // add id 
-        notNullList.add(id);
-        
-        return new ExtractionBundle(result, notNullList);
-    }
-       
+
 }

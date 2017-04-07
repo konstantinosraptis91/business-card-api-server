@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.BusinessCardDao;
+import java.util.List;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -26,7 +27,7 @@ public class BusinessCardService {
         return businessCardDao.updateBusinessCard(id, businessCard);
     }
     
-    public BusinessCard findByUserId(long id) throws DataAccessException {
+    public List<BusinessCard> findByUserId(long id) throws DataAccessException {
         return businessCardDao.findByUserId(id);
     }
     
@@ -34,7 +35,7 @@ public class BusinessCardService {
         return businessCardDao.findById(id);
     }
     
-    public BusinessCard findByUserEmail(String email) throws DataAccessException {
+    public List<BusinessCard> findByUserEmail(String email) throws DataAccessException {
         return businessCardDao.findByUserEmail(email);
     }
     
