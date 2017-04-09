@@ -32,14 +32,13 @@ public class JdbcCompanyDao implements CompanyDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Company saveCompany(Company company) throws DataAccessException {
+    public long saveCompany(Company company) throws DataAccessException {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName(MySQLHelper.COMPANY_TABLE).usingGeneratedKeyColumns(MySQLHelper.COMPANY_ID);
         Map<String, Object> params = new HashMap<>();
         params.put(MySQLHelper.COMPANY_NAME, company.getName());
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-        company.setId(key.intValue());
-        return company;
+        return key.longValue();
     }
 
     @Override

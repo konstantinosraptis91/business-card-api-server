@@ -9,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -27,9 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 public class CompanyControllerTest {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyControllerTest.class);
-    
+        
     @Autowired
     private CompanyController controller;
     private Company theCompany;
@@ -42,24 +38,28 @@ public class CompanyControllerTest {
     
     @Test 
     public void testCompanyController() throws JsonProcessingException {
-        LOGGER.info("Running: testCompanyController");
-        testSaveCompany();
-        testGetCompanyById();
-        testGetCompanyByName();
-        testUpdateCompany();
-        testGetAllCompanies();
-        testDeleteCompany();
+        saveCompany();
+        getCompanyById();
+        getCompanyByName();
+        updateCompany();
+        getAllCompanies();
+        deleteCompany();
     }
     
-    public void testSaveCompany() throws JsonProcessingException {
+    public void saveCompany() throws JsonProcessingException {
         
-        ResponseEntity<Company> response = controller.saveCompany(theCompany, UriComponentsBuilder.newInstance());
-        theCompany = response.getBody();
+        ResponseEntity<Void> response = controller.saveCompany(theCompany, UriComponentsBuilder.newInstance());
+        
+        String[] results = response.getHeaders().getLocation().getPath().split("/");
+        long id = Long.parseLong(results[results.length - 1]);
+        theCompany.setId(id);
+        
+        System.out.println("id: " + id);
         
         Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
     
-    public void testUpdateCompany() {
+    public void updateCompany() {
        
         theCompany.setName("The Triaps Company");
         
@@ -68,14 +68,14 @@ public class CompanyControllerTest {
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     
-    public void testDeleteCompany() {
+    public void deleteCompany() {
         
         ResponseEntity<Void> response = controller.deleteCompanyById(theCompany.getId());
         
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     
-    public void testGetCompanyById() throws JsonProcessingException {
+    public void getCompanyById() throws JsonProcessingException {
         
         ResponseEntity<Company> response = controller.findById(theCompany.getId());
         theCompany = response.getBody();
@@ -83,7 +83,7 @@ public class CompanyControllerTest {
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
     
-    public void testGetAllCompanies() {
+    public void getAllCompanies() {
                 
         ResponseEntity<List<Company>> response = controller.find(null);
                 
@@ -92,7 +92,7 @@ public class CompanyControllerTest {
                         .or(Matchers.is(HttpStatus.NO_CONTENT)));
     }
     
-    public void testGetCompanyByName() {
+    public void getCompanyByName() {
         
         ResponseEntity<List<Company>> response = controller.find(theCompany.getName());
         

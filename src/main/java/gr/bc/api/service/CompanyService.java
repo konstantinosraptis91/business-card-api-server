@@ -19,7 +19,7 @@ public class CompanyService {
     @Qualifier("MySQLCompany")
     private CompanyDao companyDao;
     
-    public Company saveCompany(Company company) throws DataAccessException {
+    public long saveCompany(Company company) throws DataAccessException {
         return companyDao.saveCompany(company);
     }
     

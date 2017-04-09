@@ -41,20 +41,21 @@ public class CompanyController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Company> saveCompany(@Valid @RequestBody Company company,
+    public ResponseEntity<Void> saveCompany(@Valid @RequestBody Company company,
             UriComponentsBuilder ucBuilder) {
 
-        Company theCompany;
+        long id;
+        
         try {
-            theCompany = companyService.saveCompany(company);
+            id = companyService.saveCompany(company);
         } catch (DataAccessException ex) {
             LOGGER.error("saveCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Company " + theCompany.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Company: " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/company/{id}").buildAndExpand(theCompany.getId()).toUri());
-        return new ResponseEntity<>(theCompany, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/company/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     // Update company

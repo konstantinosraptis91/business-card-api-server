@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
  */
 public interface CompanyDao {
     
-    Company saveCompany(Company company) throws DataAccessException;
+    long saveCompany(Company company) throws DataAccessException;
         
     Company findByName(String name) throws DataAccessException;
     
