@@ -41,20 +41,21 @@ public class ProfessionController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> saveProfession(@Valid @RequestBody Profession profession,
+    public ResponseEntity<Void> saveProfession(@Valid @RequestBody Profession profession,
             UriComponentsBuilder ucBuilder) {
 
-        Profession theProfession;
+        long id;
+        
         try {
-            theProfession = professionService.saveProfession(profession);
+            id = professionService.saveProfession(profession);
         } catch (DataAccessException ex) {
             LOGGER.error("saveProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Profession " + theProfession.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Profession with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(theProfession.getId()).toUri());
-        return new ResponseEntity<>(theProfession, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     // Update profession
@@ -74,7 +75,7 @@ public class ProfessionController {
         }
 
         if (response) {
-            LOGGER.info("Profession " + profession.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Profession with id " + profession.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);

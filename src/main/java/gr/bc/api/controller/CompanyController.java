@@ -52,7 +52,7 @@ public class CompanyController {
             LOGGER.error("saveCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Company: " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Company with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/company/{id}").buildAndExpand(id).toUri());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
@@ -75,7 +75,7 @@ public class CompanyController {
         }
 
         if (response) {
-            LOGGER.info("Company " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Company with id " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);

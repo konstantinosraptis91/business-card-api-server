@@ -53,9 +53,7 @@ public class CompanyControllerTest {
         String[] results = response.getHeaders().getLocation().getPath().split("/");
         long id = Long.parseLong(results[results.length - 1]);
         theCompany.setId(id);
-        
-        System.out.println("id: " + id);
-        
+      
         Assert.assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
     

@@ -32,14 +32,13 @@ public class JdbcProfessionDao implements ProfessionDao {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Profession saveProfession(Profession profession) throws DataAccessException {
+    public long saveProfession(Profession profession) throws DataAccessException {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName(MySQLHelper.PROFESSION_TABLE).usingGeneratedKeyColumns(MySQLHelper.PROFESSION_ID);
         Map<String, Object> params = new HashMap<>();
         params.put(MySQLHelper.PROFESSION_NAME, profession.getName());
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-        profession.setId(key.intValue());
-        return profession;
+        return key.longValue();
     }
 
     @Override

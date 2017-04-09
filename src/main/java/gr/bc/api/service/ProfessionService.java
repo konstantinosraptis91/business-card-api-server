@@ -19,7 +19,7 @@ public class ProfessionService {
     @Qualifier("MySQLProfession")
     private ProfessionDao professionDao;
     
-    public Profession saveProfession(Profession profession) throws DataAccessException {
+    public long saveProfession(Profession profession) throws DataAccessException {
         return professionDao.saveProfession(profession);
     }
     

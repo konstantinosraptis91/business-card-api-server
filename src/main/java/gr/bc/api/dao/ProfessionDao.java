@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
  */
 public interface ProfessionDao {
         
-    Profession saveProfession(Profession profession) throws DataAccessException;    
+    long saveProfession(Profession profession) throws DataAccessException;    
         
     Profession findByName(String name) throws DataAccessException;
     
