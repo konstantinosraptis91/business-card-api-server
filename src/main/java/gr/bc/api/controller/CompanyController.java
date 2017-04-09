@@ -74,7 +74,7 @@ public class CompanyController {
         }
 
         if (response) {
-            LOGGER.info("Company " + company.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Company " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);

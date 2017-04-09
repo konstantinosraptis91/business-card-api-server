@@ -1,9 +1,18 @@
 package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  *
  * @author Konstantinos Raptis
  */
+@JsonPropertyOrder(
+        {
+            "id",
+            "name",
+            "createdAt",
+            "lastUpdated"
+        })
 public class Company extends DBEntity {
 
     private String name;
