@@ -46,12 +46,12 @@ public class BusinessCardController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BusinessCard> saveBusinessCard(@Valid @RequestBody BusinessCard businessCard,
+    public ResponseEntity<Void> saveBusinessCard(@Valid @RequestBody BusinessCard businessCard,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
             UriComponentsBuilder ucBuilder) {
 
         User owner;
-        BusinessCard theBusinessCard;
+        long id;
 
         try {
 
@@ -59,7 +59,7 @@ public class BusinessCardController {
 
             // if tokens are equal then autorized to proceed and save given business card for owner user
             if (owner.getToken().equals(authToken)) {
-                theBusinessCard = businessCardService.saveBusinessCard(businessCard);
+                id = businessCardService.saveBusinessCard(businessCard);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -72,10 +72,10 @@ public class BusinessCardController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        LOGGER.info("Business Card: " + theBusinessCard.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Business Card " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/businesscard/{id}").buildAndExpand(theBusinessCard.getId()).toUri());
-        return new ResponseEntity<>(theBusinessCard, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/api/businesscard/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     // Get business card id

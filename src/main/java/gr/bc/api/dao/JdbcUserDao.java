@@ -3,7 +3,6 @@ package gr.bc.api.dao;
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
 import gr.bc.api.util.ExtractionBundle;
-import gr.bc.api.util.MySQLHelper;
 import gr.bc.api.util.TokenUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
@@ -28,27 +25,33 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLUser")
-public class JdbcUserDao implements UserDao {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUserDao.class);
-
+public class JdbcUserDao extends JdbcDao implements UserDao {
+        
+    protected static final String TABLE_USER = "user";
+    protected static final String EMAIL = "email";
+    protected static final String PASSWORD = "password";
+    protected static final String FIRSTNAME = "firstname";
+    protected static final String LASTNAME = "lastname";
+    protected static final String TOKEN = "token";
+    protected static final String IMAGE_FILENAME = "image_filename";
+        
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
     public User saveUser(User user) throws DataAccessException {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        jdbcInsert.withTableName(MySQLHelper.USER_TABLE).usingGeneratedKeyColumns(MySQLHelper.USER_ID);
+        jdbcInsert.withTableName(TABLE_USER).usingGeneratedKeyColumns(ID);
         String token = new TokenUtils().createToken(TokenUtils.TOKEN_SIZE);
         Map<String, Object> params = new HashMap<>();
-        params.put(MySQLHelper.USER_EMAIL, user.getEmail());
-        params.put(MySQLHelper.USER_PASSWORD, user.getPassword());
-        params.put(MySQLHelper.USER_FIRSTNAME, user.getFirstName());
-        params.put(MySQLHelper.USER_LASTNAME, user.getLastName());
-        params.put(MySQLHelper.USER_TOKEN, token);
-        params.put(MySQLHelper.USER_IMAGE_PATH, user.getFileName());
+        params.put(EMAIL, user.getEmail());
+        params.put(PASSWORD, user.getPassword());
+        params.put(FIRSTNAME, user.getFirstName());
+        params.put(LASTNAME, user.getLastName());
+        params.put(TOKEN, token);
+        params.put(IMAGE_FILENAME, user.getFileName());
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-        user.setId(key.intValue());
+        user.setId(key.longValue());
         user.setToken(token);
         return user;
     }
@@ -57,9 +60,9 @@ public class JdbcUserDao implements UserDao {
     public boolean updateUser(long id, User user) throws DataAccessException {
         ExtractionBundle bundle = extractNotNull(id, user);
         
-        String updateQuery = " UPDATE " + MySQLHelper.USER_TABLE
+        String updateQuery = " UPDATE " + TABLE_USER
                 + " SET " + bundle.getAttributes()
-                + " WHERE " + MySQLHelper.USER_ID + "=?";
+                + " WHERE " + ID + "=?";
         
         int rows = jdbcTemplate.update(updateQuery, bundle.getValues().toArray());
         return rows > 0;
@@ -68,8 +71,8 @@ public class JdbcUserDao implements UserDao {
     @Override
     public boolean deleteUserById(long id) throws DataAccessException {
         
-        String deleteQuery = "DELETE FROM " + MySQLHelper.USER_TABLE
-                + " WHERE " + MySQLHelper.USER_ID + " = " + "?";
+        String deleteQuery = "DELETE FROM " + TABLE_USER
+                + " WHERE " + ID + " = " + "?";
         
         int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
         return rows > 0;
@@ -78,8 +81,8 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User findByEmail(String email) throws DataAccessException {
         
-        String selectQuery = "SELECT * FROM " + MySQLHelper.USER_TABLE 
-                + " WHERE " + MySQLHelper.USER_EMAIL + " = " + "'" + email + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_USER 
+                + " WHERE " + EMAIL + " = " + "'" + email + "'";
         
         User user = jdbcTemplate.queryForObject(selectQuery, new JdbcUserDao.UserMapper());
         return user;
@@ -88,8 +91,8 @@ public class JdbcUserDao implements UserDao {
     @Override
     public User findById(long id) throws DataAccessException {
         
-        String selectQuery = "SELECT * FROM " + MySQLHelper.USER_TABLE 
-                + " WHERE " + MySQLHelper.USER_ID + " = " + "'" + id + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_USER
+                + " WHERE " + ID + " = " + "'" + id + "'";
         
         User user = jdbcTemplate.queryForObject(selectQuery, new JdbcUserDao.UserMapper());
         return user;
@@ -99,10 +102,10 @@ public class JdbcUserDao implements UserDao {
     public String authenticate(Credentials credentials) throws DataAccessException {
         String token = new TokenUtils().createToken(TokenUtils.TOKEN_SIZE);
 
-        String updateQuery = " UPDATE " + MySQLHelper.USER_TABLE
-                + " SET " + MySQLHelper.USER_TOKEN + "=?"
-                + " WHERE " + MySQLHelper.USER_EMAIL + "=?"
-                + " AND " + MySQLHelper.USER_PASSWORD + "=?";
+        String updateQuery = " UPDATE " + TABLE_USER
+                + " SET " + TOKEN + "=?"
+                + " WHERE " + EMAIL + "=?"
+                + " AND " + PASSWORD + "=?";
         
         int rows = jdbcTemplate.update(updateQuery, new Object[]{token, credentials.getUsername(), credentials.getPassword()});
         return rows > 0 ? token : null;
@@ -113,27 +116,27 @@ public class JdbcUserDao implements UserDao {
         List<Object> notNullList = new ArrayList<>();
         
         if (user.getEmail() != null) {
-            builder.append(MySQLHelper.USER_EMAIL + "=?,");
+            builder.append(EMAIL + "=?,");
             notNullList.add(user.getEmail());
         }
         
         if (user.getPassword() != null) {
-            builder.append(MySQLHelper.USER_PASSWORD + "=?,");
+            builder.append(PASSWORD + "=?,");
             notNullList.add(user.getPassword());
         }
         
         if (user.getFirstName() != null) {
-            builder.append(MySQLHelper.USER_FIRSTNAME + "=?,");
+            builder.append(FIRSTNAME + "=?,");
             notNullList.add(user.getFirstName());
         }
         
         if (user.getLastName() != null) {
-            builder.append(MySQLHelper.USER_LASTNAME + "=?,");
+            builder.append(LASTNAME + "=?,");
             notNullList.add(user.getLastName());
         }
         
         if (user.getToken() != null) {
-            builder.append(MySQLHelper.USER_TOKEN + "=?,");
+            builder.append(TOKEN + "=?,");
             notNullList.add(user.getToken());
         }
         
@@ -150,14 +153,14 @@ public class JdbcUserDao implements UserDao {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User u = new User();
-            u.setId(rs.getLong(MySQLHelper.USER_ID));
-            u.setEmail(rs.getString(MySQLHelper.USER_EMAIL));
-            u.setPassword(rs.getString(MySQLHelper.USER_PASSWORD));
-            u.setFirstName(rs.getString(MySQLHelper.USER_FIRSTNAME));
-            u.setLastName(rs.getString(MySQLHelper.USER_LASTNAME));
-            u.setToken(rs.getString(MySQLHelper.USER_TOKEN));
-            u.setCreatedAt(rs.getTimestamp(MySQLHelper.USER_CREATED_AT));
-            u.setLastUpdated(rs.getTimestamp(MySQLHelper.USER_LAST_UPDATED));
+            u.setId(rs.getLong(ID));
+            u.setEmail(rs.getString(EMAIL));
+            u.setPassword(rs.getString(PASSWORD));
+            u.setFirstName(rs.getString(FIRSTNAME));
+            u.setLastName(rs.getString(LASTNAME));
+            u.setToken(rs.getString(TOKEN));
+            u.setCreatedAt(rs.getTimestamp(CREATED_AT));
+            u.setLastUpdated(rs.getTimestamp(LAST_UPDATED));
             return u;
         }
         

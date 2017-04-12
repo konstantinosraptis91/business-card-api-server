@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
  */
 public interface TemplateDao {
       
-    Template saveTemplate(Template template) throws DataAccessException;
+    long saveTemplate(Template template) throws DataAccessException;
         
     Template findByName(String name) throws DataAccessException;
         

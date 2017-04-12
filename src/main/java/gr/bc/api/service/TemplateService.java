@@ -19,7 +19,7 @@ public class TemplateService {
     @Qualifier("MySQLTemplate")
     private TemplateDao templateDao;
 
-    public Template saveTemplate(Template template) throws DataAccessException {
+    public long saveTemplate(Template template) throws DataAccessException {
         return templateDao.saveTemplate(template);
     }
     

@@ -1,11 +1,21 @@
 package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.validation.constraints.Size;
 
 /**
  *
  * @author Konstantinos Raptis
  */
+@JsonPropertyOrder(
+        {
+            "id",
+            "name",
+            "primaryColor",
+            "secondaryColor",
+            "createdAt",
+            "lastUpdated"
+        })
 public class Template extends DBEntity {
         
     private String name;

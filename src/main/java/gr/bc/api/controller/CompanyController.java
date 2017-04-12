@@ -54,7 +54,7 @@ public class CompanyController {
         }
         LOGGER.info("Company with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/company/{id}").buildAndExpand(id).toUri());
+        headers.setLocation(ucBuilder.path("/api/company/{id}").buildAndExpand(id).toUri());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 

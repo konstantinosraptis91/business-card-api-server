@@ -1,11 +1,31 @@
 package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.hibernate.validator.constraints.Email;
 
 /**
  *
  * @author Konstantinos Raptis
  */
+@JsonPropertyOrder(
+        {
+            "id",
+            "userId",
+            "templateId",
+            "professionId",
+            "companyId",
+            "email1",
+            "email2",
+            "phoneNumber1",
+            "phoneNumber2",
+            "linkedIn",
+            "website",
+            "universal",
+            "address1",
+            "address2",
+            "lastUpdated",
+            "createdAt"
+        })
 public class BusinessCard extends DBEntity {
       
     private long userId;

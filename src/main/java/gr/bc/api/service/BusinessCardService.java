@@ -19,7 +19,7 @@ public class BusinessCardService {
     @Qualifier("MySQLBusinessCard")
     private BusinessCardDao businessCardDao;
 
-    public BusinessCard saveBusinessCard(BusinessCard businessCard) throws DataAccessException {
+    public long saveBusinessCard(BusinessCard businessCard) throws DataAccessException {
         return businessCardDao.saveBusinessCard(businessCard);
     }
     

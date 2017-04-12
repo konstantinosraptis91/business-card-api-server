@@ -1,5 +1,8 @@
 package gr.bc.api.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 
@@ -7,6 +10,18 @@ import org.hibernate.validator.constraints.Email;
  *
  * @author Konstantinos Raptis
  */
+@JsonPropertyOrder(
+        {
+            "id",
+            "email",
+            "password",
+            "firstName",
+            "lastName",
+            "token",
+            "fileName",
+            "lastUpdated",
+            "createdAt"
+        })
 public class User extends DBEntity {
     
     @Size(min = 1, max = 254) @Email
@@ -74,11 +89,12 @@ public class User extends DBEntity {
     }
 
     @Override
+    @SuppressWarnings("ReplaceAllDot")
     public String toString() {
         return "User{"
                 + "id=" + id
                 + ", email=" + email 
-                + ", password=" + password 
+                + ", password=" + password.replaceAll(".", "*")
                 + ", firstName=" + firstName 
                 + ", lastName=" + lastName 
                 + ", token=" + token 

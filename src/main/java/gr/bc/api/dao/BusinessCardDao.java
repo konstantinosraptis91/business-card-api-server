@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
  */
 public interface BusinessCardDao {
     
-    BusinessCard saveBusinessCard(BusinessCard businessCard) throws DataAccessException;
+    long saveBusinessCard(BusinessCard businessCard) throws DataAccessException;
     
     BusinessCard findById(long businessCardId) throws DataAccessException;
     

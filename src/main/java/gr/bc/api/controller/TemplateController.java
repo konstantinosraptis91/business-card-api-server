@@ -42,20 +42,21 @@ public class TemplateController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Template> saveTemplate(@RequestBody Template template,
+    public ResponseEntity<Void> saveTemplate(@RequestBody Template template,
             UriComponentsBuilder ucBuilder) {
 
-        Template theTemplate;
+        long id;
+        
         try {
-            theTemplate = templateService.saveTemplate(template);
+            id = templateService.saveTemplate(template);
         } catch (DataAccessException ex) {
             LOGGER.error("saveTemplate: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        LOGGER.info("Template " + theTemplate.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("Template " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/template/{id}").buildAndExpand(theTemplate.getId()).toUri());
-        return new ResponseEntity<>(theTemplate, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/api/template/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     // Get template by id

@@ -54,7 +54,7 @@ public class ProfessionController {
         }
         LOGGER.info("Profession with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/profession/{id}").buildAndExpand(id).toUri());
+        headers.setLocation(ucBuilder.path("/api/profession/{id}").buildAndExpand(id).toUri());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 

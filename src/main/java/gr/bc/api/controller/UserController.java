@@ -42,8 +42,8 @@ public class UserController {
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> saveUser(@Valid @RequestBody User user,
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> saveUser(@Valid @RequestBody User user,
             /*@RequestParam(value = "file", required = false) MultipartFile file,*/
             UriComponentsBuilder ucBuilder) {
 
@@ -56,12 +56,12 @@ public class UserController {
         }
         LOGGER.info("User " + user.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(theUser.getId()).toUri());
+        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
         
         theUser.setPassword(null);
         theUser.setEmail(null);
         
-        return new ResponseEntity<>(theUser, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(

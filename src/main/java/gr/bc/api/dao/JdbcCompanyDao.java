@@ -1,14 +1,11 @@
 package gr.bc.api.dao;
 
 import gr.bc.api.model.Company;
-import gr.bc.api.util.MySQLHelper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
@@ -24,19 +21,20 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Qualifier("MySQLCompany")
-public class JdbcCompanyDao implements CompanyDao {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcCompanyDao.class);
-
+public class JdbcCompanyDao extends JdbcDao implements CompanyDao {
+    
+    protected static final String TABLE_COMPANY = "company";
+    protected static final String NAME = "name";
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
     public long saveCompany(Company company) throws DataAccessException {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        jdbcInsert.withTableName(MySQLHelper.COMPANY_TABLE).usingGeneratedKeyColumns(MySQLHelper.COMPANY_ID);
+        jdbcInsert.withTableName(TABLE_COMPANY).usingGeneratedKeyColumns(ID);
         Map<String, Object> params = new HashMap<>();
-        params.put(MySQLHelper.COMPANY_NAME, company.getName());
+        params.put(NAME, company.getName());
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
         return key.longValue();
     }
@@ -44,8 +42,8 @@ public class JdbcCompanyDao implements CompanyDao {
     @Override
     public Company findByName(String name) throws DataAccessException {
 
-        String selectQuery = "SELECT * FROM " + MySQLHelper.COMPANY_TABLE
-                + " WHERE " + MySQLHelper.COMPANY_NAME + " = " + "'" + name + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_COMPANY
+                + " WHERE " + NAME + " = " + "'" + name + "'";
 
         Company company = jdbcTemplate.queryForObject(selectQuery, new JdbcCompanyDao.CompanyMapper());
         return company;
@@ -54,8 +52,8 @@ public class JdbcCompanyDao implements CompanyDao {
     @Override
     public Company findById(long id) throws DataAccessException {
 
-        String selectQuery = "SELECT * FROM " + MySQLHelper.COMPANY_TABLE
-                + " WHERE " + MySQLHelper.COMPANY_ID + " = " + "'" + id + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_COMPANY
+                + " WHERE " + ID + " = " + "'" + id + "'";
 
         Company company = jdbcTemplate.queryForObject(selectQuery, new JdbcCompanyDao.CompanyMapper());
         return company;
@@ -64,7 +62,7 @@ public class JdbcCompanyDao implements CompanyDao {
     @Override
     public List<Company> findAllCompanies() throws DataAccessException {
 
-        String selectQuery = "SELECT * FROM " + MySQLHelper.COMPANY_TABLE;
+        String selectQuery = "SELECT * FROM " + TABLE_COMPANY;
 
         List<Company> companies = jdbcTemplate.query(selectQuery, new JdbcCompanyDao.CompanyMapper());
 
@@ -74,8 +72,8 @@ public class JdbcCompanyDao implements CompanyDao {
     @Override
     public boolean deleteCompanyById(long id) throws DataAccessException {
 
-        String deleteQuery = "DELETE FROM " + MySQLHelper.COMPANY_TABLE
-                + " WHERE " + MySQLHelper.COMPANY_ID + " = " + "?";
+        String deleteQuery = "DELETE FROM " + TABLE_COMPANY
+                + " WHERE " + ID + " = " + "?";
 
         int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
         return rows > 0;
@@ -84,9 +82,9 @@ public class JdbcCompanyDao implements CompanyDao {
     @Override
     public boolean updateCompany(long id, Company company) throws DataAccessException {
 
-        String updateQuery = " UPDATE " + MySQLHelper.COMPANY_TABLE
-                + " SET " + MySQLHelper.COMPANY_NAME + "=?"
-                + " WHERE " + MySQLHelper.COMPANY_ID + "=?";
+        String updateQuery = " UPDATE " + TABLE_COMPANY
+                + " SET " + NAME + "=?"
+                + " WHERE " + ID + "=?";
 
         int rows = jdbcTemplate.update(updateQuery, new Object[]{company.getName(), id});
         return rows > 0;
@@ -97,10 +95,10 @@ public class JdbcCompanyDao implements CompanyDao {
         @Override
         public Company mapRow(ResultSet rs, int rowNum) throws SQLException {
             Company c = new Company();
-            c.setId(rs.getLong(MySQLHelper.COMPANY_ID));
-            c.setName(rs.getString(MySQLHelper.COMPANY_NAME));
-            c.setLastUpdated(rs.getTimestamp(MySQLHelper.COMPANY_LAST_UPDATED));
-            c.setCreatedAt(rs.getTimestamp(MySQLHelper.COMPANY_CREATED_AT));
+            c.setId(rs.getLong(ID));
+            c.setName(rs.getString(NAME));
+            c.setLastUpdated(rs.getTimestamp(LAST_UPDATED));
+            c.setCreatedAt(rs.getTimestamp(CREATED_AT));
             return c;
         }
 
