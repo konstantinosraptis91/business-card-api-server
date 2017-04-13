@@ -66,20 +66,20 @@ public class UserController {
 
     @RequestMapping(
             value = "/authenticate",
-            produces = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.TEXT_PLAIN_VALUE,
             method = RequestMethod.POST)
-    public ResponseEntity<User> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+    public ResponseEntity<String> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
+            UriComponentsBuilder ucBuilder) {
         Credentials crs = Credentials.getCredentials(authToken);
         String newToken;
         
         if ((newToken = userService.authenticate(crs)) != null) {
             User theUser = userService.findByEmail(crs.getUsername());
             
-            theUser.setToken(newToken);
-            theUser.setPassword(null);
-            theUser.setEmail(null);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
             
-            return new ResponseEntity<>(theUser, HttpStatus.OK);
+            return new ResponseEntity<>(newToken, headers, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
