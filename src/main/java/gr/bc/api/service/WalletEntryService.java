@@ -20,7 +20,7 @@ public class WalletEntryService {
     @Qualifier("MySQLWallet")
     private WalletEntryDao walletDao;
     
-    public long saveWalletEntry(WalletEntry entry) throws DataAccessException {
+    public boolean saveWalletEntry(WalletEntry entry) throws DataAccessException {
         return walletDao.saveWalletEntry(entry);
     }
     
@@ -28,12 +28,12 @@ public class WalletEntryService {
         return walletDao.findAllBusinessCardsByUserId(id);
     }
     
-    public WalletEntry findById(long id) throws DataAccessException {
-        return walletDao.findById(id);
+    public WalletEntry find(WalletEntry entry) throws DataAccessException {
+        return walletDao.find(entry);
     }
     
-    public boolean deleteWalletEntryById(long id) throws DataAccessException {
-        return walletDao.deleteWalletEntryById(id);
+    public boolean deleteWalletEntry(WalletEntry entry) throws DataAccessException {
+        return walletDao.deleteWalletEntry(entry);
     }
        
 }

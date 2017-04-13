@@ -1,6 +1,7 @@
 package gr.bc.api.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -8,25 +9,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonPropertyOrder(
         {
-            "id",
-            "businessCardId",
             "userId",
-            "createdAt",
-            "lastUpdated"
+            "businessCardId"
         })
-public class WalletEntry extends DBEntity {
+public class WalletEntry {
     
-    private final long businessCardId;
-    private final long userId;
-    private final String stamp;
-    
-    public WalletEntry(long userId, long businessCardId) {
+    @NotNull
+    private long businessCardId;
+    @NotNull
+    private long userId;
+        
+    public WalletEntry() {
         super();
-        this.userId = userId;
-        this.businessCardId = businessCardId;
-        this.stamp = userId + "_" + businessCardId;
     }
-       
+
+    public void setBusinessCardId(long businessCardId) {
+        this.businessCardId = businessCardId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+    
     public long getBusinessCardId() {
         return businessCardId;
     }
@@ -34,20 +38,12 @@ public class WalletEntry extends DBEntity {
     public long getUserId() {
         return userId;
     }
-
-    public String getStamp() {
-        return stamp;
-    }
     
     @Override
     public String toString() {
         return "WalletEntry{"
-                + "id=" + id
-                + ", businessCardId=" + businessCardId 
+                + "businessCardId=" + businessCardId 
                 + ", userId=" + userId
-                + ", stamp=" + stamp
-                + ", lastUpdated=" + lastUpdated
-                + ", createdAt=" + createdAt
                 + '}';
     }
     

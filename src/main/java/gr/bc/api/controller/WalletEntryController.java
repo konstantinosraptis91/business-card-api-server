@@ -10,22 +10,22 @@ import gr.bc.api.util.Constants;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
@@ -34,7 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping(value = "/api/walletentry")
 public class WalletEntryController {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(WalletEntryController.class);
     @Autowired
     private WalletEntryService walletEntryService;
@@ -45,24 +45,22 @@ public class WalletEntryController {
 
     // Add business card to user wallet (user_business_card)
     @RequestMapping(
-            value = "/user/{userId}/businesscard/{businessCardId}",
-            method = RequestMethod.POST)
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveWalletEntry(
-            @NotNull @PathVariable("userId") long userId,
-            @NotNull @PathVariable("businessCardId") long businessCardId,
-            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
-            UriComponentsBuilder ucBuilder) {
+            @Valid @RequestBody WalletEntry entry,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
         BusinessCard theBusinessCard;
-        long id;
+        boolean response;
 
         try {
-            walletOwner = userService.findById(userId);
+            walletOwner = userService.findById(entry.getUserId());
 
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
 
-                theBusinessCard = businessCardService.findById(businessCardId);
+                theBusinessCard = businessCardService.findById(entry.getBusinessCardId());
                 // Check if user trying to add his own card in wallet
                 if (walletOwner.getId() == theBusinessCard.getId()) {
                     LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
@@ -75,8 +73,7 @@ public class WalletEntryController {
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);
                 }
                 
-                WalletEntry entry = new WalletEntry(userId, businessCardId);
-                id = walletEntryService.saveWalletEntry(entry);
+                response = walletEntryService.saveWalletEntry(entry);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -89,11 +86,12 @@ public class WalletEntryController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
+        if (response) {
+            LOGGER.info(entry.toString() + " added", Constants.LOG_DATE_FORMAT.format(new Date()));
+        }
         
-        LOGGER.info("Business Card " + theBusinessCard.getId() + " added to User " + walletOwner.getId() + " Wallet", Constants.LOG_DATE_FORMAT.format(new Date()));
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/api/walletentry/{id}").buildAndExpand(id).toUri());
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+        
+        return response? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // Get all business card a user got in his wallet by user id
@@ -137,22 +135,20 @@ public class WalletEntryController {
 
     // Delete a business card from user wallet
     @RequestMapping(
-            value = "/{id}",
-            method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteWalletEntryById(@PathVariable("id") long id,
+            method = RequestMethod.DELETE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteWalletEntryById(@Valid @RequestBody WalletEntry entry,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
-        WalletEntry theEntry;
         boolean response;
 
         try {
-            theEntry = walletEntryService.findById(id);
-            walletOwner = userService.findById(theEntry.getUserId());
+            walletOwner = userService.findById(entry.getUserId());
                         
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
                 
-                response = walletEntryService.deleteWalletEntryById(id);
+                response = walletEntryService.deleteWalletEntry(entry);
 
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -167,7 +163,7 @@ public class WalletEntryController {
         }
 
         if (response) {
-            LOGGER.info("Business Card " + theEntry.getBusinessCardId() + " deleted from User's Wallet " + walletOwner.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.info("Business Card " + entry.getBusinessCardId() + " deleted from User's Wallet " + walletOwner.getId(), Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
