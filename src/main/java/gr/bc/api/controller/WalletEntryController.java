@@ -64,13 +64,13 @@ public class WalletEntryController {
                 // Check if user trying to add his own card in wallet
                 if (walletOwner.getId() == theBusinessCard.getId()) {
                     LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
-                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 
                 // Check if business card not public
                 if (!theBusinessCard.isUniversal()) {
                     LOGGER.info("Business card not public...");
-                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 
                 response = walletEntryService.saveWalletEntry(entry);
