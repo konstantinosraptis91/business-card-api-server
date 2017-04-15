@@ -2,7 +2,6 @@ package gr.bc.api.service;
 
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

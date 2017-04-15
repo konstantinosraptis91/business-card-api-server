@@ -75,7 +75,9 @@ public class UserController {
         
         if ((newToken = userService.authenticate(crs)) != null) {
             User theUser = userService.findByEmail(crs.getUsername());
+            theUser.setToken(newToken);
             
+            LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
             

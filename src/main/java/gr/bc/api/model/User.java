@@ -1,8 +1,6 @@
 package gr.bc.api.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 
