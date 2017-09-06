@@ -39,8 +39,7 @@ public class ProfessionController {
     // Save new Profession
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveProfession(@Valid @RequestBody Profession profession,
             UriComponentsBuilder ucBuilder) {
 

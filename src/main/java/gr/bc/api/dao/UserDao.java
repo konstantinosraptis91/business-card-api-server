@@ -9,12 +9,12 @@ import org.springframework.dao.DataAccessException;
  * @author Konstantinos Raptis
  */
 public interface UserDao {
-        
-    User findByEmail(String email) throws DataAccessException;
+    
+    User saveUser(User user) throws DataAccessException;
         
     User findById(long id) throws DataAccessException;
     
-    User saveUser(User user) throws DataAccessException;
+    User findByEmail(String email) throws DataAccessException;
     
     String authenticate(Credentials credentials) throws DataAccessException;
     

@@ -92,7 +92,7 @@ public class User extends DBEntity {
         return "User{"
                 + "id=" + id
                 + ", email=" + email 
-                + ", password=" + password.replaceAll(".", "*")
+                + ", password=" + password != null ? password.replaceAll(".", "*") : "*"
                 + ", firstName=" + firstName 
                 + ", lastName=" + lastName 
                 + ", token=" + token 

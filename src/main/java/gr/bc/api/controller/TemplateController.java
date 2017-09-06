@@ -40,8 +40,7 @@ public class TemplateController {
     // Save template
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveTemplate(@RequestBody Template template,
             UriComponentsBuilder ucBuilder) {
 

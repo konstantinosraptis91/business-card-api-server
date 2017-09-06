@@ -39,8 +39,7 @@ public class CompanyController {
     // Save new company
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveCompany(@Valid @RequestBody Company company,
             UriComponentsBuilder ucBuilder) {
 

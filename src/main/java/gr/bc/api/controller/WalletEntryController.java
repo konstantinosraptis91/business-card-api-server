@@ -105,6 +105,7 @@ public class WalletEntryController {
         List<BusinessCard> businessCardList;
 
         try {
+            LOGGER.info("Looking for user " + id + " wallet");
             walletOwner = userService.findById(id);
 
             // if tokens are equal then autorized to proceed
@@ -129,6 +130,8 @@ public class WalletEntryController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
+        LOGGER.info("Returning user " + id + " wallet");
+        
         return businessCardList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(businessCardList, HttpStatus.OK);
     }
@@ -137,7 +140,7 @@ public class WalletEntryController {
     @RequestMapping(
             method = RequestMethod.DELETE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deleteWalletEntryById(@Valid @RequestBody WalletEntry entry,
+    public ResponseEntity<Void> deleteWalletEntry(@Valid @RequestBody WalletEntry entry,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
         boolean response;

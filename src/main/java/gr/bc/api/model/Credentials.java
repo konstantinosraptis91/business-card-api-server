@@ -1,6 +1,5 @@
 package gr.bc.api.model;
 
-import gr.bc.api.util.Constants;
 import java.util.StringTokenizer;
 import org.apache.tomcat.util.codec.binary.Base64;
 
@@ -9,7 +8,9 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * @author Konstantinos Raptis
  */
 public class Credentials {
-        
+    
+    public static final String AUTHORIZATION_HEADER_PREFIX = "Basic";
+    
     private String username;
     private String password;
 
@@ -39,7 +40,7 @@ public class Credentials {
     }
     
     public static Credentials getCredentials(String authToken) {
-        authToken = authToken.replaceFirst(Constants.AUTHORIZATION_HEADER_PREFIX, "");
+        authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
         String decodedAuthToken = new String(Base64.decodeBase64(authToken));
         StringTokenizer tokenizer = new StringTokenizer(decodedAuthToken, ":");
         Credentials cr = new Credentials();

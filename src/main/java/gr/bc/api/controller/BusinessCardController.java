@@ -44,8 +44,7 @@ public class BusinessCardController {
     // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveBusinessCard(@Valid @RequestBody BusinessCard businessCard,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
             UriComponentsBuilder ucBuilder) {
