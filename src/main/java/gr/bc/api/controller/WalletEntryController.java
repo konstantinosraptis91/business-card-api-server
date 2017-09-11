@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -135,16 +136,19 @@ public class WalletEntryController {
         return businessCardList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(businessCardList, HttpStatus.OK);
     }
-
+    
     // Delete a business card from user wallet
     @RequestMapping(
-            method = RequestMethod.DELETE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deleteWalletEntry(@Valid @RequestBody WalletEntry entry,
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteWalletEntry(@NotNull @RequestParam("userId") long userId,
+            @NotNull @RequestParam("businessCardId") long businessCardId,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
         boolean response;
-
+        WalletEntry entry = new WalletEntry();
+        entry.setUserId(userId);
+        entry.setBusinessCardId(businessCardId);
+        
         try {
             walletOwner = userService.findById(entry.getUserId());
                         
@@ -171,5 +175,5 @@ public class WalletEntryController {
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    
 }

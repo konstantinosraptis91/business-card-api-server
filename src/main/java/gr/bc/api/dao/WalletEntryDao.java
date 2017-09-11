@@ -19,4 +19,14 @@ public interface WalletEntryDao {
     
     boolean deleteWalletEntry(WalletEntry entry) throws DataAccessException;
     
+    /**
+     * This method will be used in order to remove a business card from all wallets, so
+     * it can be deleted from business card table without conflicts
+     * 
+     * @param id Business Card Id
+     * @return
+     * @throws DataAccessException 
+     */
+    boolean deleteWalletEntryByBusinessCardId(long id) throws DataAccessException;
+    
 }

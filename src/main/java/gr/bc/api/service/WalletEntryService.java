@@ -35,5 +35,9 @@ public class WalletEntryService {
     public boolean deleteWalletEntry(WalletEntry entry) throws DataAccessException {
         return walletDao.deleteWalletEntry(entry);
     }
-       
+    
+    public boolean deleteWalletEntryByBusinessCardId(long id) throws DataAccessException {
+        return walletDao.deleteWalletEntryByBusinessCardId(id);
+    }
+    
 }

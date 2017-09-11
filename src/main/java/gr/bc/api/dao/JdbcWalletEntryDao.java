@@ -74,6 +74,16 @@ public class JdbcWalletEntryDao implements WalletEntryDao {
         WalletEntry walletEntry = jdbcTemplate.queryForObject(selectQuery, new JdbcWalletEntryDao.WalletEntryMapper());
         return walletEntry;
     }
+
+    @Override
+    public boolean deleteWalletEntryByBusinessCardId(long id) throws DataAccessException {
+        
+        String deleteQuery = "DELETE FROM " + TABLE_WALLET_ENTRY
+                + " WHERE " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "_" + JdbcDao.ID + " = " + "?";
+        
+        int rows = jdbcTemplate.update(deleteQuery, new Object[]{id});
+        return rows > 0;
+    }
     
     public static final class WalletEntryMapper implements RowMapper<WalletEntry> {
 

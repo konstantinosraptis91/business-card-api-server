@@ -4,6 +4,7 @@ import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.User;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserService;
+import gr.bc.api.service.WalletEntryService;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +41,9 @@ public class BusinessCardController {
     private BusinessCardService businessCardService;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private WalletEntryService walletEntryService;
+    
     // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
@@ -216,6 +219,8 @@ public class BusinessCardController {
             
             // if tokens are equal then autorized to proceed with deletion
             if (owner.getToken().equals(authToken)) {
+                // first delete the card from wallet entry table in order to avoid conflicts
+                walletEntryService.deleteWalletEntryByBusinessCardId(id);
                 response = businessCardService.deleteBusinessCardById(id);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
