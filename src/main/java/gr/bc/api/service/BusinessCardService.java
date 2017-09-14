@@ -39,6 +39,10 @@ public class BusinessCardService {
         return businessCardDao.findByUserEmail(email);
     }
     
+    public List<BusinessCard> findByUserName(String firstName, String lastName) throws DataAccessException {
+        return businessCardDao.findByUserName(firstName, lastName);
+    }
+    
     public boolean deleteBusinessCardById(long id) throws DataAccessException {
         return businessCardDao.deleteBusinessCardById(id);
     }

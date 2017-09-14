@@ -48,7 +48,7 @@ public class WalletEntryController {
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveWalletEntry(
+    public ResponseEntity<BusinessCard> saveWalletEntry(
             @Valid @RequestBody WalletEntry entry,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
@@ -92,7 +92,7 @@ public class WalletEntryController {
         }
         
         
-        return response? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return response? new ResponseEntity<>(theBusinessCard, HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // Get all business card a user got in his wallet by user id

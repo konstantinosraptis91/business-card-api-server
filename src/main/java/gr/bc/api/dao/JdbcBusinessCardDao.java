@@ -98,6 +98,23 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
     }
 
     @Override
+    public List<BusinessCard> findByUserName(String firstName, String lastName) throws DataAccessException {
+        
+        String selectQuery = "SELECT " + TABLE_BUSINESS_CARD + ".*"
+                + " FROM " + TABLE_BUSINESS_CARD
+                + " INNER JOIN " + JdbcUserDao.TABLE_USER
+                + " ON " + TABLE_BUSINESS_CARD + "." + JdbcUserDao.TABLE_USER + "_" + ID + "=" + JdbcUserDao.TABLE_USER + "." + ID
+                + " WHERE " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'" + firstName + "'"
+                + " AND " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'" + lastName + "'"
+                + " AND " + UNIVERSAL + "=" + "'" + 1 + "'"
+                // case sensitive search for last name
+                + " COLLATE utf8_bin";
+
+        List<BusinessCard> businessCardList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
+        return businessCardList;
+    }
+    
+    @Override
     public boolean updateBusinessCard(long id, BusinessCard businessCard) throws DataAccessException {
 
         ExtractionBundle bundle = extractNotNull(id, businessCard);

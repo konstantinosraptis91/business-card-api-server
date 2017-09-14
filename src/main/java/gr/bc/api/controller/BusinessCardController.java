@@ -43,7 +43,7 @@ public class BusinessCardController {
     private UserService userService;
     @Autowired
     private WalletEntryService walletEntryService;
-    
+
     // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
@@ -121,7 +121,7 @@ public class BusinessCardController {
         try {
             User owner = userService.findById(id);
             businessCardList = businessCardService.findByUserId(id);
-            
+
             if (businessCardList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -144,20 +144,34 @@ public class BusinessCardController {
 
     // Get business card by email (This method should be used from client to find others business cards)
     @RequestMapping(
+            value = "/user",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<BusinessCard>> findByUserEmail(@NotNull @RequestParam(value = "email", required = true) String email) {
+    public ResponseEntity<List<BusinessCard>> findBusinessCard(@RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "firstname", required = false) String firstName,
+            @RequestParam(value = "lastname", required = false) String lastName) {
+
         List<BusinessCard> businessCardList;
 
         try {
-            businessCardList = businessCardService.findByUserEmail(email);
-            
+
+            // (case 1) by user email
+            if (email != null) {
+                businessCardList = businessCardService.findByUserEmail(email);
+            } // (case 2) by first and last name
+            else if (firstName != null && lastName != null) {
+                businessCardList = businessCardService.findByUserName(firstName, lastName);
+            } // (case 3) every param is null 
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
             if (businessCardList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-           
+
         } catch (DataAccessException ex) {
-            LOGGER.error("findByUserEmail: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findUser: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -212,11 +226,11 @@ public class BusinessCardController {
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         boolean response;
         BusinessCard theBusinessCard;
-        
+
         try {
             theBusinessCard = businessCardService.findById(id);
             User owner = userService.findById(theBusinessCard.getUserId());
-            
+
             // if tokens are equal then autorized to proceed with deletion
             if (owner.getToken().equals(authToken)) {
                 // first delete the card from wallet entry table in order to avoid conflicts
@@ -225,7 +239,7 @@ public class BusinessCardController {
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-            
+
         } catch (DataAccessException ex) {
             LOGGER.error("deleteBusinessCardById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
@@ -233,7 +247,7 @@ public class BusinessCardController {
             }
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        
+
         if (response) {
             LOGGER.info("Business Card " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
