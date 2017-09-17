@@ -14,6 +14,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -80,7 +81,21 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
         BusinessCard businessCard = jdbcTemplate.queryForObject(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
         return businessCard;
     }
+    
+    @Override
+    public List<BusinessCard> findById(List<Long> idList) throws DataAccessException {
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("ids", idList);
+        
+        String selectQuery = "SELECT * FROM " + TABLE_BUSINESS_CARD
+                + " WHERE " + ID + " IN (:ids)";
 
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        List<BusinessCard> retrievedCardList = template.query(selectQuery, params, new JdbcBusinessCardDao.BusinessCardMapper());
+        return retrievedCardList;
+    }
+    
     @Override
     public List<BusinessCard> findByUserEmail(String email) throws DataAccessException {
 

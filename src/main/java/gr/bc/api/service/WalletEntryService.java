@@ -24,6 +24,10 @@ public class WalletEntryService {
         return walletDao.saveWalletEntry(entry);
     }
     
+    public void saveWalletEntries(List<WalletEntry> entries) throws DataAccessException {
+        walletDao.saveWalletEntries(entries);
+    }
+    
     public List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException {
         return walletDao.findAllBusinessCardsByUserId(id);
     }

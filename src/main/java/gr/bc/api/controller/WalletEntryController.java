@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/walletentry")
 public class WalletEntryController {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WalletEntryController.class);
     @Autowired
     private WalletEntryService walletEntryService;
@@ -44,6 +44,58 @@ public class WalletEntryController {
     @Autowired
     private BusinessCardService businessCardService;
 
+//    // Add business card/s to user wallet (user_business_card)
+//    @RequestMapping(
+//            method = RequestMethod.POST,
+//            consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<BusinessCard>> saveWalletEntry(
+//            @Valid @RequestBody List<WalletEntry> entries,
+//            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+//        User walletOwner;
+//        List<BusinessCard> theBusinessCardList;
+//        
+//        try {
+//            walletOwner = userService.findById(entries.get(0).getUserId());
+//
+//            // if tokens are equal then autorized to proceed
+//            if (walletOwner.getToken().equals(authToken)) {
+//
+//                theBusinessCardList = businessCardService.findById(entries.stream()
+//                        .map(entry -> entry.getBusinessCardId())
+//                        .collect(Collectors.toList()));
+//                
+//                for (BusinessCard card : theBusinessCardList) {
+//                    // Check if user trying to add his own card in wallet
+//                    if (walletOwner.getId() == card.getId()) {
+//                        LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
+//                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//                    }
+//                }
+//                
+//                for (BusinessCard card : theBusinessCardList) {
+//                    // Check if business card not public
+//                    if (!card.isUniversal()) {
+//                        LOGGER.info("Business card not public...");
+//                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//                    }
+//                }
+//
+//                walletEntryService.saveWalletEntries(entries);
+//            } else {
+//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//            }
+//
+//        } catch (DataAccessException ex) {
+//            LOGGER.error("addBusinessCardToWallet: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+//            if (ex instanceof EmptyResultDataAccessException) {
+//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            }
+//            return new ResponseEntity<>(HttpStatus.CONFLICT);
+//        }
+//
+//        return new ResponseEntity<>(theBusinessCardList, HttpStatus.CREATED);
+//    }
+    
     // Add business card to user wallet (user_business_card)
     @RequestMapping(
             method = RequestMethod.POST,
@@ -94,7 +146,7 @@ public class WalletEntryController {
         
         return response? new ResponseEntity<>(theBusinessCard, HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
+    
     // Get all business card a user got in his wallet by user id
     @RequestMapping(
             value = "/user/{id}",
@@ -112,13 +164,13 @@ public class WalletEntryController {
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
                 businessCardList = walletEntryService.findAllBusinessCardsByUserId(walletOwner.getId());
-                
+
                 // (1) remove from wallet business cards which are not public
                 businessCardList = businessCardList
                         .stream()
                         .filter(bc -> bc.isUniversal())
                         .collect(Collectors.toList());
-                
+
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -132,11 +184,11 @@ public class WalletEntryController {
         }
 
         LOGGER.info("Returning user " + id + " wallet");
-        
+
         return businessCardList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(businessCardList, HttpStatus.OK);
     }
-    
+
     // Delete a business card from user wallet
     @RequestMapping(
             method = RequestMethod.DELETE)
@@ -148,13 +200,13 @@ public class WalletEntryController {
         WalletEntry entry = new WalletEntry();
         entry.setUserId(userId);
         entry.setBusinessCardId(businessCardId);
-        
+
         try {
             walletOwner = userService.findById(entry.getUserId());
-                        
+
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
-                
+
                 response = walletEntryService.deleteWalletEntry(entry);
 
             } else {
@@ -175,5 +227,5 @@ public class WalletEntryController {
 
         return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    
+
 }

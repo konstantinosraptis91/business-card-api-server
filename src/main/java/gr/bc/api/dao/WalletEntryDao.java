@@ -12,7 +12,9 @@ import org.springframework.dao.DataAccessException;
 public interface WalletEntryDao {
     
     boolean saveWalletEntry(WalletEntry entry) throws DataAccessException;
-        
+    
+    void saveWalletEntries(List<WalletEntry> entries) throws DataAccessException;
+    
     List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException;
     
     WalletEntry find(WalletEntry entry) throws DataAccessException;

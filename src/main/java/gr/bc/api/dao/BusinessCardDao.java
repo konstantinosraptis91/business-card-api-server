@@ -14,8 +14,10 @@ public interface BusinessCardDao {
     
     BusinessCard findById(long businessCardId) throws DataAccessException;
     
-    List<BusinessCard> findByUserId(long userId) throws DataAccessException;
+    List<BusinessCard> findById(List<Long> idList) throws DataAccessException;
     
+    List<BusinessCard> findByUserId(long userId) throws DataAccessException;
+       
     List<BusinessCard> findByUserEmail(String email) throws DataAccessException;
          
     List<BusinessCard> findByUserName(String firstName, String lastName) throws DataAccessException;

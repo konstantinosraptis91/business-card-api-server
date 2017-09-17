@@ -35,6 +35,10 @@ public class BusinessCardService {
         return businessCardDao.findById(id);
     }
     
+    public List<BusinessCard> findById(List<Long> idList) throws DataAccessException {
+        return businessCardDao.findById(idList);
+    }
+    
     public List<BusinessCard> findByUserEmail(String email) throws DataAccessException {
         return businessCardDao.findByUserEmail(email);
     }

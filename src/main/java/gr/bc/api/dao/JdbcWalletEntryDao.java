@@ -2,6 +2,7 @@ package gr.bc.api.dao;
 
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.WalletEntry;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -40,6 +42,29 @@ public class JdbcWalletEntryDao implements WalletEntryDao {
         return rows > 0;
     }
 
+    @Override
+    public void saveWalletEntries(final List<WalletEntry> entries) throws DataAccessException {
+        
+        String insertQuery = "INSERT INTO " + TABLE_WALLET_ENTRY 
+                + " (" + JdbcUserDao.TABLE_USER + "_" + JdbcDao.ID + "," + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "_" + JdbcDao.ID + ")"
+                + " VALUES (?, ?)";
+        
+        jdbcTemplate.batchUpdate(insertQuery, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                WalletEntry entry = entries.get(i);
+                ps.setLong(1, entry.getUserId());
+                ps.setLong(2, entry.getBusinessCardId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return entries.size();
+            }
+        });
+        
+    }
+    
     @Override
     public List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException {
         
