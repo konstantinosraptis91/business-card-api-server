@@ -1,7 +1,7 @@
 package gr.bc.api.dao;
 
-import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.WalletEntry;
+import gr.bc.api.model.response.BusinessCardResponse;
 import java.util.List;
 import org.springframework.dao.DataAccessException;
 
@@ -15,7 +15,7 @@ public interface WalletEntryDao {
     
     void saveWalletEntries(List<WalletEntry> entries) throws DataAccessException;
     
-    List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException;
+    List<BusinessCardResponse> findAllBusinessCardsByUserId(long id) throws DataAccessException;
     
     WalletEntry find(WalletEntry entry) throws DataAccessException;
     

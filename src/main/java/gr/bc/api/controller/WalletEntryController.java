@@ -3,6 +3,7 @@ package gr.bc.api.controller;
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.User;
 import gr.bc.api.model.WalletEntry;
+import gr.bc.api.model.response.BusinessCardResponse;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.WalletEntryService;
@@ -43,68 +44,16 @@ public class WalletEntryController {
     private UserService userService;
     @Autowired
     private BusinessCardService businessCardService;
-
-//    // Add business card/s to user wallet (user_business_card)
-//    @RequestMapping(
-//            method = RequestMethod.POST,
-//            consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<BusinessCard>> saveWalletEntry(
-//            @Valid @RequestBody List<WalletEntry> entries,
-//            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
-//        User walletOwner;
-//        List<BusinessCard> theBusinessCardList;
-//        
-//        try {
-//            walletOwner = userService.findById(entries.get(0).getUserId());
-//
-//            // if tokens are equal then autorized to proceed
-//            if (walletOwner.getToken().equals(authToken)) {
-//
-//                theBusinessCardList = businessCardService.findById(entries.stream()
-//                        .map(entry -> entry.getBusinessCardId())
-//                        .collect(Collectors.toList()));
-//                
-//                for (BusinessCard card : theBusinessCardList) {
-//                    // Check if user trying to add his own card in wallet
-//                    if (walletOwner.getId() == card.getId()) {
-//                        LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
-//                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//                    }
-//                }
-//                
-//                for (BusinessCard card : theBusinessCardList) {
-//                    // Check if business card not public
-//                    if (!card.isUniversal()) {
-//                        LOGGER.info("Business card not public...");
-//                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//                    }
-//                }
-//
-//                walletEntryService.saveWalletEntries(entries);
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//            }
-//
-//        } catch (DataAccessException ex) {
-//            LOGGER.error("addBusinessCardToWallet: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-//            if (ex instanceof EmptyResultDataAccessException) {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
-//            return new ResponseEntity<>(HttpStatus.CONFLICT);
-//        }
-//
-//        return new ResponseEntity<>(theBusinessCardList, HttpStatus.CREATED);
-//    }
     
     // Add business card to user wallet (user_business_card)
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BusinessCard> saveWalletEntry(
+    public ResponseEntity<BusinessCardResponse> saveWalletEntry(
             @Valid @RequestBody WalletEntry entry,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
-        BusinessCard theBusinessCard;
+        BusinessCardResponse theBusinessCard;
         boolean response;
 
         try {
@@ -113,15 +62,15 @@ public class WalletEntryController {
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
 
-                theBusinessCard = businessCardService.findById(entry.getBusinessCardId());
+                theBusinessCard = businessCardService.findByIdV2(entry.getBusinessCardId());
                 // Check if user trying to add his own card in wallet
-                if (walletOwner.getId() == theBusinessCard.getId()) {
+                if (walletOwner.getId() == theBusinessCard.getBusinessCard().getId()) {
                     LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 
                 // Check if business card not public
-                if (!theBusinessCard.isUniversal()) {
+                if (!theBusinessCard.getBusinessCard().isUniversal()) {
                     LOGGER.info("Business card not public...");
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
@@ -152,10 +101,10 @@ public class WalletEntryController {
             value = "/user/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<BusinessCard>> findAllBusinessCardsByUserId(@PathVariable("id") long id,
+    public ResponseEntity<List<BusinessCardResponse>> findAllBusinessCardsByUserId(@PathVariable("id") long id,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
-        List<BusinessCard> businessCardList;
+        List<BusinessCardResponse> businessCardList;
 
         try {
             LOGGER.info("Looking for user " + id + " wallet");
@@ -168,7 +117,7 @@ public class WalletEntryController {
                 // (1) remove from wallet business cards which are not public
                 businessCardList = businessCardList
                         .stream()
-                        .filter(bc -> bc.isUniversal())
+                        .filter(bc -> bc.getBusinessCard().isUniversal())
                         .collect(Collectors.toList());
 
             } else {

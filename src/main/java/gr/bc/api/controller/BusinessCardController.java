@@ -2,6 +2,7 @@ package gr.bc.api.controller;
 
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.User;
+import gr.bc.api.model.response.BusinessCardResponse;
 import gr.bc.api.service.BusinessCardService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.WalletEntryService;
@@ -109,6 +110,35 @@ public class BusinessCardController {
         return new ResponseEntity<>(theBusinessCard, HttpStatus.OK);
     }
 
+    // Get business card id
+    @RequestMapping(
+            value = "/v2/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BusinessCardResponse> findByIdV2(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        BusinessCardResponse theBusinessCard;
+
+        try {
+            theBusinessCard = businessCardService.findByIdV2(id);
+            User owner = userService.findById(theBusinessCard.getBusinessCard().getUserId());
+
+            // Check if asking User has the right to claim this business card
+            if (!owner.getToken().equals(authToken)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findByIdV2: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(theBusinessCard, HttpStatus.OK);
+    }
+    
     // Get business card by user id (This method should be used from client to see my business cards)
     @RequestMapping(
             value = "/user/{id}",
@@ -142,6 +172,39 @@ public class BusinessCardController {
         return new ResponseEntity<>(businessCardList, HttpStatus.OK);
     }
 
+    // Get business card by user id (This method should be used from client to see my business cards)
+    @RequestMapping(
+            value = "/v2/user/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BusinessCardResponse>> findByUserIdV2(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+        List<BusinessCardResponse> businessCardList;
+
+        try {
+            User owner = userService.findById(id);
+            businessCardList = businessCardService.findByUserIdV2(id);
+
+            if (businessCardList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            // Check if asking User has the right to claim this business card
+            if (!owner.getToken().equals(authToken)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findByUserIdV2: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(businessCardList, HttpStatus.OK);
+    }
+    
     // Get business card by email (This method should be used from client to find others business cards)
     @RequestMapping(
             value = "/user",
@@ -171,7 +234,7 @@ public class BusinessCardController {
             }
 
         } catch (DataAccessException ex) {
-            LOGGER.error("findUser: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findBusinessCard: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             if (ex instanceof EmptyResultDataAccessException) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -181,6 +244,45 @@ public class BusinessCardController {
         return new ResponseEntity<>(businessCardList, HttpStatus.OK);
     }
 
+    // Get business card by email (This method should be used from client to find others business cards)
+    @RequestMapping(
+            value = "/v2/user",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BusinessCardResponse>> findBusinessCardV2(@RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "firstname", required = false) String firstName,
+            @RequestParam(value = "lastname", required = false) String lastName) {
+
+        List<BusinessCardResponse> businessCardList;
+
+        try {
+
+            // (case 1) by user email
+            if (email != null) {
+                businessCardList = businessCardService.findByUserEmailV2(email);
+            } // (case 2) by first and last name
+            else if (firstName != null && lastName != null) {
+                businessCardList = businessCardService.findByUserNameV2(firstName, lastName);
+            } // (case 3) every param is null 
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (businessCardList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("findBusinessCardV2: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(businessCardList, HttpStatus.OK);
+    }
+    
     // Update business card
     @RequestMapping(
             value = "/{id}",

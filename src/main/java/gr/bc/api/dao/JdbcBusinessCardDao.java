@@ -1,6 +1,15 @@
 package gr.bc.api.dao;
 
+import static gr.bc.api.dao.JdbcCompanyDao.NAME;
+import static gr.bc.api.dao.JdbcDao.ID;
+import static gr.bc.api.dao.JdbcProfessionDao.NAME;
+import static gr.bc.api.dao.JdbcTemplateDao.NAME;
 import gr.bc.api.model.BusinessCard;
+import gr.bc.api.model.Company;
+import gr.bc.api.model.Profession;
+import gr.bc.api.model.Template;
+import gr.bc.api.model.response.BusinessCardResponse;
+import gr.bc.api.model.response.BusinessCardResponseImpl;
 import gr.bc.api.util.ExtractionBundle;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +45,24 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
     protected static final String UNIVERSAL = "universal";
     protected static final String ADDRESS_1 = "address_1";
     protected static final String ADDRESS_2 = "address_2";
-        
+    
+    private static final String SELECT_QUERY_V2_START = "SELECT " 
+                + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + ","
+                + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + ","
+                + JdbcProfessionDao.TABLE_PROFESSION + ".*" + ","
+                + JdbcCompanyDao.TABLE_COMPANY + ".*" + ","
+                + JdbcTemplateDao.TABLE_TEMPLATE + ".*" + ","
+                + TABLE_BUSINESS_CARD + ".*"
+                + " FROM " + TABLE_BUSINESS_CARD
+                
+                + " INNER JOIN " + JdbcUserDao.TABLE_USER + " ON " + TABLE_BUSINESS_CARD + "." + JdbcUserDao.TABLE_USER + "_" + ID + "=" + JdbcUserDao.TABLE_USER + "." + ID
+                
+                + " INNER JOIN " + JdbcProfessionDao.TABLE_PROFESSION + " ON " + TABLE_BUSINESS_CARD + "." + JdbcProfessionDao.TABLE_PROFESSION + "_" + ID + "=" + JdbcProfessionDao.TABLE_PROFESSION + "." + ID
+                
+                + " INNER JOIN " + JdbcCompanyDao.TABLE_COMPANY + " ON " + TABLE_BUSINESS_CARD + "." + JdbcCompanyDao.TABLE_COMPANY + "_" + ID + "=" + JdbcCompanyDao.TABLE_COMPANY + "." + ID
+                
+                + " INNER JOIN " + JdbcTemplateDao.TABLE_TEMPLATE + " ON " + TABLE_BUSINESS_CARD + "." + JdbcTemplateDao.TABLE_TEMPLATE + "_" + ID + "=" + JdbcTemplateDao.TABLE_TEMPLATE + "." + ID;
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -83,10 +109,10 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
     }
     
     @Override
-    public List<BusinessCard> findById(List<Long> idList) throws DataAccessException {
+    public List<BusinessCard> findById(List<Long> cardIdList) throws DataAccessException {
         
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("ids", idList);
+        params.addValue("ids", cardIdList);
         
         String selectQuery = "SELECT * FROM " + TABLE_BUSINESS_CARD
                 + " WHERE " + ID + " IN (:ids)";
@@ -127,6 +153,67 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
 
         List<BusinessCard> businessCardList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
         return businessCardList;
+    }
+
+    @Override
+    public List<BusinessCardResponse> findByUserNameV2(String firstName, String lastName) throws DataAccessException {
+        
+        String selectQuery = SELECT_QUERY_V2_START
+                + " WHERE " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'" + firstName + "'"
+                + " AND " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'" + lastName + "'"
+                + " AND " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + UNIVERSAL + "=" + "'" + 1 + "'"
+                // case sensitive search for last name
+                + " COLLATE utf8_bin";
+        
+        List<BusinessCardResponse> businessCardResponseList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
+        return businessCardResponseList;
+    }
+
+    @Override
+    public List<BusinessCardResponse> findByIdV2(List<Long> cardIdList) throws DataAccessException {
+        
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("ids", cardIdList);
+        
+        String selectQuery = SELECT_QUERY_V2_START
+                + " WHERE " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + ID + " IN (:ids)";
+
+        NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        List<BusinessCardResponse> retrievedCardList = template.query(selectQuery, params, new JdbcBusinessCardDao.BusinessCardResponseMapper());
+        return retrievedCardList;
+    }
+
+    @Override
+    public List<BusinessCardResponse> findByUserIdV2(long userId) throws DataAccessException {
+        
+        String selectQuery = SELECT_QUERY_V2_START
+                + " WHERE " + JdbcUserDao.TABLE_USER + "_" + ID + " = " + "'" + userId + "'";
+
+        List<BusinessCardResponse> businessCards = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
+        return businessCards;
+    }
+
+    @Override
+    public List<BusinessCardResponse> findByUserEmailV2(String email) throws DataAccessException {
+        
+        String selectQuery = SELECT_QUERY_V2_START
+                + " WHERE " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.EMAIL + "=" + "'" + email + "'"
+                + " AND " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + UNIVERSAL + "=" + "'" + 1 + "'"
+                // case sensitive search for last name
+                + " COLLATE utf8_bin";
+
+        List<BusinessCardResponse> businessCardList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
+        return businessCardList;
+    }
+
+    @Override
+    public BusinessCardResponse findByIdV2(long businessCardId) throws DataAccessException {
+        
+        String selectQuery = SELECT_QUERY_V2_START
+                + " WHERE " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + ID + " = " + "'" + businessCardId + "'";
+
+        BusinessCardResponse businessCard = jdbcTemplate.queryForObject(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
+        return businessCard;
     }
     
     @Override
@@ -250,4 +337,67 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
 
     }
 
+    public static final class BusinessCardResponseMapper implements RowMapper<BusinessCardResponse> {
+
+        @Override
+        public BusinessCardResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+            // fristname, lastname
+            String firstName = rs.getString(JdbcUserDao.FIRSTNAME);
+            String lastName = rs.getString(JdbcUserDao.LASTNAME);
+            
+            // profession
+            Profession p = new Profession();
+            p.setId(rs.getLong(JdbcProfessionDao.TABLE_PROFESSION + "." + ID));
+            p.setName(rs.getString(JdbcProfessionDao.TABLE_PROFESSION + "." + JdbcProfessionDao.NAME));
+            p.setLastUpdated(rs.getTimestamp(JdbcProfessionDao.TABLE_PROFESSION + "." + LAST_UPDATED));
+            p.setCreatedAt(rs.getTimestamp(JdbcProfessionDao.TABLE_PROFESSION + "." +  CREATED_AT));
+            
+            // company
+            Company c = new Company();
+            c.setId(rs.getLong(JdbcCompanyDao.TABLE_COMPANY + "." + ID));
+            c.setName(rs.getString(JdbcCompanyDao.TABLE_COMPANY + "." + JdbcCompanyDao.NAME));
+            c.setLastUpdated(rs.getTimestamp(JdbcCompanyDao.TABLE_COMPANY + "." + LAST_UPDATED));
+            c.setCreatedAt(rs.getTimestamp(JdbcCompanyDao.TABLE_COMPANY + "." +  CREATED_AT));
+            
+            // template
+            Template t = new Template();
+            t.setId(rs.getLong(JdbcTemplateDao.TABLE_TEMPLATE + "." + ID));
+            t.setName(rs.getString(JdbcTemplateDao.TABLE_TEMPLATE + "." + JdbcTemplateDao.NAME));
+            t.setPrimaryColor(rs.getString(JdbcTemplateDao.PRIMARY_COLOR));
+            t.setSecondaryColor(rs.getString(JdbcTemplateDao.SECONDARY_COLOR));
+            t.setLastUpdated(rs.getTimestamp(JdbcTemplateDao.TABLE_TEMPLATE + "." + LAST_UPDATED));
+            t.setCreatedAt(rs.getTimestamp(JdbcTemplateDao.TABLE_TEMPLATE + "." +  CREATED_AT));
+            
+            // business card
+            BusinessCard bc = new BusinessCard();
+            bc.setId(rs.getLong(JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + ID));
+            bc.setUserId(rs.getLong(JdbcUserDao.TABLE_USER + "_" + ID));
+            bc.setTemplateId(rs.getLong(JdbcTemplateDao.TABLE_TEMPLATE + "_" + ID));
+            bc.setProfessionId(rs.getLong(JdbcProfessionDao.TABLE_PROFESSION + "_" + ID));
+            bc.setCompanyId(rs.getLong(JdbcCompanyDao.TABLE_COMPANY + "_" + ID));
+            bc.setEmail1(rs.getString(EMAIL_1));
+            bc.setEmail2(rs.getString(EMAIL_2));
+            bc.setPhoneNumber1(rs.getString(PHONE_NUMBER_1));
+            bc.setPhoneNumber2(rs.getString(PHONE_NUMBER_2));
+            bc.setLinkedIn(rs.getString(LINKED_IN));
+            bc.setWebsite(rs.getString(WEBSITE));
+            bc.setUniversal(rs.getBoolean(UNIVERSAL));
+            bc.setAddress1(rs.getString(ADDRESS_1));
+            bc.setAddress2(rs.getString(ADDRESS_2));
+            bc.setLastUpdated(rs.getTimestamp(JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + LAST_UPDATED));
+            bc.setCreatedAt(rs.getTimestamp(JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + CREATED_AT));
+            
+            // set up BusinessCardResponse here
+            BusinessCardResponse bcr = new BusinessCardResponseImpl();
+            bcr.setUserFullName(firstName, lastName);
+            bcr.setProfession(p);
+            bcr.setCompany(c);
+            bcr.setTemplate(t);
+            bcr.setBusinessCard(bc);
+            
+            return bcr;
+        }
+
+    }
+    
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataAccessException;
 import gr.bc.api.dao.WalletEntryDao;
 import gr.bc.api.model.WalletEntry;
+import gr.bc.api.model.response.BusinessCardResponse;
 
 /**
  *
@@ -28,7 +29,7 @@ public class WalletEntryService {
         walletDao.saveWalletEntries(entries);
     }
     
-    public List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException {
+    public List<BusinessCardResponse> findAllBusinessCardsByUserId(long id) throws DataAccessException {
         return walletDao.findAllBusinessCardsByUserId(id);
     }
     

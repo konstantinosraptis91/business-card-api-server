@@ -1,7 +1,9 @@
 package gr.bc.api.dao;
 
+import static gr.bc.api.dao.JdbcBusinessCardDao.TABLE_BUSINESS_CARD;
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.WalletEntry;
+import gr.bc.api.model.response.BusinessCardResponse;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,15 +68,30 @@ public class JdbcWalletEntryDao implements WalletEntryDao {
     }
     
     @Override
-    public List<BusinessCard> findAllBusinessCardsByUserId(long id) throws DataAccessException {
+    public List<BusinessCardResponse> findAllBusinessCardsByUserId(long id) throws DataAccessException {
         
-        String selectQuery = "SELECT " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + ".*"
-                + " FROM " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD
-                + " INNER JOIN " + TABLE_WALLET_ENTRY
-                + " ON " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + JdbcDao.ID + "=" + TABLE_WALLET_ENTRY + "." + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "_" + JdbcDao.ID
+        String selectQuery = "SELECT " 
+                + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + ","
+                + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + ","
+                + JdbcProfessionDao.TABLE_PROFESSION + ".*" + ","
+                + JdbcCompanyDao.TABLE_COMPANY + ".*" + ","
+                + JdbcTemplateDao.TABLE_TEMPLATE + ".*" + ","
+                + TABLE_BUSINESS_CARD + ".*"
+                + " FROM " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD 
+                
+                + " INNER JOIN " + TABLE_WALLET_ENTRY + " ON " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + JdbcDao.ID + "=" + TABLE_WALLET_ENTRY + "." + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "_" + JdbcDao.ID
+                
+                + " INNER JOIN " + JdbcUserDao.TABLE_USER + " ON " + TABLE_BUSINESS_CARD + "." + JdbcUserDao.TABLE_USER + "_" + JdbcDao.ID + "=" + JdbcUserDao.TABLE_USER + "." + JdbcDao.ID
+                
+                + " INNER JOIN " + JdbcProfessionDao.TABLE_PROFESSION + " ON " + TABLE_BUSINESS_CARD + "." + JdbcProfessionDao.TABLE_PROFESSION + "_" + JdbcDao.ID + "=" + JdbcProfessionDao.TABLE_PROFESSION + "." + JdbcDao.ID
+                
+                + " INNER JOIN " + JdbcCompanyDao.TABLE_COMPANY + " ON " + TABLE_BUSINESS_CARD + "." + JdbcCompanyDao.TABLE_COMPANY + "_" + JdbcDao.ID + "=" + JdbcCompanyDao.TABLE_COMPANY + "." + JdbcDao.ID
+                
+                + " INNER JOIN " + JdbcTemplateDao.TABLE_TEMPLATE + " ON " + TABLE_BUSINESS_CARD + "." + JdbcTemplateDao.TABLE_TEMPLATE + "_" + JdbcDao.ID + "=" + JdbcTemplateDao.TABLE_TEMPLATE + "." + JdbcDao.ID
+                
                 + " WHERE " + TABLE_WALLET_ENTRY + "." + JdbcUserDao.TABLE_USER + "_" + JdbcDao.ID + "=" + "'" + id + "'";
         
-        List<BusinessCard> bcs = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardMapper());
+        List<BusinessCardResponse> bcs = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
         return bcs;
     }
 

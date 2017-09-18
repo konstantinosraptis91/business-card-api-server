@@ -38,7 +38,5 @@ public class Profession extends DBEntity {
                 + ", createdAt=" + createdAt
                 + '}';
     }
-    
-    
        
 }
