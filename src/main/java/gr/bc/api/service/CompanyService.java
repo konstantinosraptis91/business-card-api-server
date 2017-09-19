@@ -31,6 +31,10 @@ public class CompanyService {
         return companyDao.findByName(name);
     }
     
+    public List<Company> findByNameV2(String name) throws DataAccessException {
+        return companyDao.findByNameV2(name);
+    }
+    
     public List<Company> findAllCompanies() throws DataAccessException {
         return companyDao.findAllCompanies();
     }

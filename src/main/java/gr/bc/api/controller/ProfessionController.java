@@ -139,8 +139,7 @@ public class ProfessionController {
         // Get profession by name
         } else {
             try {
-                response = new ArrayList<>();
-                response.add(professionService.findByName(name));
+                response = professionService.findByNameV2(name);
             } catch (DataAccessException ex) {
                 LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
                 if (ex instanceof EmptyResultDataAccessException) {

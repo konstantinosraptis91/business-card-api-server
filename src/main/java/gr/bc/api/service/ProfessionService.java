@@ -31,6 +31,10 @@ public class ProfessionService {
         return professionDao.findByName(name);
     }
     
+    public List<Profession> findByNameV2(String name) throws DataAccessException {
+        return professionDao.findByNameV2(name);
+    }
+    
     public List<Profession> findAllProfessions() throws DataAccessException {
         return professionDao.findAllProfessions();
     }

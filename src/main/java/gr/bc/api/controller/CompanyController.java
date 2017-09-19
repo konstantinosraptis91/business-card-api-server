@@ -139,8 +139,7 @@ public class CompanyController {
         // Get company by name
         } else {
             try {
-                companyList = new ArrayList<>();
-                companyList.add(companyService.findByName(name));
+                companyList = companyService.findByNameV2(name);
             } catch (DataAccessException ex) {
                 LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
                 if (ex instanceof EmptyResultDataAccessException) {

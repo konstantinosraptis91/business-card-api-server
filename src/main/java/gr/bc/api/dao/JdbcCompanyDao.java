@@ -50,6 +50,16 @@ public class JdbcCompanyDao extends JdbcDao implements CompanyDao {
     }
 
     @Override
+    public List<Company> findByNameV2(String name) throws DataAccessException {
+
+        String selectQuery = "SELECT * FROM " + TABLE_COMPANY
+                + " WHERE " + NAME + " LIKE " + "'%" + name + "%'";
+
+        List<Company> companyList = jdbcTemplate.query(selectQuery, new JdbcCompanyDao.CompanyMapper());
+        return companyList;
+    }
+    
+    @Override
     public Company findById(long id) throws DataAccessException {
 
         String selectQuery = "SELECT * FROM " + TABLE_COMPANY

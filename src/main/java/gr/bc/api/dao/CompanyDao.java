@@ -14,6 +14,8 @@ public interface CompanyDao {
         
     Company findByName(String name) throws DataAccessException;
     
+    List<Company> findByNameV2(String name) throws DataAccessException;
+    
     Company findById(long id) throws DataAccessException;
     
     List<Company> findAllCompanies() throws DataAccessException;
