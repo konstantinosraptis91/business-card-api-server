@@ -1,9 +1,15 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.model.BusinessCard;
+import gr.bc.api.model.Company;
+import gr.bc.api.model.Profession;
 import gr.bc.api.model.User;
+import gr.bc.api.model.request.BusinessCardRequest;
+import gr.bc.api.model.request.BusinessCardRequestImpl;
 import gr.bc.api.model.response.BusinessCardResponse;
 import gr.bc.api.service.BusinessCardService;
+import gr.bc.api.service.CompanyService;
+import gr.bc.api.service.ProfessionService;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.WalletEntryService;
 import gr.bc.api.util.Constants;
@@ -44,7 +50,11 @@ public class BusinessCardController {
     private UserService userService;
     @Autowired
     private WalletEntryService walletEntryService;
-
+    @Autowired
+    private CompanyService companyService;
+    @Autowired
+    private ProfessionService professionService;
+    
     // Create user new business card
     @RequestMapping(
             method = RequestMethod.POST,
@@ -81,6 +91,76 @@ public class BusinessCardController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    // Create user new business card
+    @RequestMapping(
+            value = "/v2",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> saveBusinessCardV2(@RequestBody BusinessCardRequestImpl cardRequest,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
+            UriComponentsBuilder ucBuilder) {
+
+        User owner;
+        long id;
+
+        try {
+
+            owner = userService.findById(cardRequest.getBusinessCard().getUserId());
+
+            // if tokens are equal then autorized to proceed and save given business card for owner user
+            if (owner.getToken().equals(authToken)) {
+                
+                Profession p = new Profession();
+                p.setName(cardRequest.getProfessionName());
+                long profId;
+                
+                try {
+                    // try to save profession here
+                    profId = professionService.saveProfession(p);
+                } catch (DataAccessException ex) {
+                    // cannot save prof cause already exist
+                    // retrieve it and use its id
+                    profId = professionService.findByName(p.getName()).getId();
+                }
+                                
+                Company c = new Company();        
+                c.setName(cardRequest.getCompanyName());
+                long compId;
+                
+                try {
+                    // try to save company here        
+                    compId = companyService.saveCompany(c);
+                } catch (DataAccessException ex) {
+                    // cannot save comp cause already exist
+                    // retrieve it and use its id
+                    compId = companyService.findByName(c.getName()).getId();
+                }
+                
+                // set prof id and comp id here
+                cardRequest.getBusinessCard().setProfessionId(profId);
+                cardRequest.getBusinessCard().setCompanyId(compId);
+                // only for testing set template id to 1L
+                cardRequest.getBusinessCard().setTemplateId(1L);
+                
+                id = businessCardService.saveBusinessCard(cardRequest.getBusinessCard());
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (DataAccessException ex) {
+            LOGGER.error("saveBusinessCard: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            if (ex instanceof EmptyResultDataAccessException) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        LOGGER.info("Business Card " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/api/businesscard/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+    
     // Get business card id
     @RequestMapping(
             value = "/{id}",

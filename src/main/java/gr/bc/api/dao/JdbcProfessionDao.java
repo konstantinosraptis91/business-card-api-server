@@ -53,7 +53,11 @@ public class JdbcProfessionDao extends JdbcDao implements ProfessionDao {
     public List<Profession> findByNameV2(String name) throws DataAccessException {
         
         String selectQuery = "SELECT * FROM " + TABLE_PROFESSION 
-                + " WHERE " + NAME + " LIKE " + "'%" + name + "%'";
+                + " WHERE " + NAME + " LIKE " + "'% " + name + " %'"
+                + " OR " + NAME + " LIKE " + "'% " + name + "'"
+                + " OR " + NAME + " LIKE " + "'" + name + " %'"
+                + " OR " + NAME + " = " + "'" + name + "'";
+                
         
         List<Profession> professionList = jdbcTemplate.query(selectQuery, new JdbcProfessionDao.ProfessionMapper());
         return professionList;
