@@ -159,11 +159,24 @@ public class JdbcBusinessCardDao extends JdbcDao implements BusinessCardDao {
     public List<BusinessCardResponse> findByUserNameV2(String firstName, String lastName) throws DataAccessException {
         
         String selectQuery = SELECT_QUERY_V2_START
-                + " WHERE " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'" + firstName + "'"
-                + " AND " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'" + lastName + "'"
-                + " AND " + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + UNIVERSAL + "=" + "'" + 1 + "'"
-                // case sensitive search for last name
-                + " COLLATE utf8_bin";
+                
+                + " WHERE " 
+                
+                + "("
+                + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'% " + firstName + " %'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'% " + firstName + "'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " LIKE " + "'" + firstName + " %'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.FIRSTNAME + " = " + "'" + firstName + "'"
+                
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'% " + lastName + " %'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'% " + lastName + "'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " LIKE " + "'" + lastName + " %'"
+                + " OR " + JdbcUserDao.TABLE_USER + "." + JdbcUserDao.LASTNAME + " = " + "'" + lastName + "'"
+                + ")"
+                + " AND " 
+                + "("
+                + JdbcBusinessCardDao.TABLE_BUSINESS_CARD + "." + UNIVERSAL + "=" + "'" + 1 + "'"
+                + ")";
         
         List<BusinessCardResponse> businessCardResponseList = jdbcTemplate.query(selectQuery, new JdbcBusinessCardDao.BusinessCardResponseMapper());
         return businessCardResponseList;

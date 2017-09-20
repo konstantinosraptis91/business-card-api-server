@@ -82,4 +82,9 @@ public class BusinessCardResponseImpl implements BusinessCardResponse {
         return bc;
     }
 
+    @Override
+    public String toString() {
+        return "BusinessCardResponseImpl{" + "userFullName=" + userFullName + ", p=" + p + ", c=" + c + ", t=" + t + ", bc=" + bc + '}';
+    }
+    
 }

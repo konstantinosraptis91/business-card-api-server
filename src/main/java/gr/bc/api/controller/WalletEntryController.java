@@ -1,6 +1,5 @@
 package gr.bc.api.controller;
 
-import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.User;
 import gr.bc.api.model.WalletEntry;
 import gr.bc.api.model.response.BusinessCardResponse;
@@ -53,7 +52,7 @@ public class WalletEntryController {
             @Valid @RequestBody WalletEntry entry,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         User walletOwner;
-        BusinessCardResponse theBusinessCard;
+        BusinessCardResponse theBusinessCardResponse;
         boolean response;
 
         try {
@@ -62,15 +61,18 @@ public class WalletEntryController {
             // if tokens are equal then autorized to proceed
             if (walletOwner.getToken().equals(authToken)) {
 
-                theBusinessCard = businessCardService.findByIdV2(entry.getBusinessCardId());
+                theBusinessCardResponse = businessCardService.findByIdV2(entry.getBusinessCardId());
+                
+                System.out.println(theBusinessCardResponse.toString());
+                
                 // Check if user trying to add his own card in wallet
-                if (walletOwner.getId() == theBusinessCard.getBusinessCard().getId()) {
+                if (walletOwner.getId() == theBusinessCardResponse.getBusinessCard().getUserId()) {
                     LOGGER.info("It is not allowed for a user to add his own card in his wallet...");
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 
                 // Check if business card not public
-                if (!theBusinessCard.getBusinessCard().isUniversal()) {
+                if (!theBusinessCardResponse.getBusinessCard().isUniversal()) {
                     LOGGER.info("Business card not public...");
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
@@ -93,7 +95,7 @@ public class WalletEntryController {
         }
         
         
-        return response? new ResponseEntity<>(theBusinessCard, HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return response? new ResponseEntity<>(theBusinessCardResponse, HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     
     // Get all business card a user got in his wallet by user id
