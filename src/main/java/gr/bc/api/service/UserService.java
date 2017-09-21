@@ -6,7 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.UserDao;
+import gr.bc.api.service.exception.BadCredentialsException;
+import gr.bc.api.service.exception.ServiceException;
+import gr.bc.api.util.Constants;
+import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  *
@@ -14,6 +23,8 @@ import org.springframework.dao.DataAccessException;
  */
 @Service
 public class UserService {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     
     @Autowired
     @Qualifier("MySQLUser")
@@ -39,8 +50,23 @@ public class UserService {
         return userDao.findById(id);
     }
     
-    public String authenticate(Credentials credentials) throws DataAccessException {
-        return userDao.authenticate(credentials);
+    public User authenticateByToken(String authToken) throws BadCredentialsException {
+        Credentials crs = Credentials.getCredentials(authToken);
+        return authenticateByCredentials(crs);
+    }
+    
+    public User authenticateByCredentials(Credentials crs) throws BadCredentialsException {
+        
+        String newToken;
+        
+        if ((newToken = userDao.authenticate(crs)) != null) {
+            User theUser = findByEmail(crs.getUsername());
+            theUser.setToken(newToken);
+            return theUser;
+        } else {
+            throw new BadCredentialsException("Unauthorized access");
+        }
+
     }
     
 }

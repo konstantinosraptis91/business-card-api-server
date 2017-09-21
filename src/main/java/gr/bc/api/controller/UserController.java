@@ -3,6 +3,8 @@ package gr.bc.api.controller;
 import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
 import gr.bc.api.service.UserService;
+import gr.bc.api.service.exception.BadCredentialsException;
+import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import javax.validation.Valid;
@@ -70,20 +72,17 @@ public class UserController {
             method = RequestMethod.POST)
     public ResponseEntity<String> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
             UriComponentsBuilder ucBuilder) {
-        Credentials crs = Credentials.getCredentials(authToken);
-        String newToken;
         
-        if ((newToken = userService.authenticate(crs)) != null) {
-            User theUser = userService.findByEmail(crs.getUsername());
-            theUser.setToken(newToken);
-            
-            LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        try {
+            User theUser = userService.authenticateByToken(authToken);
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
-            
-            return new ResponseEntity<>(newToken, headers, HttpStatus.OK);
+            LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
+            LOGGER.info("authentication failed", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
-
+        
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
