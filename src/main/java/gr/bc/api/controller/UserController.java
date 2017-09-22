@@ -1,10 +1,10 @@
 package gr.bc.api.controller;
 
-import gr.bc.api.model.Credentials;
 import gr.bc.api.model.User;
 import gr.bc.api.service.UserService;
-import gr.bc.api.service.exception.BadCredentialsException;
+import gr.bc.api.service.exception.ConflictException;
 import gr.bc.api.service.exception.ServiceException;
+import gr.bc.api.service.exception.UnauthorizedException;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import javax.validation.Valid;
@@ -50,19 +50,18 @@ public class UserController {
             UriComponentsBuilder ucBuilder) {
 
         User theUser;
+
         try {
             theUser = userService.saveUser(user);
-        } catch (DataAccessException ex) {
+        } catch (ConflictException ex) {
             LOGGER.error("saveUser: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+
         LOGGER.info("User " + user.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
-        
-        theUser.setPassword(null);
-        theUser.setEmail(null);
-        
+
         return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.CREATED);
     }
 
@@ -72,18 +71,21 @@ public class UserController {
             method = RequestMethod.POST)
     public ResponseEntity<String> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
             UriComponentsBuilder ucBuilder) {
-        
+
+        User theUser;
+
         try {
-            User theUser = userService.authenticateByToken(authToken);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
-            LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.OK);
-        } catch (BadCredentialsException ex) {
-            LOGGER.info("authentication failed", Constants.LOG_DATE_FORMAT.format(new Date()));
+            theUser = userService.authenticateByToken(authToken);
+        } catch (UnauthorizedException ex) {
+            LOGGER.info(ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
+        LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
+
+        return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.OK);
     }
 
     // Update user (Update Account)
@@ -91,28 +93,15 @@ public class UserController {
             value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateUser(@PathVariable("id") long id,
+    public ResponseEntity<?> updateUser(@PathVariable("id") long id,
             @Valid @RequestBody User user,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
         boolean response;
-        User theUser;
 
         try {
-            theUser = userService.findById(id);
-
-            // if tokens are equal then autorized to proceed with update
-            if (theUser.getToken().equals(authToken)) {
-                response = userService.updateUser(id, user);
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-
-        } catch (DataAccessException ex) {
-            LOGGER.error("updateUser: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            response = userService.updateUser(id, user, authToken);
+        } catch (ServiceException ex) {
+            return ex.getResponse();
         }
 
         if (response) {

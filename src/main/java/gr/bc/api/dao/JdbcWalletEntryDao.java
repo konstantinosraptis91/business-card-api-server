@@ -1,7 +1,6 @@
 package gr.bc.api.dao;
 
 import static gr.bc.api.dao.JdbcBusinessCardDao.TABLE_BUSINESS_CARD;
-import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.WalletEntry;
 import gr.bc.api.model.response.BusinessCardResponse;
 import java.sql.PreparedStatement;
