@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import gr.bc.api.dao.UserDao;
-import gr.bc.api.model.authentication.AuthToken;
+import gr.bc.api.model.authentication.TokenProperties;
 import gr.bc.api.service.exception.ConflictException;
 import gr.bc.api.service.exception.NotFoundException;
 import gr.bc.api.service.exception.UnauthorizedException;
 import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.util.CredentialsUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -24,12 +22,17 @@ import org.springframework.dao.EmptyResultDataAccessException;
 @Service
 public class UserService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
     @Autowired
     @Qualifier("MySQLUser")
     private UserDao userDao;
 
+    /**
+     * Save a user (create account)
+     *
+     * @param user The user to be saved
+     * @return
+     * @throws ConflictException
+     */
     public User saveUser(User user) throws ConflictException {
 
         User u;
@@ -43,96 +46,113 @@ public class UserService {
         return u;
     }
 
-    public boolean updateUser(AuthToken authToken, User u) throws ServiceException {
-
-        boolean result;
-
-        try {
-            // authorize user
-            authorizeUser(authToken.getUserId(), authToken.getToken());
-            // update user
-            result = userDao.updateUser(authToken.getUserId(), u);
-            
-        } catch (DataAccessException ex) {
-            if (ex instanceof EmptyResultDataAccessException) {
-                throw new NotFoundException(ex.getMessage());
-            }
-            throw new ConflictException(ex.getMessage());
-        }
-
-        return result;
-    }
-
-    public boolean deleteUserById(AuthToken authToken) throws ServiceException {
-        
-        boolean result;
-
-        try {
-            // authorize user
-            authorizeUser(authToken.getUserId(), authToken.getToken());
-            // delete user
-            result = userDao.deleteUserById(authToken.getUserId());
-            
-        } catch (DataAccessException ex) {
-            if (ex instanceof EmptyResultDataAccessException) {
-                throw new NotFoundException(ex.getMessage());
-            }
-            throw new ConflictException(ex.getMessage());
-        }
-
-        return result;
-    }
-    
     /**
-     * Find user by the user authentication token
-     * 
-     * @param authToken User authToken
-     * @return The user
+     * Update a user (update account)
+     *
+     * @param id User id of the user to be updated
+     * @param token User token of the user to be updated
+     * @param u User to be updated
+     * @return
      * @throws ServiceException
      */
-    public User findById(AuthToken authToken) throws ServiceException {
-              
-        // authorize user
-        authorizeUser(authToken.getUserId(), authToken.getToken());
-        // retrieve user
-        return userDao.findById(authToken.getUserId());
+    public boolean updateUser(long id, String token, User u) throws ServiceException {
+
+        boolean result;
+
+        try {
+            // authorize user
+            authorizeUser(id, token);
+            // update user
+            result = userDao.updateUser(id, u);
+
+        } catch (DataAccessException ex) {
+            if (ex instanceof EmptyResultDataAccessException) {
+                throw new NotFoundException(ex.getMessage());
+            }
+            throw new ConflictException(ex.getMessage());
+        }
+
+        return result;
     }
-    
+
     /**
-     * Authorize a user to proceed
-     * 
-     * @param id User id of the user, for whom 
-     * the user, who owns the token want to be authorized 
+     * Delete User (delete account)
+     *
+     * @param id User id of the user to be deleted
+     * @param token User token of the user to be deleted
+     * @return
+     * @throws ServiceException
+     */
+    public boolean deleteUserById(long id, String token) throws ServiceException {
+
+        boolean result;
+
+        try {
+            // authorize user
+            authorizeUser(id, token);
+            // delete user
+            result = userDao.deleteUserById(id);
+
+        } catch (DataAccessException ex) {
+            if (ex instanceof EmptyResultDataAccessException) {
+                throw new NotFoundException(ex.getMessage());
+            }
+            throw new ConflictException(ex.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * Find user
+     *
+     * @param id User id of the user to be retrieved
+     * @param token User token of the user to be retrieved
+     * @return
+     * @throws ServiceException
+     */
+    public User findById(long id, String token) throws ServiceException {
+
+        // authorize user
+        authorizeUser(id, token);
+        // retrieve user
+        return userDao.findById(id);
+    }
+
+    /**
+     * Authorize a user
+     *
+     * @param id User id of the user, for whom the user, who owns the token want to be authorized
      * @param token User token
      * @throws NotFoundException User with provided id could't find
      */
     public void authorizeUser(long id, String token) throws ServiceException {
-        
+
         User originalUser;
-        
+
         // find user with id = authTokens's userId
         try {
             originalUser = userDao.findById(id);
         } catch (DataAccessException ex) {
             throw new NotFoundException(ex.getMessage());
         }
-        
+
         // Check if retrieved's user token NOT matching with authToken token then unauthorized access
         if (!originalUser.getToken().equals(token)) {
-           throw new UnauthorizedException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
-        
+
     }
-    
+
     /**
      * By giving a valid credentials token you get back an authentication token
      *
      * @param credentialsToken The credentials (username & password) as a token. Credentials token form is
      * usernameChunk:passwordChunk and uses base64 coding
-     * @return authentication token containing token and user id
+     * @return token properties containing token and user id
      * @throws ServiceException
      */
-    public AuthToken authenticateByCredentialsToken(String credentialsToken) throws ServiceException {
+    public TokenProperties authenticateByCredentialsToken(String credentialsToken) throws ServiceException {
         return authenticateByCredentials(CredentialsUtils.extractCredentials(credentialsToken));
     }
 
@@ -140,33 +160,33 @@ public class UserService {
      * By giving a valid credentials you get back an authentication token
      *
      * @param crs The credentials object with username and password
-     * @return authentication token containing token and user id
-     * @throws ServiceException 
+     * @return token properties containing token and user id
+     * @throws ServiceException
      */
-    public AuthToken authenticateByCredentials(Credentials crs) throws ServiceException {
+    public TokenProperties authenticateByCredentials(Credentials crs) throws ServiceException {
 
-        AuthToken at;
+        TokenProperties properties;
         String newToken;
 
         if ((newToken = userDao.authenticate(crs)) != null) {
 
             User theUser;
-            at = new AuthToken();
+            properties = new TokenProperties();
 
             try {
                 theUser = userDao.findByEmail(crs.getUsername());
-                at.setUserId(theUser.getId());
+                properties.setId(theUser.getId());
             } catch (DataAccessException ex) {
                 throw new NotFoundException(ex.getMessage());
             }
 
-            at.setToken(newToken);
+            properties.setToken(newToken);
 
         } else {
             throw new UnauthorizedException("Unauthorized");
         }
 
-        return at;
+        return properties;
     }
 
 }

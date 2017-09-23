@@ -14,8 +14,6 @@ import gr.bc.api.service.exception.NotFoundException;
 import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.service.exception.UnauthorizedException;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 /**
@@ -24,8 +22,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
  */
 @Service
 public class WalletEntryService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WalletEntryService.class);
 
     @Autowired
     @Qualifier("MySQLWallet")
@@ -36,10 +32,11 @@ public class WalletEntryService {
     private BusinessCardService businessCardService;
 
     /**
+     * Save a wallet entry to the user's wallet
      *
-     * @param id User id
-     * @param token User token
-     * @param entry
+     * @param id User id of the user who owns the wallet
+     * @param token User token of the user who owns the wallet
+     * @param entry Wallet entry to be saved in user's wallet
      * @return
      * @throws ServiceException
      */
@@ -79,12 +76,16 @@ public class WalletEntryService {
         return cardResponse;
     }
 
-    public void saveWalletEntries(List<WalletEntry> entries) throws DataAccessException {
-        walletDao.saveWalletEntries(entries);
-    }
-
+    /**
+     * Find all the entries of the user's wallet
+     *
+     * @param id User id of the user who owns the wallet
+     * @param token User token of the user who owns the wallet
+     * @return
+     * @throws ServiceException
+     */
     public List<BusinessCardResponse> findAllBusinessCardsByUserId(long id, String token) throws ServiceException {
-        
+
         List<BusinessCardResponse> cardResponseList;
 
         try {
@@ -112,14 +113,18 @@ public class WalletEntryService {
         return cardResponseList;
     }
 
-    public WalletEntry find(WalletEntry entry) throws DataAccessException {
-        return walletDao.find(entry);
-    }
-
+    /**
+     * Delete a specific wallet entry for the user's wallet
+     *
+     * @param entry The entry to be deleted from the user's wallet
+     * @param token User token of the user who owns the wallet
+     * @return
+     * @throws ServiceException
+     */
     public boolean deleteWalletEntry(WalletEntry entry, String token) throws ServiceException {
-        
+
         boolean result;
-        
+
         try {
             // authorize user for this specific wallet
             authorizeForWallet(entry.getUserId(), token);
@@ -135,6 +140,13 @@ public class WalletEntryService {
         return result;
     }
 
+    /**
+     * Removes a business card from all wallets, so it can be deleted from business card table without conflicts
+     *
+     * @param id
+     * @return
+     * @throws DataAccessException
+     */
     public boolean deleteWalletEntryByBusinessCardId(long id) throws DataAccessException {
         return walletDao.deleteWalletEntryByBusinessCardId(id);
     }

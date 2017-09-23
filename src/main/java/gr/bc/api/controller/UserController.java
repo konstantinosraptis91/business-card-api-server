@@ -1,7 +1,7 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.model.User;
-import gr.bc.api.model.authentication.AuthToken;
+import gr.bc.api.model.authentication.TokenProperties;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.exception.ConflictException;
 import gr.bc.api.service.exception.ServiceException;
@@ -66,20 +66,20 @@ public class UserController {
     public ResponseEntity<?> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String credentialsToken,
             UriComponentsBuilder ucBuilder) {
 
-        AuthToken at;
+        TokenProperties properties;
 
         try {
-            at = userService.authenticateByCredentialsToken(credentialsToken);
+            properties = userService.authenticateByCredentialsToken(credentialsToken);
         } catch (ServiceException ex) {
             LOGGER.info(ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return ex.getResponse();
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(at.getUserId()).toUri());
-        LOGGER.info("User with id: " + at.getUserId() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(properties.getId()).toUri());
+        LOGGER.info("User with id: " + properties.getId() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
 
-        return new ResponseEntity<>(at.getToken(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(properties.getToken(), headers, HttpStatus.OK);
     }
 
     // Update user (Update Account)
@@ -91,11 +91,10 @@ public class UserController {
             @Valid @RequestBody User user,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
         
-        AuthToken at = new AuthToken(id, token);
         boolean response;
 
         try {
-            response = userService.updateUser(at, user);
+            response = userService.updateUser(id, token, user);
         } catch (ServiceException ex) {
             return ex.getResponse();
         }
@@ -114,11 +113,10 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable("id") long id,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
         
-        AuthToken at = new AuthToken(id, token);
         boolean result;
         
         try {
-            result = userService.deleteUserById(at);
+            result = userService.deleteUserById(id, token);
         } catch (ServiceException ex) {
             LOGGER.error("deleteUserById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return ex.getResponse();
@@ -139,11 +137,10 @@ public class UserController {
     public ResponseEntity<?> findById(@PathVariable("id") long id,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
         
-        AuthToken at = new AuthToken(id, token);
         User u;
         
         try {
-            u = userService.findById(at);
+            u = userService.findById(id, token);
 
         } catch (ServiceException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));

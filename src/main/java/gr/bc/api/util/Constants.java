@@ -12,6 +12,5 @@ public class Constants {
        
     public static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-   
-    public static final String DEFAULT_IMAGE_PATH = "default_image";
+    
 }

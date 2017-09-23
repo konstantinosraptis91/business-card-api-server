@@ -24,6 +24,13 @@ public class CompanyService {
     @Qualifier("MySQLCompany")
     private CompanyDao companyDao;
 
+    /**
+     * Save a company
+     *
+     * @param company The company to be saved
+     * @return The id of the new saved company
+     * @throws ServiceException
+     */
     public long saveCompany(Company company) throws ServiceException {
 
         long id;
@@ -37,6 +44,14 @@ public class CompanyService {
         return id;
     }
 
+    /**
+     * Update a company
+     *
+     * @param id The id of the company update will affect
+     * @param company The company to be updated
+     * @return
+     * @throws ServiceException
+     */
     public boolean updateCompany(long id, Company company) throws ServiceException {
 
         boolean result;
@@ -53,8 +68,15 @@ public class CompanyService {
         return result;
     }
 
+    /**
+     * Delete a company
+     *
+     * @param id The id of the company delete will affect
+     * @return
+     * @throws ServiceException
+     */
     public boolean deleteCompanyById(long id) throws ServiceException {
-        
+
         boolean result;
 
         try {
@@ -69,8 +91,15 @@ public class CompanyService {
         return result;
     }
 
+    /**
+     * Find a company
+     *
+     * @param id The company id
+     * @return
+     * @throws ServiceException
+     */
     public Company findById(long id) throws ServiceException {
-        
+
         Company c;
 
         try {
@@ -78,12 +107,19 @@ public class CompanyService {
         } catch (DataAccessException ex) {
             throw new NotFoundException(ex.getMessage());
         }
-        
+
         return c;
     }
 
+    /**
+     * Find a company
+     *
+     * @param name The company name
+     * @return
+     * @throws ServiceException
+     */
     public Company findByName(String name) throws ServiceException {
-        
+
         Company c;
 
         try {
@@ -91,12 +127,19 @@ public class CompanyService {
         } catch (DataAccessException ex) {
             throw new NotFoundException(ex.getMessage());
         }
-        
+
         return c;
     }
 
+    /**
+     * Search for a company/companies with a similar name to the given parameter
+     *
+     * @param name The name of the company
+     * @return
+     * @throws ServiceException
+     */
     public List<Company> searchByName(String name) throws ServiceException {
-        
+
         List<Company> cList;
 
         try {
@@ -104,12 +147,23 @@ public class CompanyService {
         } catch (DataAccessException ex) {
             throw new NotFoundException(ex.getMessage());
         }
-        
+
         return cList;
     }
-    
+
+    /**
+     * This method has to cases
+     *
+     * (1) For a null name parameter, find all companies
+     *
+     * (2) For a non null name parameter, find the company for that name
+     *
+     * @param name The company name
+     * @return
+     * @throws ServiceException
+     */
     public List<Company> find(String name) throws ServiceException {
-        
+
         List<Company> cList = new ArrayList<>();
 
         if (name == null) {
@@ -121,9 +175,15 @@ public class CompanyService {
 
         return cList;
     }
-    
+
+    /**
+     * Find all saved companies
+     * 
+     * @return
+     * @throws ServiceException 
+     */
     public List<Company> findAllCompanies() throws ServiceException {
-        
+
         List<Company> cList;
 
         try {
@@ -131,7 +191,7 @@ public class CompanyService {
         } catch (DataAccessException ex) {
             throw new NotFoundException(ex.getMessage());
         }
-        
+
         return cList;
     }
 

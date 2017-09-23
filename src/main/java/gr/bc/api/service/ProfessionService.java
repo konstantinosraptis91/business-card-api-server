@@ -174,7 +174,11 @@ public class ProfessionService {
     }
 
     /**
-     * In case name is null find all professions, in other case find profession by name
+     * This method has to cases
+     *
+     * (1) For a null name parameter, find all professions
+     *
+     * (2) For a non null name parameter, find the profession for that name
      *
      * @param name The profession name
      * @return

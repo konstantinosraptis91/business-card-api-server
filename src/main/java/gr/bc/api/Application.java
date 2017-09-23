@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Konstantinos Raptis
  */
 @SpringBootApplication
-//@EnableConfigurationProperties(StorageProperties.class)
 public class Application {
     /**
      * @param args the command line arguments
