@@ -1,9 +1,6 @@
 package gr.bc.api.dao;
 
-import static gr.bc.api.dao.JdbcCompanyDao.NAME;
 import static gr.bc.api.dao.JdbcDao.ID;
-import static gr.bc.api.dao.JdbcProfessionDao.NAME;
-import static gr.bc.api.dao.JdbcTemplateDao.NAME;
 import gr.bc.api.model.BusinessCard;
 import gr.bc.api.model.Company;
 import gr.bc.api.model.Profession;

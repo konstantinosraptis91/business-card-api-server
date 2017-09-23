@@ -1,10 +1,10 @@
 package gr.bc.api.controller;
 
 import gr.bc.api.model.User;
+import gr.bc.api.model.authentication.AuthToken;
 import gr.bc.api.service.UserService;
 import gr.bc.api.service.exception.ConflictException;
 import gr.bc.api.service.exception.ServiceException;
-import gr.bc.api.service.exception.UnauthorizedException;
 import gr.bc.api.util.Constants;
 import java.util.Date;
 import javax.validation.Valid;
@@ -12,8 +12,6 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,55 +35,51 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
-//    @Autowired
-//    private StorageService storageService;  
 
     // Save user (Create Account)    
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> saveUser(@Valid @RequestBody User user,
-            /*@RequestParam(value = "file", required = false) MultipartFile file,*/
-            UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<?> saveUser(@Valid @RequestBody User user, UriComponentsBuilder ucBuilder) {
 
-        User theUser;
+        User u;
 
         try {
-            theUser = userService.saveUser(user);
+            u = userService.saveUser(user);
         } catch (ConflictException ex) {
             LOGGER.error("saveUser: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
         LOGGER.info("User " + user.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
+        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(u.getId()).toUri());
 
-        return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(u.getToken(), headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(
             value = "/authenticate",
             produces = MediaType.TEXT_PLAIN_VALUE,
             method = RequestMethod.POST)
-    public ResponseEntity<String> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken,
+    public ResponseEntity<?> authenticate(@RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String credentialsToken,
             UriComponentsBuilder ucBuilder) {
 
-        User theUser;
+        AuthToken at;
 
         try {
-            theUser = userService.authenticateByToken(authToken);
-        } catch (UnauthorizedException ex) {
+            at = userService.authenticateByCredentialsToken(credentialsToken);
+        } catch (ServiceException ex) {
             LOGGER.info(ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return ex.getResponse();
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(theUser.getId()).toUri());
-        LOGGER.info("User " + theUser.toString() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(at.getUserId()).toUri());
+        LOGGER.info("User with id: " + at.getUserId() + " authenticated", Constants.LOG_DATE_FORMAT.format(new Date()));
 
-        return new ResponseEntity<>(theUser.getToken(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(at.getToken(), headers, HttpStatus.OK);
     }
 
     // Update user (Update Account)
@@ -95,11 +89,13 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUser(@PathVariable("id") long id,
             @Valid @RequestBody User user,
-            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
+        
+        AuthToken at = new AuthToken(id, token);
         boolean response;
 
         try {
-            response = userService.updateUser(id, user, authToken);
+            response = userService.updateUser(at, user);
         } catch (ServiceException ex) {
             return ex.getResponse();
         }
@@ -115,34 +111,24 @@ public class UserController {
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteUserById(@PathVariable("id") long id,
-            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
-        boolean response;
-        User theUser;
-
+    public ResponseEntity<?> deleteUserById(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
+        
+        AuthToken at = new AuthToken(id, token);
+        boolean result;
+        
         try {
-            theUser = userService.findById(id);
-
-            // if tokens are equal then autorized to proceed with deletion
-            if (theUser.getToken().equals(authToken)) {
-                response = userService.deleteUserById(id);
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-
-        } catch (DataAccessException ex) {
+            result = userService.deleteUserById(at);
+        } catch (ServiceException ex) {
             LOGGER.error("deleteUserById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        if (response) {
+        if (result) {
             LOGGER.info("User " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
         }
 
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return result ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // Get user by id
@@ -150,38 +136,21 @@ public class UserController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> findById(@PathVariable("id") long id,
-            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String authToken) {
-        User theUser;
-
+    public ResponseEntity<?> findById(@PathVariable("id") long id,
+            @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
+        
+        AuthToken at = new AuthToken(id, token);
+        User u;
+        
         try {
-            theUser = userService.findById(id);
+            u = userService.findById(at);
 
-            // Check if asking User has the right to claim asked user 
-            if (theUser.getToken().equals(authToken)) {
-
-                User response = new User();
-                response.setId(theUser.getId());
-                response.setFirstName(theUser.getFirstName());
-                response.setLastName(theUser.getLastName());
-                response.setLastUpdated(theUser.getLastUpdated());
-                response.setCreatedAt(theUser.getCreatedAt());
-
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            }
-
-        } catch (DataAccessException ex) {
+        } catch (ServiceException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        
+        return new ResponseEntity<>(u, HttpStatus.OK);
     }
 
-//    @ExceptionHandler(StorageFileNotFoundException.class)
-//    public ResponseEntity handleStorageFileNotFound(StorageFileNotFoundException exc) {
-//        return ResponseEntity.notFound().build();
-//    }
 }

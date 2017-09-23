@@ -2,8 +2,8 @@ package gr.bc.api.controller;
 
 import gr.bc.api.model.Template;
 import gr.bc.api.service.TemplateService;
+import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.util.Constants;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
@@ -11,8 +11,6 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,17 +39,18 @@ public class TemplateController {
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveTemplate(@RequestBody Template template,
+    public ResponseEntity<?> saveTemplate(@RequestBody Template template,
             UriComponentsBuilder ucBuilder) {
 
         long id;
-        
+
         try {
             id = templateService.saveTemplate(template);
-        } catch (DataAccessException ex) {
+        } catch (ServiceException ex) {
             LOGGER.error("saveTemplate: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
+
         LOGGER.info("Template " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/template/{id}").buildAndExpand(id).toUri());
@@ -63,52 +62,37 @@ public class TemplateController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Template> findById(@PathVariable("id") long id) {
-        Template theTemplate;
+    public ResponseEntity<?> findById(@PathVariable("id") long id) {
+
+        Template t;
 
         try {
-            theTemplate = templateService.findById(id);
-        } catch (DataAccessException ex) {
+            t = templateService.findById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-        return new ResponseEntity<>(theTemplate, HttpStatus.OK);
+
+        return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
     // find
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Template>> find(@RequestParam(value = "name", required = false) String name) {
-        List<Template> templateList;
+    public ResponseEntity<?> find(@RequestParam(value = "name", required = false) String name) {
 
-        // Get all templates
-        if (name == null) {
-            try {
-                templateList = templateService.findAllTemplates();
-            } catch (DataAccessException ex) {
-                LOGGER.error("findAllTemplates: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-            // Get template by name
-        } else {
-            try {
-                templateList = new ArrayList<>();
-                templateList.add(templateService.findByName(name));
-            } catch (DataAccessException ex) {
-                LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                if (ex instanceof EmptyResultDataAccessException) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
+        List<Template> tList;
+
+        try {
+            tList = templateService.find(name);
+        } catch (ServiceException ex) {
+            LOGGER.error("find: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return ex.getResponse();
         }
 
-        return templateList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(templateList, HttpStatus.OK);
+        return tList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(tList, HttpStatus.OK);
     }
 
     // Get all the templates by given primary color
@@ -116,18 +100,19 @@ public class TemplateController {
             value = "/primarycolor/{primaryColor}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Template>> findByPrimaryColor(@NotNull @PathVariable("primaryColor") String primaryColor) {
-        List<Template> templateList;
+    public ResponseEntity<?> findByPrimaryColor(@NotNull @PathVariable("primaryColor") String primaryColor) {
+        
+        List<Template> tList;
 
         try {
-            templateList = templateService.findByPrimaryColor(primaryColor);
-        } catch (DataAccessException ex) {
+            tList = templateService.findByPrimaryColor(primaryColor);
+        } catch (ServiceException ex) {
             LOGGER.error("findByPrimaryColor: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        return templateList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(templateList, HttpStatus.OK);
+        return tList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(tList, HttpStatus.OK);
     }
 
     // Get all the templates by given secondary color
@@ -135,39 +120,35 @@ public class TemplateController {
             value = "/secondarycolor/{secondaryColor}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Template>> findBySecondaryColor(@NotNull @PathVariable("secondaryColor") String secondaryColor) {
-        List<Template> templateList;
+    public ResponseEntity<?> findBySecondaryColor(@NotNull @PathVariable("secondaryColor") String secondaryColor) {
+        
+        List<Template> tList;
 
         try {
-            templateList = templateService.findBySecondaryColor(secondaryColor);
-        } catch (DataAccessException ex) {
+            tList = templateService.findBySecondaryColor(secondaryColor);
+        } catch (ServiceException ex) {
             LOGGER.error("findBySecondaryColor: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        return templateList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(templateList, HttpStatus.OK);
+        return tList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(tList, HttpStatus.OK);
     }
 
     // Delete template
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteTemplateById(@PathVariable("id") long id) {
-        boolean response;
+    public ResponseEntity<?> deleteTemplateById(@PathVariable("id") long id) {
 
         try {
-            response = templateService.deleteTemplateById(id);
-        } catch (DataAccessException ex) {
+            templateService.deleteTemplateById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("deleteTemplateById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        if (response) {
-            LOGGER.info("Template with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Update Template
@@ -175,22 +156,17 @@ public class TemplateController {
             value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateTemplate(@PathVariable("id") long id,
+    public ResponseEntity<?> updateTemplate(@PathVariable("id") long id,
             @Valid @RequestBody Template template) {
-        boolean response;
 
         try {
-            response = templateService.updateTemplate(id, template);
-        } catch (DataAccessException ex) {
+            templateService.updateTemplate(id, template);
+        } catch (ServiceException ex) {
             LOGGER.error("updateTemplate: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        if (response) {
-            LOGGER.info("Template " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

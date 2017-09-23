@@ -14,7 +14,7 @@ public interface ProfessionDao {
         
     Profession findByName(String name) throws DataAccessException;
     
-    List<Profession> findByNameV2(String name) throws DataAccessException;
+    List<Profession> searchByName(String name) throws DataAccessException;
     
     Profession findById(long id) throws DataAccessException;
     

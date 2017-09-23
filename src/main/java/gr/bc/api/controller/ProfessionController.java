@@ -2,16 +2,14 @@ package gr.bc.api.controller;
 
 import gr.bc.api.model.Profession;
 import gr.bc.api.service.ProfessionService;
+import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.util.Constants;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,17 +38,18 @@ public class ProfessionController {
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveProfession(@Valid @RequestBody Profession profession,
+    public ResponseEntity<?> saveProfession(@Valid @RequestBody Profession profession,
             UriComponentsBuilder ucBuilder) {
 
         long id;
         
         try {
             id = professionService.saveProfession(profession);
-        } catch (DataAccessException ex) {
+        } catch (ServiceException ex) {
             LOGGER.error("saveProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
+        
         LOGGER.info("Profession with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/profession/{id}").buildAndExpand(id).toUri());
@@ -62,43 +61,35 @@ public class ProfessionController {
             value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateProfession(@PathVariable("id") long id, 
+    public ResponseEntity<?> updateProfession(@PathVariable("id") long id, 
             @Valid @RequestBody Profession profession) {
-        boolean response;
 
         try {
-            response = professionService.updateProfession(id, profession);
-        } catch (DataAccessException ex) {
+            professionService.updateProfession(id, profession);
+        } catch (ServiceException ex) {
             LOGGER.error("updateProfession: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-
-        if (response) {
-            LOGGER.info("Profession with id " + profession.getId() + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        
+        LOGGER.info("Profession with id " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Delete profession
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteProfessionById(@PathVariable("id") long id) {
-        boolean response;
+    public ResponseEntity<?> deleteProfessionById(@PathVariable("id") long id) {
 
         try {
-            response = professionService.deleteProfessionById(id);
-        } catch (DataAccessException ex) {
+            professionService.deleteProfessionById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("deleteProfessionById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        if (response) {
-            LOGGER.info("Profession with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        LOGGER.info("Profession with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Get profession by id
@@ -106,51 +97,58 @@ public class ProfessionController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Profession> findById(@PathVariable("id") long id) {
-        Profession response;
+    public ResponseEntity<?> findById(@PathVariable("id") long id) {
+        
+        Profession p;
 
         try {
-            response = professionService.findById(id);
-        } catch (DataAccessException ex) {
+            p = professionService.findById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        
+        LOGGER.info("Profession with id " + id + " retrieved", Constants.LOG_DATE_FORMAT.format(new Date()));
+        return new ResponseEntity<>(p, HttpStatus.OK);
     }
 
     // find
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Profession>> find(@RequestParam(value = "name", required = false) String name) {
-        List<Profession> response;
-
-        // Get all professions
-        if (name == null) {
-            try {
-                response = professionService.findAllProfessions();
-            } catch (DataAccessException ex) {
-                LOGGER.error("findAllProfessions: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-        // Get profession by name
-        } else {
-            try {
-                response = professionService.findByNameV2(name);
-            } catch (DataAccessException ex) {
-                LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                if (ex instanceof EmptyResultDataAccessException) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
+    public ResponseEntity<?> find(@RequestParam(value = "name", required = false) String name) {
+        
+        List<Profession> pList;
+        
+        try {
+            pList = professionService.find(name);
+        } catch (ServiceException ex) {
+            LOGGER.error("find: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return ex.getResponse();
         }
-
-        return response.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(response, HttpStatus.OK);
+        
+        return pList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(pList, HttpStatus.OK); 
     }
 
+    // search
+    @RequestMapping(
+            value = "/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchByName(@RequestParam(value = "name", required = true) String name) {
+        
+        List<Profession> pList;
+        
+        try {
+            pList = professionService.searchByName(name);
+        } catch (ServiceException ex) {
+            LOGGER.error("find: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return ex.getResponse();
+        }
+        
+        return pList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(pList, HttpStatus.OK); 
+    }
+    
 }

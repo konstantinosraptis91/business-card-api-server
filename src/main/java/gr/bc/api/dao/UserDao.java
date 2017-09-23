@@ -1,6 +1,6 @@
 package gr.bc.api.dao;
 
-import gr.bc.api.model.Credentials;
+import gr.bc.api.model.authentication.Credentials;
 import gr.bc.api.model.User;
 import org.springframework.dao.DataAccessException;
 

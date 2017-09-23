@@ -50,7 +50,7 @@ public class JdbcProfessionDao extends JdbcDao implements ProfessionDao {
     }
 
     @Override
-    public List<Profession> findByNameV2(String name) throws DataAccessException {
+    public List<Profession> searchByName(String name) throws DataAccessException {
         
         String selectQuery = "SELECT * FROM " + TABLE_PROFESSION 
                 + " WHERE " + NAME + " LIKE " + "'% " + name + " %'"

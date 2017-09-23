@@ -2,16 +2,14 @@ package gr.bc.api.controller;
 
 import gr.bc.api.model.Company;
 import gr.bc.api.service.CompanyService;
+import gr.bc.api.service.exception.ServiceException;
 import gr.bc.api.util.Constants;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,17 +38,18 @@ public class CompanyController {
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveCompany(@Valid @RequestBody Company company,
+    public ResponseEntity<?> saveCompany(@Valid @RequestBody Company company,
             UriComponentsBuilder ucBuilder) {
 
         long id;
         
         try {
             id = companyService.saveCompany(company);
-        } catch (DataAccessException ex) {
+        } catch (ServiceException ex) {
             LOGGER.error("saveCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
+        
         LOGGER.info("Company with id " + id + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/company/{id}").buildAndExpand(id).toUri());
@@ -62,43 +61,34 @@ public class CompanyController {
             value = "/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateCompany(@PathVariable("id") long id, 
+    public ResponseEntity<?> updateCompany(@PathVariable("id") long id, 
             @Valid @RequestBody Company company) {
-        boolean response;
-
+        
         try {
-            response = companyService.updateCompany(id, company);
-        } catch (DataAccessException ex) {
+            companyService.updateCompany(id, company);
+        } catch (ServiceException ex) {
             LOGGER.error("updateCompany: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-
-        if (response) {
-            LOGGER.info("Company with id " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        
+        LOGGER.info("Company with id " + id + " updated", Constants.LOG_DATE_FORMAT.format(new Date()));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Delete company
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteCompanyById(@PathVariable("id") long id) {
-        boolean response;
-
+    public ResponseEntity<?> deleteCompanyById(@PathVariable("id") long id) {
+        
         try {
-            response = companyService.deleteCompanyById(id);
-        } catch (DataAccessException ex) {
+            companyService.deleteCompanyById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("deleteCompanyById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
 
-        if (response) {
-            LOGGER.info("Company with id " + id + " deleted", Constants.LOG_DATE_FORMAT.format(new Date()));
-        }
-
-        return response ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Get company by id
@@ -106,51 +96,57 @@ public class CompanyController {
             value = "/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Company> findById(@PathVariable("id") long id) {
-        Company theCompany;
+    public ResponseEntity<?> findById(@PathVariable("id") long id) {
+        
+        Company c;
 
         try {
-            theCompany = companyService.findById(id);
-        } catch (DataAccessException ex) {
+            c = companyService.findById(id);
+        } catch (ServiceException ex) {
             LOGGER.error("findById: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-            if (ex instanceof EmptyResultDataAccessException) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return ex.getResponse();
         }
-        return new ResponseEntity<>(theCompany, HttpStatus.OK);
+        
+        return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
     // find
     @RequestMapping(
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Company>> find(@RequestParam(value = "name", required = false) String name) {
-        List<Company> companyList;
-
-        // Get all companies
-        if (name == null) {
-            try {
-                companyList = companyService.findAllCompanies();
-            } catch (DataAccessException ex) {
-                LOGGER.error("findAllCompanies: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
-        // Get company by name
-        } else {
-            try {
-                companyList = companyService.findByNameV2(name);
-            } catch (DataAccessException ex) {
-                LOGGER.error("findByName: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
-                if (ex instanceof EmptyResultDataAccessException) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
-            }
+    public ResponseEntity<?> find(@RequestParam(value = "name", required = false) String name) {
+        
+        List<Company> cList;
+        
+        try {
+            cList = companyService.find(name);
+        } catch (ServiceException ex) {
+            LOGGER.error("find: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return ex.getResponse();
         }
-
-        return companyList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(companyList, HttpStatus.OK);
+        
+        return cList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(cList, HttpStatus.OK);
     }
-
+    
+    // search
+    @RequestMapping(
+            value = "/search",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchByName(@RequestParam(value = "name", required = true) String name) {
+        
+        List<Company> cList;
+        
+        try {
+            cList = companyService.searchByName(name);
+        } catch (ServiceException ex) {
+            LOGGER.error("search: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            return ex.getResponse();
+        }
+        
+        return cList.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(cList, HttpStatus.OK); 
+    }
+    
 }
