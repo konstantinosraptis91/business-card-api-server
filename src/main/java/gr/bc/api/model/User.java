@@ -87,19 +87,8 @@ public class User extends DBEntity {
     }
 
     @Override
-    @SuppressWarnings("ReplaceAllDot")
     public String toString() {
-        return "User{"
-                + "id=" + id
-                + ", email=" + email 
-                + ", password=" + password != null ? password.replaceAll(".", "*") : "*"
-                + ", firstName=" + firstName 
-                + ", lastName=" + lastName 
-                + ", token=" + token 
-                + ", fileName=" + fileName
-                + ", lastUpdated=" + lastUpdated
-                + ", createdAt=" + createdAt
-                + '}';
+        return "User{" + "email=" + email + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", token=" + token + ", fileName=" + fileName + '}';
     }
-          
+    
 }

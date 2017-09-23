@@ -52,7 +52,7 @@ public class UserController {
             return ex.getResponse();
         }
 
-        LOGGER.info("User " + user.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
+        LOGGER.info("User " + u.toString() + " created", Constants.LOG_DATE_FORMAT.format(new Date()));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(u.getId()).toUri());
 

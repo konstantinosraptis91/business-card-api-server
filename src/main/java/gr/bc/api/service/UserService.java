@@ -36,9 +36,6 @@ public class UserService {
 
         try {
             u = userDao.saveUser(user);
-            // setting those fields to null for security reasons
-            u.setPassword(null);
-            u.setEmail(null);
         } catch (DataAccessException ex) {
             throw new ConflictException(ex.getMessage());
         }

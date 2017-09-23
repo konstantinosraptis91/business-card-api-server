@@ -209,12 +209,12 @@ public class BusinessCardController {
     public ResponseEntity<?> findByUserIdV2(@PathVariable("id") long id,
             @NotNull @RequestHeader(Constants.AUTHORIZATION_HEADER_KEY) String token) {
 
-        List<BusinessCard> cardResponseList;
+        List<BusinessCardResponse> cardResponseList;
 
         try {
-            cardResponseList = businessCardService.findByUserId(id, token);
+            cardResponseList = businessCardService.findByUserIdV2(id, token);
         } catch (ServiceException ex) {
-            LOGGER.error("findByUserId: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
+            LOGGER.error("findByUserIdV2: " + ex.getMessage(), Constants.LOG_DATE_FORMAT.format(new Date()));
             return ex.getResponse();
         }
 
